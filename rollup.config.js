@@ -1,0 +1,30 @@
+import json from 'rollup-plugin-json';
+import nodeResolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+import babel from 'rollup-plugin-babel';
+import babili from 'rollup-plugin-babili';
+
+let external = []; // process.env.production ?
+
+export default {
+	entry: 'src/index.js',
+	moduleName: 'tmlabs',
+	plugins: [
+		json(),
+		commonjs(),
+    nodeResolve({
+			jsnext: true,
+    }),
+    babel(),
+    process.env.production ? babili({
+      comments: false,
+      banner: '/**\r* Tempico Labs SDK v0.1.0 \r*/',
+    }) : false,
+  ],
+	external: external,
+	// globals: {
+	// 	'acorn/dist/acorn.js': 'acorn',
+	// 	'magic-string': 'MagicString'
+	// },
+	sourceMap: true
+};

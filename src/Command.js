@@ -4,15 +4,26 @@ import FetchCommand from './command/FetchCommand';
 export default class Command extends AbstractCommand{
   constructor(action, params) {
     super(action, params);
-    // console.log('CLASS', this.class);
+    if(!this.instance) {
+      throw new TypeError("Action not found");
+    }
   }
-  get class() {
-    switch (this.action) {
+  static getClass(action = false) {
+    if(!action) throw new ReferenceError("Action param empty");
+    switch (action) {
       case 'fetch':
-        return new FetchCommand(this.params);
+        return FetchCommand;
       default:
         throw new ReferenceError('Action not found');
     }
+  }
+  get class() {
+    const action = this.map.get(this).action;
+    return Command.getClass(action);
+  }
+  get instance() {
+    const commandClass = this.class;
+    return new commandClass(this.params);
   }
   do() {
     // console.log('command object', this.class);

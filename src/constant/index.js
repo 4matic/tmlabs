@@ -1,1 +1,3 @@
-export * from './endpoint';
+import * as endpoint from './endpoint';
+
+export { endpoint };

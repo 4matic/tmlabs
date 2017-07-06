@@ -4,8 +4,8 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import babili from 'rollup-plugin-babili';
 
-let external = []; // process.env.production ?
-
+//let external = !process.env.production ? [] : [ 'whatwg-fetch'];
+let external = [];
 export default {
 	entry: 'src/index.js',
 	moduleName: 'tmlabs',
@@ -39,8 +39,7 @@ export default {
   ],
 	external: external,
 	// globals: {
-	// 	'acorn/dist/acorn.js': 'acorn',
-	// 	'magic-string': 'MagicString'
+	// 	'whatwg-fetch': 'node-fetch'
 	// },
 	sourceMap: true
 };

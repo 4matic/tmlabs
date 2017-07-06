@@ -5,7 +5,7 @@ export default class ParseCommand extends Command{
   constructor(params) {
     super('parse', params);
   }
-  do() {
+  run() {
 
   }
 }

@@ -1,5 +1,7 @@
 import AbstractCommand from './command/AbstractCommand';
 import FetchCommand from './command/FetchCommand';
+import AuthorizeCommand from './command/AuthorizeCommand';
+import StatusCommand from './command/StatusCommand';
 
 export default class Command extends AbstractCommand{
   constructor(action, params) {
@@ -13,6 +15,10 @@ export default class Command extends AbstractCommand{
     switch (action) {
       case 'fetch':
         return FetchCommand;
+      case 'auth':
+        return AuthorizeCommand;
+      case 'status':
+        return StatusCommand;
       default:
         throw new ReferenceError('Action not found');
     }
@@ -25,7 +31,7 @@ export default class Command extends AbstractCommand{
     const commandClass = this.class;
     return new commandClass(this.params);
   }
-  do() {
-    // console.log('command object', this.class);
+  run() {
+    if(this.instance) return this.instance.run();
   }
 }

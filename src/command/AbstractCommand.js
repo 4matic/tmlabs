@@ -6,9 +6,11 @@ export default class AbstractCommand {
     }
     if(!action) throw new ReferenceError("Empty action string argument");
     if(typeof action !== 'string') throw new ReferenceError("Invalid action type");
-    if(!params) throw new ReferenceError("Empty params object argument");
-    if(typeof params !== 'object') throw new ReferenceError("Invalid params type");
-    if(Object.keys(params).length === 0) throw new ReferenceError("Empty params object");
+    if(params !== false) {
+      if (!params) throw new ReferenceError("Empty params object argument");
+      if (typeof params !== 'object') throw new ReferenceError("Invalid params type");
+      if (Object.keys(params).length === 0) throw new ReferenceError("Empty params object");
+    }
     this.map = new WeakMap();
     this.map.set(this, {
       action,

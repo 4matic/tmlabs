@@ -13,13 +13,6 @@ module.exports = {
 
     rules: {
       // `js`common extension
-      'import/extensions': [
-        'error',
-        'always',
-        {
-          js: 'never',
-        },
-      ],
 
       // Not supporting nested package.json yet
       // https://github.com/benmosher/eslint-plugin-import/issues/458

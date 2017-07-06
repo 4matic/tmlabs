@@ -17,7 +17,11 @@
   "scripts": {
     "lint:js": "eslint src tools",
     "lint:staged": "lint-staged",
+    "compile": "babel src/ --out-dir dist/",
     "build": "npm run build:umd && npm run build:es && npm run build:browser",
+    "build:umd": "rollup -c -f umd -o dist/tmlabs.umd.js",
+    "build:browser": "rollup -c --environment BROWSER -f umd -o dist/tmlabs.deps.js",
+    "build:es": "rollup -c -f es -o dist/tmlabs.es.js",
     "test": "mocha",
     "test:watch": "npm run test -- --reporter min --watch",
     "precommit": "lint-staged"
@@ -27,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/4matic/tmlabs.git"
+    "url": "git+ssh://git@github.com:TempicoLabs/tmlabs.git"
   },
   "keywords": [
     "tempicolabs",
@@ -49,10 +53,19 @@
     ]
   },
   "babel": {
+    "plugins": [
+      "external-helpers"
+    ],
     "presets": [
-      "es2015"
+      ["es2015", { "modules": false }],
+      ["stage-0"]
     ],
     "env": {
+      "production": {
+        "presets": [
+          "babili"
+        ]
+      },
       "test": {
         "plugins": [
           "istanbul",
@@ -62,10 +75,18 @@
     }
   },
   "devDependencies": {
+    "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-external-helpers-2": "^6.3.13",
     "babel-plugin-istanbul": "^4.1.4",
     "babel-plugin-rewire": "^1.1.0",
+    "babel-preset-babili": "^0.1.4",
     "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "babel-preset-latest": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.24.1",
     "chai": "^4.0.2",
     "cross-env": "^5.0.1",
@@ -76,6 +97,14 @@
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "opn-cli": "^3.1.0",
-    "rollup": "^0.43.0"
+    "rollup": "^0.43.0",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-babili": "^3.1.0",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-resolve": "^3.0.0"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.23.0"
   }
 }

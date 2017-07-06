@@ -1,4 +1,4 @@
-import * as Constants from './constant';
+//import * as Constants from './constant';
 
 export default class TmLabs {
   constructor(options) {
@@ -12,13 +12,13 @@ export default class TmLabs {
       }
     }
   }
-  fetch = async (params) => {
-
-  }
-
-  doAction = async (command) => {
-
-  }
+  // fetch = async (params) => {
+  //
+  // }
+  //
+  // doAction = async (command) => {
+  //
+  // }
 
   set token(token) {
     if(!token) {

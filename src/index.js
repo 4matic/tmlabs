@@ -3,10 +3,10 @@ import Command from './Command';
 
 //
 const fetch = async (params) => {
-  const tmLabs = new TmLabs();
-  const answer = await tmLabs.doAction(new Command('fetch', params));
+  const command = new Command('fetch', params);
+  const answer = await command.do();
   return answer;
 };
 //
 export default TmLabs;
-export { TmLabs, fetch }
+export { TmLabs, Command }

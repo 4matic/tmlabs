@@ -1,21 +1,12 @@
-import * as Constants from './constant';
+import TmLabs from './TmLabs';
+import Command from './Command';
 
-export default class TmLabs {
-  constructor(options) {
-    console.log('Constants', Constants);
-    console.log('Options', options);
-  }
-  fetch = async (params) => {
-
-  }
-  setToken = (token) => {
-
-  }
-}
 //
-const fetch = (options) => {
-  const tmLabs = new TmLabs(options);
-  return tmLabs.fetch();
+const fetch = async (params) => {
+  const tmLabs = new TmLabs();
+  const answer = await tmLabs.doAction(new Command('fetch', params));
+  return answer;
 };
 //
-export { fetch }
+export default TmLabs;
+export { TmLabs, fetch }

@@ -53,12 +53,9 @@
     ]
   },
   "babel": {
-    "plugins": [
-      "external-helpers"
-    ],
     "presets": [
-      ["es2015", { "modules": false }],
-      ["stage-0"]
+      "es2015",
+      "stage-0"
     ],
     "env": {
       "production": {
@@ -81,6 +78,7 @@
     "babel-plugin-external-helpers-2": "^6.3.13",
     "babel-plugin-istanbul": "^4.1.4",
     "babel-plugin-rewire": "^1.1.0",
+    "babel-polyfill": "^6.23.0",
     "babel-preset-babili": "^0.1.4",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-es2015-rollup": "^3.0.0",
@@ -105,6 +103,6 @@
     "rollup-plugin-node-resolve": "^3.0.0"
   },
   "dependencies": {
-    "babel-polyfill": "^6.23.0"
+    "whatwg-fetch": "^2.0.3"
   }
 }

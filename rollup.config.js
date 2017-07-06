@@ -15,7 +15,23 @@ export default {
     nodeResolve({
 			jsnext: true,
     }),
-    babel(),
+    babel({
+      babelrc: false,
+      "presets": [
+        [
+          "es2015",
+          {
+            "modules": false
+          }
+        ],
+        [
+          "stage-0"
+        ]
+      ],
+      "plugins": [
+        "external-helpers"
+      ],
+    }),
     process.env.production ? babili({
       comments: false,
       banner: '/**\r* Tempico Labs SDK v0.1.0 \r*/',

@@ -9,7 +9,6 @@ export default class AuthorizeCommand extends FetchCommand{
     });
   }
   run = async (options) => {
-    console.log('status', options);
     return await this.fetch({
       method: 'GET',
     });

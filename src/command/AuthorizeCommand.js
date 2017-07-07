@@ -33,7 +33,7 @@ export default class AuthorizeCommand extends FetchCommand{
     });
   }
   run = async (options) => {
-    console.log('login', options);
-    return await this.login();
+    // console.log('login', options);
+    // return await this.login();
   }
 }

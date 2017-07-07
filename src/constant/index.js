@@ -1,3 +1,5 @@
 import * as endpoint from './endpoint';
+import argument from './argument'
+import specification from './specification'
 
-export { endpoint };
+export { endpoint, argument, specification };

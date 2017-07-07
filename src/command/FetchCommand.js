@@ -19,6 +19,7 @@ export default class FetchCommand extends AbstractCommand{
     if(params.version !== false) this.version = 'v2';
     else this.version = params.version;
     this.map.get(this).method = method;
+    this.map.get(this).headers = {};
   }
   makeRequest = async (url, params = {}, fetchFunc = false) => {
     if(!url) throw new ReferenceError("Empty url");
@@ -53,13 +54,6 @@ export default class FetchCommand extends AbstractCommand{
     }
     this.map.get(this).method = method;
   }
-  get method() {
-    return this.map.get(this).method;
-  }
-  get url() {
-    const version = this.version ? `${this.version}/` : '';
-    return `${this.api_url}api/${version}${this.method}`;
-  }
   run = async (options = {}) => {
     return await this.fetch(options);
   }
@@ -92,12 +86,39 @@ export default class FetchCommand extends AbstractCommand{
         status,
         statusText,
       };
+      this.map.get(this).content = content;
       ['remaining', 'lastbill', 'reset'].forEach((suffix) => {
         fetchResponse.headers[`balance_${suffix}`] = headers.get(`x-balance-${suffix}`);
+        //this.map.get(this).headers[`balance_${suffix}`] = headers.get(`x-balance-${suffix}`);
+      });
+      Object.keys(fetchResponse).forEach((key) => {
+        this.map.get(this)[key] = fetchResponse[key];
       });
       return fetchResponse;
     } catch(err) {
       console.error(err);
     }
+  }
+  get method() {
+    return this.map.get(this).method;
+  }
+  get headers() {
+    return this.map.get(this).headers;
+  }
+  get content() {
+    return this.map.get(this).content;
+  }
+  get error() {
+    return this.map.get(this).error;
+  }
+  get status() {
+    return this.map.get(this).status;
+  }
+  get statusText() {
+    return this.map.get(this).statusText;
+  }
+  get url() { // todo: replace with url package
+    const version = this.version ? `${this.version}/` : '';
+    return `${this.api_url}api/${version}${this.method}`;
   }
 }

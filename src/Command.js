@@ -39,11 +39,7 @@ export default class Command extends AbstractCommand{
     const action = this.map.get(this).action;
     return Command.getClass(action);
   }
-  // get instance() {
-  //   const commandClass = this.class;
-  //   return new commandClass(this.params);
-  // }
-  run() {
-    if(this.instance) return this.instance.run();
+  run = async (params) => {
+    if(this.instance) return await this.instance.run(params);
   }
 }

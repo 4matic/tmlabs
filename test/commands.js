@@ -63,13 +63,89 @@ describe('Commands Tests', () => {
         });
         assert.instanceOf(command.instance, FetchCommand, 'command instance is an instance of FetchCommand');
       });
-      it('do command', async () => {
+      it('do command without method required params', async () => {
         const command = new Command('fetch', {
           method: 'ip',
         });
-        const ipAnswer = await command.run();
-        console.log('URL', command.url);
-        assert.equal(command.status, 404, 'code 200');
+        try {
+          const ipResponse = await command.run();
+        } catch(e) {
+          assert.instanceOf(e, TypeError);
+          assert.equal(e.message, 'Method required params not found', 'exception message');
+        }
+        assert.equal(command.status, undefined, 'no code');
+        assert.equal(command.error, true, 'error=true');
+      });
+      it('do command for ip command. require params needed. throw error', async () => {
+        const command = new Command('fetch', {
+          method: 'ip',
+        });
+        try {
+          const ipResponse = await command.run({});
+        } catch(e) {
+          assert.instanceOf(e, TypeError);
+          assert.equal(e.message, 'Method required params not found', 'exception message');
+        }
+        assert.equal(command.status, undefined, 'no code');
+        assert.equal(command.error, true, 'error=true');
+      });
+      it('do command for ip command. require params invalid type. throw error', async () => {
+        const command = new Command('fetch', {
+          method: 'ip',
+        });
+        try {
+          const ipResponse = await command.run('some test string');
+        } catch(e) {
+          assert.instanceOf(e, TypeError);
+          assert.equal(e.message, 'Method params should be an object', 'exception message');
+        }
+        assert.equal(command.status, undefined, 'no code');
+        assert.equal(command.error, true, 'error=true');
+      });
+      it('do command. throw error for invalid params', async () => {
+        const command = new Command('fetch', {
+          method: 'ip',
+        });
+        try {
+          const ipResponse = await command.run({
+            ipfs: false, //invalid param
+          });
+        } catch(e) {
+          assert.instanceOf(e, TypeError);
+          assert.equal(e.message, 'Method required params not found', 'exception message');
+        }
+        assert.equal(command.status, undefined, 'code undefined');
+        assert.equal(command.error, true, 'error=true');
+      });
+      it('do command. throw error for invalid required param', async () => {
+        const command = new Command('fetch', {
+          method: 'ip',
+        });
+        try {
+          const ipResponse = await command.run({
+            ip: false, //invalid param
+          });
+        } catch(e) {
+          assert.instanceOf(e, TypeError);
+          assert.equal(e.message, 'Method required param \'ip\' validation error', 'exception message');
+        }
+        assert.equal(command.status, undefined, 'code undefined');
+        assert.equal(command.error, true, 'error=true');
+      });
+      it('do command. throw error for invalid required param validation', async () => {
+        const command = new Command('fetch', {
+          method: 'ip',
+        });
+        try {
+          const ipResponse = await command.run({
+            ip: 'some string', //invalid param. not ip!
+          });
+        } catch(e) {
+          assert.instanceOf(e, TypeError);
+          assert.equal(e.message, 'Method required param \'ip\' validation error', 'exception message');
+        }
+        assert.equal(command.status, undefined, 'code undefined');
+        assert.equal(command.error, true, 'error=true');
       });
     });
     describe('Action Status', () => {

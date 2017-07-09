@@ -107,6 +107,6 @@
     "es6-promise": "^4.1.1",
     "isomorphic-fetch": "^2.2.1",
     "node-fetch": "^1.7.1",
-    "whatwg-fetch": "^2.0.3"
+    "validator": "^8.0.0"
   }
 }

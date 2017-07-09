@@ -8,9 +8,7 @@ export default class AuthorizeCommand extends FetchCommand{
       version: false,
     });
   }
-  run = async (options) => {
-    return await this.fetch({
-      method: 'GET',
-    });
+  run = async (options = {}) => {
+    return await this.fetch(options);
   }
 }

@@ -147,6 +147,42 @@ describe('Commands Tests', () => {
         assert.equal(command.status, undefined, 'code undefined');
         assert.equal(command.error, true, 'error=true');
       });
+      it('do command. fetch ip data. error for bad ip', async () => {
+        const command = new Command('fetch', {
+          method: 'ip',
+        });
+        const ipResponse = await command.run({
+          ip: '127.0.0.1',
+        });
+        assert.equal(command.status, 400, 'code 400');
+        assert.equal(command.error, true, 'error=true');
+        assert.deepEqual(command.args, [{
+          "arg": "ip",
+          "val": "127.0.0.1",
+        }], 'arguments');
+        assert.equal(command.url, 'https://tempicolabs.com/api/v2/ip/127.0.0.1/', 'correct url');
+        assert.equal(command.statusText, 'BAD REQUEST');
+        assert.equal(command.errorText, 'Incorrect IPv4 address', 'incorrect ipv4 address');
+      });
+      it('do command. fetch google ip data. using alias as require param', async () => {
+        const command = new Command('fetch', {
+          method: 'ip',
+        });
+        const ipResponse = await command.run({
+          ipaddr: '173.194.122.233', // google ip address. using alias
+        });
+        assert.equal(command.status, 200, 'code 400');
+        assert.equal(command.error, false, 'error=true');
+        assert.deepEqual(command.args, [{
+          "arg": "ipaddr",
+          "val": "173.194.122.233",
+        }], 'arguments');
+        assert.equal(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/', 'correct url');
+        assert.equal(command.statusText, 'OK');
+        assert.equal(command.errorText, undefined);
+        assert.equal(command.content.isp, 'Google');
+        // console.log(command.headers);
+      });
     });
     describe('Action Status', () => {
       it('check balance properties', async () => {

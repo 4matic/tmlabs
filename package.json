@@ -5,15 +5,10 @@
   "main": "dist/tmlabs.umd.js",
   "jsnext:main": "dist/tmlabs.es.js",
   "files": [
-    "bin",
     "src",
     "dist",
-    "register.js",
     "README.md"
   ],
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "lint:js": "eslint src tools",
     "lint:staged": "lint-staged",
@@ -25,9 +20,6 @@
     "test": "mocha",
     "test:watch": "npm run test -- --reporter min --watch",
     "precommit": "lint-staged"
-  },
-  "bin": {
-    "tmlabs": "./bin/tmlabs"
   },
   "repository": {
     "type": "git",
@@ -43,9 +35,9 @@
   "author": "Maxim Maximov <root@4matikku.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/4matic/tmlabs/issues"
+    "url": "https://github.com/TempicoLabs/tmlabs/issues"
   },
-  "homepage": "https://github.com/4matic/tmlabs#readme",
+  "homepage": "https://github.com/TempicoLabs/tmlabs#readme",
   "lint-staged": {
     "*.js": [
       "eslint --fix",
@@ -89,7 +81,11 @@
     "chai": "^4.0.2",
     "cross-env": "^5.0.1",
     "eslint": "^4.1.1",
+    "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "husky": "^0.14.3",
     "lint-staged": "^4.0.0",
     "minimist": "^1.2.0",

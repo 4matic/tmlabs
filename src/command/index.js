@@ -1,4 +1,4 @@
-import Fetch from './FetchCommand';
-import Parse from './ParseCommand';
+import Fetch from './FetchCommand'
+import Parse from './ParseCommand'
 
-export { Fetch, Parse };
+export { Fetch, Parse }

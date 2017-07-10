@@ -5,9 +5,9 @@ import {
   DNS,
   ME,
   IP
-} from './endpoint';
+} from './endpoint'
 
-const mode = ['detailed', 'simple', 'blacklist', 'geoip'];
+const mode = ['detailed', 'simple', 'blacklist', 'geoip']
 
 const argument = {
   [EMAIL_LEAKS]: [
@@ -19,10 +19,10 @@ const argument = {
         args: [{
           require_display_name: false,
           allow_display_name: false,
-          allow_utf8_local_part: true,
-        }],
-      },
-    },
+          allow_utf8_local_part: true
+        }]
+      }
+    }
   ],
   [SCAN]: [
     {
@@ -30,8 +30,8 @@ const argument = {
       required: true,
       check: {
         func: 'isIP',
-        args: [4],
-      },
+        args: [4]
+      }
     },
     {
       arg: 'portmin',
@@ -40,9 +40,9 @@ const argument = {
         func: 'isInt',
         args: [{
           gt: 0,
-          lt: 65535,
-        }],
-      },
+          lt: 65535
+        }]
+      }
     },
     {
       arg: 'portmax',
@@ -51,10 +51,10 @@ const argument = {
         func: 'isInt',
         args: [{
           gt: 0,
-          lt: 65535,
-        }],
-      },
-    },
+          lt: 65535
+        }]
+      }
+    }
   ],
   [HASH]: [
     {
@@ -62,9 +62,9 @@ const argument = {
       required: true,
       check: {
         func: 'matches',
-        args: [/[0-9a-f]{5,40}/i],
-      },
-    },
+        args: [/[0-9a-f]{5,40}/i]
+      }
+    }
   ],
   [IP]: [
     {
@@ -73,14 +73,14 @@ const argument = {
       required: true,
       check: {
         func: 'isIP',
-        args: [4],
-      },
+        args: [4]
+      }
     },
     {
       arg: 'mode',
       required: false,
-      check: mode,
-    },
+      check: mode
+    }
   ],
   [DNS]: [
     {
@@ -92,18 +92,17 @@ const argument = {
           require_tld: true,
           allow_underscores: false,
           allow_trailing_dot: false
-        }],
-      },
-    },
+        }]
+      }
+    }
   ],
   [ME]: [
     {
       arg: 'mode',
       required: false,
-      check: mode,
-    },
-  ],
-};
+      check: mode
+    }
+  ]
+}
 
-export default argument;
-
+export default argument

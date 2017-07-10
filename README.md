@@ -2,12 +2,17 @@
   <br>
   <a href="https://tempicolabs.com"><img src="https://www.tempicolabs.com/img/logo_tl_H_black.png" alt="TempicoLabs" width="400"></a>
   <br>
-  TmLabs SDK
+  TmLabs SDK [In-Progress]
   <br>
   <br>
 </h1>
 
 <h4 align="center">Tempico Labs SDK for API. For node.js and the web.</h4>
+
+<p align="center">
+  <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" alt="js-standard-style"></a>
+</p>
+<br>
 
 **TmLabs** is a SDK for [TempicoLabs API](https://www.tempicolabs.com/index.t3m#api-description) using in **node.js** and the **browser**.
 It is written in clean ES6 Javascript.

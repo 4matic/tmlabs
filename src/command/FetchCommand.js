@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import validator from 'validator'
 import AbstractCommand from './AbstractCommand'
-import { endpoint, specification, argument } from '../constant'
+import { endpoint, specification, argument, error } from '../constant'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -10,7 +10,7 @@ require('isomorphic-fetch')
 export default class FetchCommand extends AbstractCommand {
   constructor (params) {
     super('fetch', params)
-    const { method, version, data, fetchFunc } = params// todo: do data parsing
+    const { method, version, data, key, fetchFunc } = params // todo: do data parsing
     const methods = FetchCommand.getMethods()
 
     if (!method) throw new TypeError("Empty required param 'method'")
@@ -21,19 +21,26 @@ export default class FetchCommand extends AbstractCommand {
     this.api_url = 'https://tempicolabs.com'
     if (version !== undefined) this.version = version
     else this.version = 'v2'
+
+    if (key !== undefined && typeof key === 'string') this.map.get(this).key = key
+    else if (process && process.env && process.env.TMLABS_KEY) this.map.get(this).key = process.env.TMLABS_KEY
     this.map.get(this).method = method
     this.map.get(this).headers = {}
     this.map.get(this).args = []
 
-    return new Proxy(this, {
-      get (target, name) {
-        if (name.startsWith('_')) {
-          throw new TypeError('Accessing to a private property is not allowed')
-        } else {
-          return target[name]
-        }
-      }
-    })
+    this.map.get(this).balance_remaining = undefined
+    this.map.get(this).balance_lastbill = undefined
+    this.map.get(this).balance_reset = undefined
+    // return new Proxy(this, {
+    //   get (target, name) {
+    //     console.log('PROXY', name)
+    //     // if (name.startsWith('_')) {
+    //     //   throw new TypeError('Accessing to a private property is not allowed')
+    //     // } else {
+    //     return target[name]
+    //     // }
+    //   }
+    // })
   }
   _checkArguments (data) {
     if (typeof data !== 'object') throw new TypeError(`Method params should be an object`)
@@ -46,8 +53,7 @@ export default class FetchCommand extends AbstractCommand {
         args.forEach((arg) => {
           if (arg.required) {
             if (!({}).hasOwnProperty.call(data, arg.arg) && (arg.alias && !({}).hasOwnProperty.call(data, arg.alias))) throw new TypeError(`Method required params not found`)
-            let argValue
-            let argName
+            let argValue, argName
             if (data[arg.arg]) {
               argValue = data[arg.arg]
               argName = arg.arg
@@ -67,6 +73,26 @@ export default class FetchCommand extends AbstractCommand {
               val: argValue,
               arg: argName
             })
+          } else {
+            if (({}).hasOwnProperty.call(data, arg.arg) || (arg.alias && ({}).hasOwnProperty.call(data, arg.alias))) {
+              let argValue, argName
+              if (data[arg.arg]) {
+                argValue = data[arg.arg]
+                argName = arg.arg
+              } else if (data[arg.alias]) {
+                argValue = data[arg.alias]
+                argName = arg.alias
+              }
+              if (arg.check) {
+                if (Array.isArray(arg.check)) {
+                  if (!arg.check.includes(argValue)) throw new TypeError(`Method optional param '${arg.arg}' validation error`)
+                  returnArgs.push({
+                    val: argValue,
+                    arg: argName
+                  })
+                }
+              }
+            }
           }
         })
       }
@@ -134,6 +160,7 @@ export default class FetchCommand extends AbstractCommand {
   async fetch (options = {}) {
     let params = {}
     const method = options.method || 'GET'
+    if (options.key !== undefined && typeof options.key === 'string') this.map.get(this).key = options.key
     let fetchResponse
     try {
       // console.log('FETCH', options);
@@ -147,7 +174,7 @@ export default class FetchCommand extends AbstractCommand {
       const response = await this._makeRequest(this.url, params)
       const { headers, status, statusText } = response
       let content
-      const contentType = response.headers.get('Content-Type')
+      const contentType = headers.get('Content-Type')
       if (contentType.indexOf('text/html') !== -1) {
         content = await response.text()
       } else if (contentType.indexOf('application/json') !== -1) {
@@ -160,20 +187,25 @@ export default class FetchCommand extends AbstractCommand {
         status,
         statusText
       }
-      this.map.get(this).content = content;
-      ['remaining', 'lastbill', 'reset'].forEach((suffix) => {
-        fetchResponse.headers[`balance_${suffix}`] = headers.get(`x-balance-${suffix}`)
-      })
+      this.map.get(this).content = content
+      if (headers._headers) {
+        const headersList = headers._headers
+        const billHeaders = ['remaining', 'lastbill', 'reset']
+        billHeaders.forEach((suffix) => {
+          this.map.get(this)[`balance_${suffix}`] = headersList[`x-balance-${suffix}`]
+        })
+        fetchResponse.headers = headersList
+      }
       Object.keys(fetchResponse).forEach((key) => {
         this.map.get(this)[key] = fetchResponse[key]
       })
       if (!response.ok && content && content.error) {
         this.map.get(this).errorText = content.error
+        if (status === 429) throw new error.InsufficientFundsError(content.error)
       }
       return fetchResponse
     } catch (err) {
       this.map.get(this).error = true
-      console.error('FETCH EXCEPTION', err.message)
       throw err
     }
   }
@@ -201,6 +233,15 @@ export default class FetchCommand extends AbstractCommand {
   get errorText () {
     return this.map.get(this).errorText
   }
+  get balanceRemaining () {
+    return this.map.get(this).balance_remaining
+  }
+  get balanceLastbill () {
+    return this.map.get(this).balance_lastbill
+  }
+  get balanceReset () {
+    return this.map.get(this).balance_reset
+  }
   get url () {
     const parts = [this.api_url, 'api', this.version, this.method]
     const args = this.args
@@ -213,6 +254,10 @@ export default class FetchCommand extends AbstractCommand {
         if (arg) url += `${arg.val}/`
       })
     }
+    if (this.key) url += `?key=${this.key}`
     return url
+  }
+  get key () {
+    return this.map.get(this).key
   }
 }

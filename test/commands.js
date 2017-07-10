@@ -1,9 +1,12 @@
 /* eslint-env mocha */
 /* eslint-disable no-new */
 
-import { assert } from 'chai'
+import chai, { assert } from 'chai'
+import chaiString from 'chai-string'
 import { Fetch as FetchCommand } from '../src/command'
 import Command from '../src/Command'
+
+chai.use(chaiString)
 
 describe('Commands Tests', () => {
   describe('Class Command', () => {
@@ -147,7 +150,7 @@ describe('Commands Tests', () => {
         assert.equal(command.status, undefined, 'code undefined')
         assert.equal(command.error, true, 'error=true')
       })
-      it('do command. fetch ip data. error for bad ip', async () => {
+      it('do command. fetch ip data. error for bad ip(127.0.0.1)', async () => {
         const command = new Command('fetch', {
           method: 'ip'
         })
@@ -160,7 +163,7 @@ describe('Commands Tests', () => {
           'arg': 'ip',
           'val': '127.0.0.1'
         }], 'arguments')
-        assert.equal(command.url, 'https://tempicolabs.com/api/v2/ip/127.0.0.1/', 'correct url')
+        assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/127.0.0.1/', 'correct url')
         assert.equal(command.statusText, 'BAD REQUEST')
         assert.equal(command.errorText, 'Incorrect IPv4 address', 'incorrect ipv4 address')
       })
@@ -177,12 +180,31 @@ describe('Commands Tests', () => {
           'arg': 'ipaddr',
           'val': '173.194.122.233'
         }], 'arguments')
-        assert.equal(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/', 'correct url')
+        assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/', 'correct url')
         assert.equal(command.statusText, 'OK')
         assert.equal(command.errorText, undefined)
         assert.equal(command.content.isp, 'Google')
       })
       it('do command. fetch google ip data. optional parameter invalid', async () => {
+        const command = new Command('fetch', {
+          method: 'ip'
+        })
+        try {
+          await command.run({
+            ipaddr: '173.194.122.233', // google ip address. using alias
+            mode: 'string'
+          })
+        } catch (e) {
+          assert.instanceOf(e, TypeError)
+          assert.equal(e.message, 'Method optional param \'mode\' validation error', 'exception message')
+        }
+        // assert.equal(command.errorText, undefined);
+        // assert.equal(command.content.isp, 'Google');
+        assert.equal(command.status, undefined, 'code undefined')
+        assert.equal(command.error, true, 'error=true')
+        assert.deepEqual(command.args, [], 'arguments')
+      })
+      it('do command. fetch google ip data. valid optional parameter', async () => {
         const command = new Command('fetch', {
           method: 'ip'
         })
@@ -192,42 +214,86 @@ describe('Commands Tests', () => {
         })
         // assert.equal(command.errorText, undefined);
         // assert.equal(command.content.isp, 'Google');
-        console.log('CONTENT', command.content)
-        assert.equal(command.status, 200, 'code 400')
-        assert.equal(command.error, false, 'error=false')
+        assert.equal(command.status, 404, 'not blacklisted')
+        assert.equal(command.error, true, 'error=false')
         assert.deepEqual(command.args, [{
-          'arg': 'ipaddr',
-          'val': '173.194.122.233'
+          arg: 'ipaddr',
+          val: '173.194.122.233'
+        }, {
+          arg: 'mode',
+          val: 'blacklist'
         }], 'arguments')
-        assert.equal(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/blacklist', 'correct url')
-        assert.equal(command.statusText, 'OK')
+        assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/blacklist/', 'correct url')
+        assert.equal(command.statusText, 'NOT FOUND')
+        assert.equal(command.content.blacklisted, false)
       })
     })
     describe('Action Status', () => {
       it('check balance properties', async () => {
         const command = new Command('status', false)
-        const statusAnswer = await command.run()
-        assert.equal(statusAnswer.status, 200, 'code 200')
-        assert.hasAllKeys(statusAnswer.headers, [
-          'balance_remaining', 'balance_lastbill', 'balance_reset'
+        await command.run()
+        assert.hasAnyKeys(command.headers, [
+          'x-balance-remaining', 'x-balance-lastbill', 'x-balance-reset'
         ], 'has balance keys in headers')
-        assert.hasAllKeys(statusAnswer.content, [
+        assert.hasAllKeys(command.content, [
           'balance', 'stats'
         ], 'has balance & stats keys in body')
-        assert.hasAllKeys(statusAnswer.content.balance, [
+        assert.hasAllKeys(command.content.balance, [
           'reset', 'remaining'
         ], 'check balance object')
-        assert.hasAllKeys(statusAnswer.content.stats, [
+        assert.hasAllKeys(command.content.stats, [
           'blacklisted', 'objects', 'queue'
         ], 'check stats object')
+        assert.equal(command.status, 200, 'code 200')
       })
     })
   })
   describe('Class FetchCommand', () => {
-    it('init object with empty params', () => {
+    it('init object with undefined params', () => {
       assert.throw(function () {
         new FetchCommand()
       }, ReferenceError, 'Empty params object')
+    })
+    it('init object with empty params', () => {
+      assert.throw(function () {
+        new FetchCommand({})
+      }, ReferenceError, 'Empty params object')
+    })
+    it('init object with invalid params type', () => {
+      assert.throw(function () {
+        new FetchCommand('asds')
+      }, ReferenceError, 'Invalid params type')
+    })
+    it('do command without method required params', async () => {
+      const command = new FetchCommand({
+        method: 'ip'
+      })
+      try {
+        await command.run()
+      } catch (e) {
+        assert.instanceOf(e, TypeError)
+        assert.equal(e.message, 'Method required params not found', 'exception message')
+      }
+      assert.equal(command.status, undefined, 'no code')
+      assert.equal(command.error, true, 'error=true')
+    })
+    it('do command. fetch google ip data. using alias as require param', async () => {
+      const command = new FetchCommand({
+        method: 'ip'
+      })
+      await command.run({
+        ipaddr: '173.194.122.233' // google ip address. using alias
+      })
+      assert.equal(command.status, 200, 'code 400')
+      assert.equal(command.error, false, 'error=false')
+      assert.deepEqual(command.args, [{
+        'arg': 'ipaddr',
+        'val': '173.194.122.233'
+      }], 'arguments')
+      assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/', 'correct url')
+      assert.equal(command.statusText, 'OK')
+      assert.equal(command.errorText, undefined)
+      assert.equal(command.content.isp, 'Google')
     })
   })
 })

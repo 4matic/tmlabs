@@ -1,22 +1,26 @@
 import json from 'rollup-plugin-json'
-import nodeResolve from 'rollup-plugin-node-resolve'
+import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
 import babili from 'rollup-plugin-babili'
+import replace from 'rollup-plugin-replace'
 
 // let external = !process.env.production ? [] : [ 'whatwg-fetch'];
 let external = []
 export default {
   entry: 'src/index.js',
-  moduleName: 'tmlabs',
+  moduleName: 'TmLabs',
   plugins: [
     json(),
-    commonjs(),
-    nodeResolve({
-      jsnext: true
+    resolve({
+      jsnext: true,
+      main: true,
+      browser: true
     }),
+    commonjs(),
     babel({
       babelrc: false,
+      exclude: 'node_modules/**',
       'presets': [
         [
           'es2015',
@@ -31,6 +35,10 @@ export default {
       'plugins': [
         'external-helpers'
       ]
+    }),
+    replace({
+      exclude: 'node_modules/**'
+      // TMLABS_KEY: JSON.stringify(process.env.TMLABS_KEY || false)
     }),
     process.env.production ? babili({
       comments: false,

@@ -1,14 +1,14 @@
-//import * as Constants from './constant';
+// import * as Constants from './constant';
 
 export default class TmLabs {
-  constructor(options) {
+  constructor (options) {
     // console.log('Constants', Constants);
     // console.log('Options', options);
-    if(options) {
+    if (options) {
       try {
-        this.token = options.token;
+        this.token = options.token
       } catch (e) {
-        console.error(e);
+        console.error(e)
       }
     }
   }
@@ -20,13 +20,13 @@ export default class TmLabs {
   //
   // }
 
-  set token(token) {
-    if(!token) {
-      throw new Error("Token is empty!");
+  set token (token) {
+    if (!token) {
+      throw new Error('Token is empty!')
     }
-    this.token = token;
+    this.token = token
   }
-  get token() {
-    return this.token;
+  get token () {
+    return this.token
   }
 }

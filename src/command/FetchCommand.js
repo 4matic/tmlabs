@@ -1,11 +1,10 @@
 /* global fetch:false */
 /* eslint-disable no-unused-vars */
+import fetchPonyfill from 'fetch-ponyfill'
 import validator from 'validator'
 import AbstractCommand from './AbstractCommand'
 import { endpoint, specification, argument, error } from '../constant'
-
-require('es6-promise').polyfill()
-require('isomorphic-fetch')
+const { fetch } = fetchPonyfill()
 
 export default class FetchCommand extends AbstractCommand {
   constructor (params) {
@@ -65,7 +64,7 @@ export default class FetchCommand extends AbstractCommand {
               if (typeof arg.check === 'object') {
                 const { func, args } = arg.check
                 if (!func) throw new TypeError(`Method required params validation function not found!`)
-                const validation = validator[func].bind(this, argValue, ...args)
+                const validation = validator[func].bind(this, argValue + '', ...args) // to string
                 if (!validation()) throw new TypeError(`Method required param '${arg.arg}' validation error`)
               }
             }
@@ -154,13 +153,14 @@ export default class FetchCommand extends AbstractCommand {
     }
     this.map.get(this).method = method
   }
-  async run (options = {}) {
+  run (options = {}) {
     return this.fetch(options)
   }
   async fetch (options = {}) {
     let params = {}
     const method = options.method || 'GET'
     if (options.key !== undefined && typeof options.key === 'string') this.map.get(this).key = options.key
+    else if (process && process.env && process.env.TMLABS_KEY) this.map.get(this).key = process.env.TMLABS_KEY
     let fetchResponse
     try {
       // console.log('FETCH', options);

@@ -1,6 +1,5 @@
 import AbstractCommand from './command/AbstractCommand'
 import FetchCommand from './command/FetchCommand'
-import AuthorizeCommand from './command/AuthorizeCommand'
 import StatusCommand from './command/StatusCommand'
 
 export default class Command extends AbstractCommand {
@@ -13,12 +12,8 @@ export default class Command extends AbstractCommand {
     }
     return new Proxy(this, {
       get (target, name) {
-        if (name.startsWith('_')) {
-          throw new TypeError('Accessing to a private property is not allowed')
-        } else {
-          if (['run', 'instance', 'class'].includes(name)) return target[name]
-          else return target.instance[name]
-        }
+        if (['run', 'instance', 'class'].includes(name)) return target[name]
+        else return target.instance[name]
       }
     })
   }
@@ -27,8 +22,6 @@ export default class Command extends AbstractCommand {
     switch (action) {
       case 'fetch':
         return FetchCommand
-      case 'auth':
-        return AuthorizeCommand
       case 'status':
         return StatusCommand
       default:
@@ -36,7 +29,7 @@ export default class Command extends AbstractCommand {
     }
   }
   get class () {
-    const action = this.map.get(this).action
+    const action = this._map.get(this).action
     return Command.getClass(action)
   }
   run (params) {

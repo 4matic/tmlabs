@@ -15,12 +15,14 @@ export default {
     resolve({
       jsnext: true,
       main: true,
+      modulesOnly: false,
       browser: true
     }),
     commonjs(),
     babel({
       babelrc: false,
       exclude: 'node_modules/**',
+      runtimeHelpers: true,
       'presets': [
         [
           'es2015',
@@ -33,16 +35,17 @@ export default {
         ]
       ],
       'plugins': [
+        'transform-runtime',
         'external-helpers'
       ]
     }),
     replace({
-      exclude: 'node_modules/**'
-      // TMLABS_KEY: JSON.stringify(process.env.TMLABS_KEY || false)
+      exclude: 'node_modules/**',
+      'process.env.TMLABS_KEY': JSON.stringify(process.env.TMLABS_KEY || false)
     }),
     process.env.production ? babili({
       comments: false,
-      banner: '/**\r* Tempico Labs SDK v0.1.0 \r*/'
+      banner: '/**\r* Tempico Labs SDK v1.0.0 \r*/'
     }) : false
   ],
   external: external,

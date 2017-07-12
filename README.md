@@ -2,7 +2,7 @@
   <br>
   <a href="https://tempicolabs.com"><img src="https://www.tempicolabs.com/img/logo_tl_H_black.png" alt="TempicoLabs" width="400"></a>
   <br>
-  TmLabs SDK [In-Progress]
+  TmLabs SDK
   <br>
   <br>
 </h1>
@@ -43,9 +43,76 @@ TmLabs is the wrapper for API. It uses [isomorphic-fetch](https://github.com/mat
 
 #### In the browser
 
+```html
+<script src="./dist/tmlabs.min.js"></script>
+<script>
+    var TmLabs = new TmLabs.default(); // or new TmLabs.TmLabs()
+    TmLabs.on('error', function(error, command){
+      console.error('[ SDK ERROR ]', error);
+    });
+    TmLabs.on('response', function(command, response){
+      console.info('response', response);
+      console.log('balanceRemaining', command.balanceRemaining); // return Remaining Balance
+    });
+    TmLabs.on('command', function(args, command){
+      console.log('history', TmLabs.history) // get array of one completed commands
+    });
+    TmLabs.fetch('dns', {
+      domain: 'google.com'
+    }).then(function(answer){
+      var ip = answer.content[Object.keys(answer.content)[0]];// because response will be in 'google.com' key
+      console.log('History after DNS command', TmLabs.history) // get array of one completed command
+      return TmLabs.fetch('ip', {
+        ip: ip
+      })
+    }).then(function(answer){
+      console.info('google ip info', answer.content) // get info about google ip address
+      console.log('History after IP command', TmLabs.history) // get array of two completed commands
+    });
+    console.log('History with pending requests', TmLabs.history) // get array of two pending commands
+</script>
+```
+
 #### In Node.js
 
 TmLabs also works in node.js, using the *same npm package!*
+
+```javascript
+  import TmLabs from 'tmlabs'
+  
+  TmLabs.on('error', (error, command) => {
+    console.error(error);
+  });
+  TmLabs.on('response', (response, command) => {
+    console.log('response', response);
+    console.log('balanceRemaining', command.balanceRemaining); // return Remaining Balance
+  });
+  TmLabs.getDNS('google.com');
+```
+
+Package also contain FetchCommand Class for customizing fetch data from API.
+For example in ES6:
+
+```javascript
+  import { FetchCommand } from 'tmlabs'
+  
+  const command = new FetchCommand({
+    method: 'ip'
+  })
+  command.on('error', (error, command) => {
+    console.error(error);
+  });
+  command.on('response', (response, command) => {
+    console.log('response object', response);
+    console.log('response code', command.status); // same as response.status. return status code, for example 200
+  });
+  const response = await command.run({ // this response also goes to command.on('response') EventHandler if no error exists
+    ipaddr: '173.194.122.233' // google ip address. using alias(ipaddr)
+  })
+  console.log(response) // API response. same as command.content
+```
+
+##### More examples you can find in [examples directory](examples)
 
 #### As a command line app
 

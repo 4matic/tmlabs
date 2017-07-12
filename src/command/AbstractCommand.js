@@ -1,6 +1,8 @@
+import EventEmitter from 'smelly-event-emitter'
 
-export default class AbstractCommand {
+export default class AbstractCommand extends EventEmitter {
   constructor (action, params) {
+    super()
     if (new.target === AbstractCommand) {
       throw new TypeError('Cannot construct AbstractCommand instance directly')
     }
@@ -11,8 +13,8 @@ export default class AbstractCommand {
       if (typeof params !== 'object') throw new ReferenceError('Invalid params type')
       if (Object.keys(params).length === 0) throw new ReferenceError('Empty params object')
     }
-    this.map = new WeakMap()
-    this.map.set(this, {
+    this._map = new WeakMap()
+    this._map.set(this, {
       action,
       params
     })
@@ -21,18 +23,18 @@ export default class AbstractCommand {
     if (!action) {
       throw new Error('Empty action')
     }
-    this.map.get(this).action = action
+    this._map.get(this).action = action
   }
   get action () {
-    return this.map.get(this).action
+    return this._map.get(this).action
   }
   get params () {
-    return this.map.get(this).params
+    return this._map.get(this).params
   }
   set params (params) {
     if (!params) {
       throw new Error('Empty params')
     }
-    this.map.get(this).params = params
+    this._map.get(this).params = params
   }
 }

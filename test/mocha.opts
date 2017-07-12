@@ -1,4 +1,4 @@
 --compilers js:babel-register
 --require babel-polyfill ./test/setup
-test/**/*.js
+test/**.js
 --timeout 10000

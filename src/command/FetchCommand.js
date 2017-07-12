@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 import os from 'os'
 import fetchPonyfill from 'fetch-ponyfill'
+import promisePonyfill from 'es6-promise'
 // import 'babel-polyfill'
 import isIP from 'validator/lib/isIP'
 import isFQDN from 'validator/lib/isFQDN'
@@ -10,6 +11,7 @@ import isInt from 'validator/lib/isInt'
 import matches from 'validator/lib/matches'
 import AbstractCommand from './AbstractCommand'
 import { endpoint, specification, argument, error } from '../constant'
+promisePonyfill.polyfill()
 const { fetch } = fetchPonyfill()
 
 const validator = {

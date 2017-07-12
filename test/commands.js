@@ -11,32 +11,32 @@ chai.use(chaiString)
 describe('Commands Tests', () => {
   describe('Class Command', () => {
     it('init object with empty action. throw type error', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new Command()
       }, ReferenceError, 'Empty action string argument')
     })
     it('init object with invalid action type. throw type error', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new Command({})
       }, ReferenceError, 'Invalid action type')
     })
     it('init object with empty params. throw type error', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new Command('asds')
       }, ReferenceError, 'Empty params object argument')
     })
     it('init object with invalid params type. throw type error', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new Command('asds', 'test')
       }, ReferenceError, 'Invalid params type')
     })
     it('init object with empty options. throw type error', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new Command('asds', {})
       }, ReferenceError, 'Empty params object')
     })
     it('init object with invalid action. throw type error', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new Command('asds', {
           method: ''
         })
@@ -44,14 +44,14 @@ describe('Commands Tests', () => {
     })
     describe('Action FetchCommand', () => {
       it('init object with valid action and empty required param', () => {
-        assert.throw(function () {
+        assert.throw(() => {
           new Command('fetch', {
             method: ''
           })
         }, TypeError, 'Empty required param \'method\'')
       })
       it('init object with valid action and invalid required param', () => {
-        assert.throw(function () {
+        assert.throw(() => {
           new Command('fetch', {
             method: 'asd'
           })
@@ -395,17 +395,17 @@ describe('Commands Tests', () => {
   })
   describe('Class FetchCommand', () => {
     it('init object with undefined params', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new FetchCommand()
       }, ReferenceError, 'Empty params object')
     })
     it('init object with empty params', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new FetchCommand({})
       }, ReferenceError, 'Empty params object')
     })
     it('init object with invalid params type', () => {
-      assert.throw(function () {
+      assert.throw(() => {
         new FetchCommand('asds')
       }, ReferenceError, 'Invalid params type')
     })

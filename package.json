@@ -1,9 +1,10 @@
 {
-  "name": "tmlabs",
+  "name": "@tempicolabs/tmlabs",
   "version": "1.0.0",
   "description": "NodeJS SDK for TempicoLabs API",
   "main": "dist/tmlabs.umd.js",
-  "jsnext:main": "dist/tmlabs.es.js",
+  "browser": "dist/tmlabs.min.js",
+  "module": "dist/tmlabs.es.js",
   "files": [
     "src",
     "dist",

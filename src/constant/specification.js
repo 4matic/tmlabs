@@ -1,12 +1,11 @@
 import {
-  STATUS,
-  EMAIL_LEAKS
+  STATUS
 } from './endpoint'
 
 const specification = {
   [STATUS]: {
     version: false
-  },
+  }
   // [EMAIL_LEAKS]: {
   //   version: false
   // }

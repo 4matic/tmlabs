@@ -1,32 +1,50 @@
+import EventEmitter from 'smelly-event-emitter'
+import Command from './Command'
 // import * as Constants from './constant';
 
-export default class TmLabs {
+export default class TmLabs extends EventEmitter {
   constructor (options) {
-    // console.log('Constants', Constants);
-    // console.log('Options', options);
-    if (options) {
-      try {
-        this.token = options.token
-      } catch (e) {
-        console.error(e)
-      }
-    }
+    super()
+    const key = options && options.key ? options.key : false
+    const history = []
+    this._map = new WeakMap()
+    this._map.set(this, {
+      key,
+      history
+    })
   }
-  // fetch = async (params) => {
-  //
-  // }
-  //
-  // doAction = async (command) => {
-  //
-  // }
+  async fetch (method, params = {}) {
+    if (this.key) params.key = this.key
+    const answer = await this.doCommand(new Command('fetch', {
+      method: method
+    }), params)
+    return answer
+  }
 
-  set token (token) {
-    if (!token) {
-      throw new Error('Token is empty!')
-    }
-    this.token = token
+  async doCommand (command, params) {
+    this._map.get(this).history.push(command)
+    this.emit('command', command, params)
+    command.on('error', (error, cmd) => {
+      this.emit('error', error, cmd)
+    })
+    command.on('fetch', (options, cmd) => {
+      this.emit('fetch', cmd, options)
+    })
+    command.on('response', (response, cmd) => {
+      this.emit('response', cmd, response)
+    })
+    command.on('raw_response', (response, cmd) => {
+      this.emit('raw_response', cmd, response)
+    })
+    const answer = await command.run(params)
+    return answer
   }
-  get token () {
-    return this.token
+
+  get history () {
+    return this._map.get(this).history
+  }
+
+  get key () {
+    return this._map.get(this).key
   }
 }

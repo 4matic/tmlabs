@@ -18,12 +18,10 @@
 //
 // @app.route('/api/status', methods=['GET'])
 
-// todo: makeUrl('/api/:version/:method:arguments', {}, {key: 'test_key'})
 export const IP = 'ip'
 export const HASH = 'hash'
 export const SCAN = 'scan'
-export const AUTH = 'auth'
 export const STATUS = 'status'
 export const DNS = 'dns'
 export const ME = 'me'
-export const EMAIL_LEAKS = 'email/leaks'
+// export const EMAIL_LEAKS = 'email/leaks'

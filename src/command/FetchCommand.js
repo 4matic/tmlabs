@@ -1,10 +1,24 @@
 /* global fetch:false */
 /* eslint-disable no-unused-vars */
+import os from 'os'
 import fetchPonyfill from 'fetch-ponyfill'
-import validator from 'validator'
+// import 'babel-polyfill'
+import isIP from 'validator/lib/isIP'
+import isFQDN from 'validator/lib/isFQDN'
+import isEmail from 'validator/lib/isEmail'
+import isInt from 'validator/lib/isInt'
+import matches from 'validator/lib/matches'
 import AbstractCommand from './AbstractCommand'
 import { endpoint, specification, argument, error } from '../constant'
 const { fetch } = fetchPonyfill()
+
+const validator = {
+  isIP,
+  isInt,
+  isFQDN,
+  isEmail,
+  matches
+}
 
 export default class FetchCommand extends AbstractCommand {
   constructor (params) {
@@ -21,25 +35,15 @@ export default class FetchCommand extends AbstractCommand {
     if (version !== undefined) this.version = version
     else this.version = 'v2'
 
-    if (key !== undefined && typeof key === 'string') this.map.get(this).key = key
-    else if (process && process.env && process.env.TMLABS_KEY) this.map.get(this).key = process.env.TMLABS_KEY
-    this.map.get(this).method = method
-    this.map.get(this).headers = {}
-    this.map.get(this).args = []
+    if (key !== undefined && typeof key === 'string') this._map.get(this).key = key
+    else if (process.env.TMLABS_KEY) this._map.get(this).key = process.env.TMLABS_KEY
+    this._map.get(this).method = method
+    this._map.get(this).headers = {}
+    this._map.get(this).args = []
 
-    this.map.get(this).balance_remaining = undefined
-    this.map.get(this).balance_lastbill = undefined
-    this.map.get(this).balance_reset = undefined
-    // return new Proxy(this, {
-    //   get (target, name) {
-    //     console.log('PROXY', name)
-    //     // if (name.startsWith('_')) {
-    //     //   throw new TypeError('Accessing to a private property is not allowed')
-    //     // } else {
-    //     return target[name]
-    //     // }
-    //   }
-    // })
+    this._map.get(this).balance_remaining = undefined
+    this._map.get(this).balance_lastbill = undefined
+    this._map.get(this).balance_reset = undefined
   }
   _checkArguments (data) {
     if (typeof data !== 'object') throw new TypeError(`Method params should be an object`)
@@ -85,11 +89,16 @@ export default class FetchCommand extends AbstractCommand {
               if (arg.check) {
                 if (Array.isArray(arg.check)) {
                   if (!arg.check.includes(argValue)) throw new TypeError(`Method optional param '${arg.arg}' validation error`)
-                  returnArgs.push({
-                    val: argValue,
-                    arg: argName
-                  })
+                } else if (typeof arg.check === 'object') {
+                  const {func, args} = arg.check
+                  if (!func) throw new TypeError(`Method optional params validation function not found!`)
+                  const validation = validator[func].bind(this, argValue + '', ...args) // to string
+                  if (!validation()) throw new TypeError(`Method optional param '${arg.arg}' validation error`)
                 }
+                returnArgs.push({
+                  val: argValue,
+                  arg: argName
+                })
               }
             }
           }
@@ -107,6 +116,9 @@ export default class FetchCommand extends AbstractCommand {
         headers = {
           'Content-Type': 'application/json'
         }
+        if (typeof module !== 'undefined' && module.exports) {
+          headers['User-Agent'] = `${os.type()}_${process.arch} Node ${process.version} - TempicoLabs SDK`
+        }
       }
       let options = {
         headers
@@ -118,10 +130,15 @@ export default class FetchCommand extends AbstractCommand {
         }
       }
       options.method = method
+      // console.log(options)
+      this.emit('fetch', options, this)
       const response = await fetchFunc(url, options)
+      this.emit('raw_response', response, this)
       return response
-    } catch (e) {
-      console.error(e)
+    } catch (err) {
+      this._map.get(this).error = true
+      this.emit('error', err, this)
+      throw err
     }
   }
   static getMethodSpecifications (method = false) {
@@ -151,7 +168,7 @@ export default class FetchCommand extends AbstractCommand {
     if (!method) {
       throw new ReferenceError('Empty method')
     }
-    this.map.get(this).method = method
+    this._map.get(this).method = method
   }
   run (options = {}) {
     return this.fetch(options)
@@ -159,8 +176,9 @@ export default class FetchCommand extends AbstractCommand {
   async fetch (options = {}) {
     let params = {}
     const method = options.method || 'GET'
-    if (options.key !== undefined && typeof options.key === 'string') this.map.get(this).key = options.key
-    else if (process && process.env && process.env.TMLABS_KEY) this.map.get(this).key = process.env.TMLABS_KEY
+    const headers = options.headers || false
+    if (options.key !== undefined && typeof options.key === 'string') this._map.get(this).key = options.key
+    else if (process.env.TMLABS_KEY) this._map.get(this).key = process.env.TMLABS_KEY
     let fetchResponse
     try {
       // console.log('FETCH', options);
@@ -168,79 +186,93 @@ export default class FetchCommand extends AbstractCommand {
       params = {
         method
       }
-      this.map.get(this).args = params.body = args
+      if (headers !== false) params.headers = headers
+      this._map.get(this).args = params.body = args
       // console.log(this.url);
       // console.log(params);
       const response = await this._makeRequest(this.url, params)
-      const { headers, status, statusText } = response
-      let content
-      const contentType = headers.get('Content-Type')
-      if (contentType.indexOf('text/html') !== -1) {
-        content = await response.text()
-      } else if (contentType.indexOf('application/json') !== -1) {
-        content = await response.json()
-      }
-      fetchResponse = {
-        content,
-        headers: {},
-        error: !response.ok,
-        status,
-        statusText
-      }
-      this.map.get(this).content = content
-      if (headers._headers) {
-        const headersList = headers._headers
-        const billHeaders = ['remaining', 'lastbill', 'reset']
-        billHeaders.forEach((suffix) => {
-          this.map.get(this)[`balance_${suffix}`] = headersList[`x-balance-${suffix}`]
+      if (response) {
+        const {headers, status, statusText} = response
+        let content
+        const contentType = headers.get('Content-Type')
+        if (contentType.indexOf('text/html') !== -1) {
+          content = await response.text()
+        } else if (contentType.indexOf('application/json') !== -1) {
+          content = await response.json()
+        }
+        fetchResponse = {
+          content,
+          headers: {},
+          error: !response.ok && ![404].includes(status),
+          status,
+          statusText
+        }
+        this._map.get(this).content = content
+        let responseHeaders = {}
+        if (headers._headers) responseHeaders = headers._headers;
+        else {
+          for (let header of headers.entries()) {
+            responseHeaders[header[0]] = header[1]
+          }
+        }
+        if (responseHeaders) {
+          const billHeaders = ['remaining', 'lastbill', 'reset']
+          billHeaders.forEach((suffix) => {
+            this._map.get(this)[`balance_${suffix}`] = responseHeaders[`x-balance-${suffix}`]
+          })
+          fetchResponse.headers = responseHeaders
+        }
+        Object.keys(fetchResponse).forEach((key) => {
+          this._map.get(this)[key] = fetchResponse[key]
         })
-        fetchResponse.headers = headersList
+        if (!response.ok && content && content.error) {
+          this._map.get(this).errorText = content.error
+          if (status === 429) throw new error.InsufficientFundsError(content.error)
+          this.emit('error', new Error(content.error), this)
+        }
+      } else {
+        throw new Error('Response is empty!')
       }
-      Object.keys(fetchResponse).forEach((key) => {
-        this.map.get(this)[key] = fetchResponse[key]
-      })
-      if (!response.ok && content && content.error) {
-        this.map.get(this).errorText = content.error
-        if (status === 429) throw new error.InsufficientFundsError(content.error)
-      }
+      this.emit('response', fetchResponse, this)
       return fetchResponse
     } catch (err) {
-      this.map.get(this).error = true
+      this._map.get(this).error = true
+      this.emit('error', err, this)
       throw err
     }
   }
   get method () {
-    return this.map.get(this).method
+    return this._map.get(this).method
   }
   get headers () {
-    return this.map.get(this).headers
+    return this._map.get(this).headers
   }
   get args () {
-    return this.map.get(this).args
+    return this._map.get(this).args
   }
   get content () {
-    return this.map.get(this).content
+    return this._map.get(this).content
   }
   get error () {
-    return this.map.get(this).error
+    return this._map.get(this).error
   }
   get status () {
-    return this.map.get(this).status
+    return this._map.get(this).status
   }
   get statusText () {
-    return this.map.get(this).statusText
+    return this._map.get(this).statusText
   }
   get errorText () {
-    return this.map.get(this).errorText
+    return this._map.get(this).errorText
   }
   get balanceRemaining () {
-    return this.map.get(this).balance_remaining
+    return this._map.get(this).balance_remaining
   }
   get balanceLastbill () {
-    return this.map.get(this).balance_lastbill
+    return this._map.get(this).balance_lastbill
   }
   get balanceReset () {
-    return this.map.get(this).balance_reset
+    return this._map.get(this).balance_reset
   }
   get url () {
     const parts = [this.api_url, 'api', this.version, this.method]
@@ -258,6 +290,6 @@ export default class FetchCommand extends AbstractCommand {
     return url
   }
   get key () {
-    return this.map.get(this).key
+    return this._map.get(this).key
   }
 }

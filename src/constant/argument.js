@@ -10,23 +10,24 @@ import {
 const mode = ['detailed', 'simple', 'blacklist', 'geoip']
 
 const argument = {
-  [EMAIL_LEAKS]: [
-    {
-      arg: 'email',
-      required: true,
-      check: {
-        func: 'isEmail',
-        args: [{
-          require_display_name: false,
-          allow_display_name: false,
-          allow_utf8_local_part: true
-        }]
-      }
-    }
-  ],
+  // [EMAIL_LEAKS]: [
+  //   {
+  //     arg: 'email',
+  //     required: true,
+  //     check: {
+  //       func: 'isEmail',
+  //       args: [{
+  //         require_display_name: false,
+  //         allow_display_name: false,
+  //         allow_utf8_local_part: true
+  //       }]
+  //     }
+  //   }
+  // ],
   [SCAN]: [
     {
       arg: 'ip',
+      alias: 'ipaddr',
       required: true,
       check: {
         func: 'isIP',

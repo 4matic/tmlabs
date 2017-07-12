@@ -1,3 +1,5 @@
+import os from 'os';
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -986,7 +988,7 @@ $export.P = 8;   // proto
 $export.B = 16;  // bind
 $export.W = 32;  // wrap
 $export.U = 64;  // safe
-$export.R = 128; // real proto method for `library`
+$export.R = 128; // real proto method for `library` 
 var _export = $export;
 
 var _redefine = _hide;
@@ -1418,7 +1420,7 @@ var _invoke = function(fn, args, that){
   } return              fn.apply(that, args);
 };
 
-var process$1            = _global.process;
+var process$2            = _global.process;
 var setTask            = _global.setImmediate;
 var clearTask          = _global.clearImmediate;
 var MessageChannel     = _global.MessageChannel;
@@ -1454,9 +1456,9 @@ if(!setTask || !clearTask){
     delete queue[id];
   };
   // Node.js 0.8-
-  if(_cof(process$1) == 'process'){
+  if(_cof(process$2) == 'process'){
     defer = function(id){
-      process$1.nextTick(_ctx(run, id, 1));
+      process$2.nextTick(_ctx(run, id, 1));
     };
   // Browsers with MessageChannel, includes WebWorkers
   } else if(MessageChannel){
@@ -1493,16 +1495,16 @@ var _task = {
 
 var macrotask = _task.set;
 var Observer  = _global.MutationObserver || _global.WebKitMutationObserver;
-var process$2   = _global.process;
+var process$3   = _global.process;
 var Promise$1   = _global.Promise;
-var isNode$1    = _cof(process$2) == 'process';
+var isNode$1    = _cof(process$3) == 'process';
 
 var _microtask = function(){
   var head, last, notify;
 
   var flush = function(){
     var parent, fn;
-    if(isNode$1 && (parent = process$2.domain))parent.exit();
+    if(isNode$1 && (parent = process$3.domain))parent.exit();
     while(head){
       fn   = head.fn;
       head = head.next;
@@ -1520,7 +1522,7 @@ var _microtask = function(){
   // Node.js
   if(isNode$1){
     notify = function(){
-      process$2.nextTick(flush);
+      process$3.nextTick(flush);
     };
   // browsers with MutationObserver
   } else if(Observer){
@@ -1602,10 +1604,10 @@ var task               = _task.set;
 var microtask          = _microtask();
 var PROMISE            = 'Promise';
 var TypeError$1          = _global.TypeError;
-var process            = _global.process;
+var process$1            = _global.process;
 var $Promise           = _global[PROMISE];
-var process            = _global.process;
-var isNode             = _classof(process) == 'process';
+var process$1            = _global.process;
+var isNode             = _classof(process$1) == 'process';
 var empty              = function(){ /* empty */ };
 var Internal;
 var GenericPromiseCapability;
@@ -1701,7 +1703,7 @@ var onUnhandled = function(promise){
     if(isUnhandled(promise)){
       abrupt = perform(function(){
         if(isNode){
-          process.emit('unhandledRejection', value, promise);
+          process$1.emit('unhandledRejection', value, promise);
         } else if(handler = _global.onunhandledrejection){
           handler({promise: promise, reason: value});
         } else if((console = _global.console) && console.error){
@@ -1728,7 +1730,7 @@ var onHandleUnhandled = function(promise){
   task.call(_global, function(){
     var handler;
     if(isNode){
-      process.emit('rejectionHandled', promise);
+      process$1.emit('rejectionHandled', promise);
     } else if(handler = _global.onrejectionhandled){
       handler({promise: promise, reason: promise._v});
     }
@@ -1799,7 +1801,7 @@ if(!USE_NATIVE){
       var reaction    = newPromiseCapability(_speciesConstructor(this, $Promise));
       reaction.ok     = typeof onFulfilled == 'function' ? onFulfilled : true;
       reaction.fail   = typeof onRejected == 'function' && onRejected;
-      reaction.domain = isNode ? process.domain : undefined;
+      reaction.domain = isNode ? process$1.domain : undefined;
       this._c.push(reaction);
       if(this._a)this._a.push(reaction);
       if(this._s)notify(this, false);
@@ -1938,6 +1940,381 @@ exports.default = function (fn) {
 
 var _asyncToGenerator = unwrapExports(asyncToGenerator);
 
+// 7.2.2 IsArray(argument)
+
+var _isArray = Array.isArray || function isArray(arg){
+  return _cof(arg) == 'Array';
+};
+
+var SPECIES$2  = _wks('species');
+
+var _arraySpeciesConstructor = function(original){
+  var C;
+  if(_isArray(original)){
+    C = original.constructor;
+    // cross-realm fallback
+    if(typeof C == 'function' && (C === Array || _isArray(C.prototype)))C = undefined;
+    if(_isObject(C)){
+      C = C[SPECIES$2];
+      if(C === null)C = undefined;
+    }
+  } return C === undefined ? Array : C;
+};
+
+// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+
+
+var _arraySpeciesCreate = function(original, length){
+  return new (_arraySpeciesConstructor(original))(length);
+};
+
+// 0 -> Array#forEach
+// 1 -> Array#map
+// 2 -> Array#filter
+// 3 -> Array#some
+// 4 -> Array#every
+// 5 -> Array#find
+// 6 -> Array#findIndex
+
+var _arrayMethods = function(TYPE, $create){
+  var IS_MAP        = TYPE == 1
+    , IS_FILTER     = TYPE == 2
+    , IS_SOME       = TYPE == 3
+    , IS_EVERY      = TYPE == 4
+    , IS_FIND_INDEX = TYPE == 6
+    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX
+    , create        = $create || _arraySpeciesCreate;
+  return function($this, callbackfn, that){
+    var O      = _toObject($this)
+      , self   = _iobject(O)
+      , f      = _ctx(callbackfn, that, 3)
+      , length = _toLength(self.length)
+      , index  = 0
+      , result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined
+      , val, res;
+    for(;length > index; index++)if(NO_HOLES || index in self){
+      val = self[index];
+      res = f(val, index, O);
+      if(TYPE){
+        if(IS_MAP)result[index] = res;            // map
+        else if(res)switch(TYPE){
+          case 3: return true;                    // some
+          case 5: return val;                     // find
+          case 6: return index;                   // findIndex
+          case 2: result.push(val);               // filter
+        } else if(IS_EVERY)return false;          // every
+      }
+    }
+    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+  };
+};
+
+var _meta = createCommonjsModule(function (module) {
+var META     = _uid('meta')
+  , setDesc  = _objectDp.f
+  , id       = 0;
+var isExtensible = Object.isExtensible || function(){
+  return true;
+};
+var FREEZE = !_fails(function(){
+  return isExtensible(Object.preventExtensions({}));
+});
+var setMeta = function(it){
+  setDesc(it, META, {value: {
+    i: 'O' + ++id, // object ID
+    w: {}          // weak collections IDs
+  }});
+};
+var fastKey = function(it, create){
+  // return primitive with prefix
+  if(!_isObject(it))return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+  if(!_has(it, META)){
+    // can't set metadata to uncaught frozen object
+    if(!isExtensible(it))return 'F';
+    // not necessary to add metadata
+    if(!create)return 'E';
+    // add missing metadata
+    setMeta(it);
+  // return object ID
+  } return it[META].i;
+};
+var getWeak = function(it, create){
+  if(!_has(it, META)){
+    // can't set metadata to uncaught frozen object
+    if(!isExtensible(it))return true;
+    // not necessary to add metadata
+    if(!create)return false;
+    // add missing metadata
+    setMeta(it);
+  // return hash weak collections IDs
+  } return it[META].w;
+};
+// add metadata on freeze-family methods calling
+var onFreeze = function(it){
+  if(FREEZE && meta.NEED && isExtensible(it) && !_has(it, META))setMeta(it);
+  return it;
+};
+var meta = module.exports = {
+  KEY:      META,
+  NEED:     false,
+  fastKey:  fastKey,
+  getWeak:  getWeak,
+  onFreeze: onFreeze
+};
+});
+
+var f$1 = Object.getOwnPropertySymbols;
+
+var _objectGops = {
+	f: f$1
+};
+
+var f$2 = {}.propertyIsEnumerable;
+
+var _objectPie = {
+	f: f$2
+};
+
+// 19.1.2.1 Object.assign(target, source, ...)
+var $assign  = Object.assign;
+
+// should work with symbols and should have deterministic property order (V8 bug)
+var _objectAssign = !$assign || _fails(function(){
+  var A = {}
+    , B = {}
+    , S = Symbol()
+    , K = 'abcdefghijklmnopqrst';
+  A[S] = 7;
+  K.split('').forEach(function(k){ B[k] = k; });
+  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+}) ? function assign(target, source){ // eslint-disable-line no-unused-vars
+  var T     = _toObject(target)
+    , aLen  = arguments.length
+    , index = 1
+    , getSymbols = _objectGops.f
+    , isEnum     = _objectPie.f;
+  while(aLen > index){
+    var S      = _iobject(arguments[index++])
+      , keys   = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S)
+      , length = keys.length
+      , j      = 0
+      , key;
+    while(length > j)if(isEnum.call(S, key = keys[j++]))T[key] = S[key];
+  } return T;
+} : $assign;
+
+var getWeak           = _meta.getWeak;
+var arrayFind         = _arrayMethods(5);
+var arrayFindIndex    = _arrayMethods(6);
+var id$1                = 0;
+
+// fallback for uncaught frozen keys
+var uncaughtFrozenStore = function(that){
+  return that._l || (that._l = new UncaughtFrozenStore);
+};
+var UncaughtFrozenStore = function(){
+  this.a = [];
+};
+var findUncaughtFrozen = function(store, key){
+  return arrayFind(store.a, function(it){
+    return it[0] === key;
+  });
+};
+UncaughtFrozenStore.prototype = {
+  get: function(key){
+    var entry = findUncaughtFrozen(this, key);
+    if(entry)return entry[1];
+  },
+  has: function(key){
+    return !!findUncaughtFrozen(this, key);
+  },
+  set: function(key, value){
+    var entry = findUncaughtFrozen(this, key);
+    if(entry)entry[1] = value;
+    else this.a.push([key, value]);
+  },
+  'delete': function(key){
+    var index = arrayFindIndex(this.a, function(it){
+      return it[0] === key;
+    });
+    if(~index)this.a.splice(index, 1);
+    return !!~index;
+  }
+};
+
+var _collectionWeak = {
+  getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
+    var C = wrapper(function(that, iterable){
+      _anInstance(that, C, NAME, '_i');
+      that._i = id$1++;      // collection id
+      that._l = undefined; // leak store for uncaught frozen objects
+      if(iterable != undefined)_forOf(iterable, IS_MAP, that[ADDER], that);
+    });
+    _redefineAll(C.prototype, {
+      // 23.3.3.2 WeakMap.prototype.delete(key)
+      // 23.4.3.3 WeakSet.prototype.delete(value)
+      'delete': function(key){
+        if(!_isObject(key))return false;
+        var data = getWeak(key);
+        if(data === true)return uncaughtFrozenStore(this)['delete'](key);
+        return data && _has(data, this._i) && delete data[this._i];
+      },
+      // 23.3.3.4 WeakMap.prototype.has(key)
+      // 23.4.3.4 WeakSet.prototype.has(value)
+      has: function has(key){
+        if(!_isObject(key))return false;
+        var data = getWeak(key);
+        if(data === true)return uncaughtFrozenStore(this).has(key);
+        return data && _has(data, this._i);
+      }
+    });
+    return C;
+  },
+  def: function(that, key, value){
+    var data = getWeak(_anObject(key), true);
+    if(data === true)uncaughtFrozenStore(that).set(key, value);
+    else data[that._i] = value;
+    return that;
+  },
+  ufstore: uncaughtFrozenStore
+};
+
+var dP$1             = _objectDp.f;
+var each           = _arrayMethods(0);
+
+var _collection = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
+  var Base  = _global[NAME]
+    , C     = Base
+    , ADDER = IS_MAP ? 'set' : 'add'
+    , proto = C && C.prototype
+    , O     = {};
+  if(!_descriptors || typeof C != 'function' || !(IS_WEAK || proto.forEach && !_fails(function(){
+    new C().entries().next();
+  }))){
+    // create collection constructor
+    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+    _redefineAll(C.prototype, methods);
+    _meta.NEED = true;
+  } else {
+    C = wrapper(function(target, iterable){
+      _anInstance(target, C, NAME, '_c');
+      target._c = new Base;
+      if(iterable != undefined)_forOf(iterable, IS_MAP, target[ADDER], target);
+    });
+    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','),function(KEY){
+      var IS_ADDER = KEY == 'add' || KEY == 'set';
+      if(KEY in proto && !(IS_WEAK && KEY == 'clear'))_hide(C.prototype, KEY, function(a, b){
+        _anInstance(this, C, KEY);
+        if(!IS_ADDER && IS_WEAK && !_isObject(a))return KEY == 'get' ? undefined : false;
+        var result = this._c[KEY](a === 0 ? 0 : a, b);
+        return IS_ADDER ? this : result;
+      });
+    });
+    if('size' in proto)dP$1(C.prototype, 'size', {
+      get: function(){
+        return this._c.size;
+      }
+    });
+  }
+
+  _setToStringTag(C, NAME);
+
+  O[NAME] = C;
+  _export(_export.G + _export.W + _export.F, O);
+
+  if(!IS_WEAK)common.setStrong(C, NAME, IS_MAP);
+
+  return C;
+};
+
+var es6_weakMap = createCommonjsModule(function (module) {
+'use strict';
+var each         = _arrayMethods(0)
+  , getWeak      = _meta.getWeak
+  , isExtensible = Object.isExtensible
+  , uncaughtFrozenStore = _collectionWeak.ufstore
+  , tmp          = {}
+  , InternalMap;
+
+var wrapper = function(get){
+  return function WeakMap(){
+    return get(this, arguments.length > 0 ? arguments[0] : undefined);
+  };
+};
+
+var methods = {
+  // 23.3.3.3 WeakMap.prototype.get(key)
+  get: function get(key){
+    if(_isObject(key)){
+      var data = getWeak(key);
+      if(data === true)return uncaughtFrozenStore(this).get(key);
+      return data ? data[this._i] : undefined;
+    }
+  },
+  // 23.3.3.5 WeakMap.prototype.set(key, value)
+  set: function set(key, value){
+    return _collectionWeak.def(this, key, value);
+  }
+};
+
+// 23.3 WeakMap Objects
+var $WeakMap = module.exports = _collection('WeakMap', wrapper, methods, _collectionWeak, true, true);
+
+// IE11 WeakMap frozen keys fix
+if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
+  InternalMap = _collectionWeak.getConstructor(wrapper);
+  _objectAssign(InternalMap.prototype, methods);
+  _meta.NEED = true;
+  each(['delete', 'has', 'get', 'set'], function(key){
+    var proto  = $WeakMap.prototype
+      , method = proto[key];
+    _redefine(proto, key, function(a, b){
+      // store frozen objects on internal weakmap shim
+      if(_isObject(a) && !isExtensible(a)){
+        if(!this._f)this._f = new InternalMap;
+        var result = this._f[key](a, b);
+        return key == 'set' ? this : result;
+      // store all the rest on native weakmap
+      } return method.call(this, a, b);
+    });
+  });
+}
+});
+
+var weakMap$1 = _core.WeakMap;
+
+var weakMap = createCommonjsModule(function (module) {
+module.exports = { "default": weakMap$1, __esModule: true };
+});
+
+var _WeakMap = unwrapExports(weakMap);
+
+// most Object methods by ES6 should accept primitives
+
+var _objectSap = function(KEY, exec){
+  var fn  = (_core.Object || {})[KEY] || Object[KEY]
+    , exp = {};
+  exp[KEY] = exec(fn);
+  _export(_export.S + _export.F * _fails(function(){ fn(1); }), 'Object', exp);
+};
+
+// 19.1.2.9 Object.getPrototypeOf(O)
+
+
+_objectSap('getPrototypeOf', function(){
+  return function getPrototypeOf(it){
+    return _objectGpo(_toObject(it));
+  };
+});
+
+var getPrototypeOf$1 = _core.Object.getPrototypeOf;
+
+var getPrototypeOf = createCommonjsModule(function (module) {
+module.exports = { "default": getPrototypeOf$1, __esModule: true };
+});
+
+var _Object$getPrototypeOf = unwrapExports(getPrototypeOf);
+
 var classCallCheck = createCommonjsModule(function (module, exports) {
 "use strict";
 
@@ -1996,136 +2373,16 @@ exports.default = function () {
 
 var _createClass = unwrapExports(createClass);
 
-// import * as Constants from './constant';
-
-var TmLabs$1 = function () {
-  function TmLabs(options) {
-    _classCallCheck(this, TmLabs);
-
-    // console.log('Constants', Constants);
-    // console.log('Options', options);
-    if (options) {
-      try {
-        this.token = options.token;
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }
-  // fetch = async (params) => {
-  //
-  // }
-  //
-  // doAction = async (command) => {
-  //
-  // }
-
-  _createClass(TmLabs, [{
-    key: 'token',
-    set: function set(token) {
-      if (!token) {
-        throw new Error('Token is empty!');
-      }
-      this.token = token;
-    },
-    get: function get() {
-      return this.token;
-    }
-  }]);
-
-  return TmLabs;
-}();
-
-// most Object methods by ES6 should accept primitives
-
-var _objectSap = function(KEY, exec){
-  var fn  = (_core.Object || {})[KEY] || Object[KEY]
-    , exp = {};
-  exp[KEY] = exec(fn);
-  _export(_export.S + _export.F * _fails(function(){ fn(1); }), 'Object', exp);
-};
-
-// 19.1.2.9 Object.getPrototypeOf(O)
-
-
-_objectSap('getPrototypeOf', function(){
-  return function getPrototypeOf(it){
-    return _objectGpo(_toObject(it));
-  };
-});
-
-var getPrototypeOf$1 = _core.Object.getPrototypeOf;
-
-var getPrototypeOf = createCommonjsModule(function (module) {
-module.exports = { "default": getPrototypeOf$1, __esModule: true };
-});
-
-var _Object$getPrototypeOf = unwrapExports(getPrototypeOf);
-
-var f$1 = _wks;
+var f$3 = _wks;
 
 var _wksExt = {
-	f: f$1
+	f: f$3
 };
 
 var iterator$2 = _wksExt.f('iterator');
 
 var iterator = createCommonjsModule(function (module) {
 module.exports = { "default": iterator$2, __esModule: true };
-});
-
-var _meta = createCommonjsModule(function (module) {
-var META     = _uid('meta')
-  , setDesc  = _objectDp.f
-  , id       = 0;
-var isExtensible = Object.isExtensible || function(){
-  return true;
-};
-var FREEZE = !_fails(function(){
-  return isExtensible(Object.preventExtensions({}));
-});
-var setMeta = function(it){
-  setDesc(it, META, {value: {
-    i: 'O' + ++id, // object ID
-    w: {}          // weak collections IDs
-  }});
-};
-var fastKey = function(it, create){
-  // return primitive with prefix
-  if(!_isObject(it))return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-  if(!_has(it, META)){
-    // can't set metadata to uncaught frozen object
-    if(!isExtensible(it))return 'F';
-    // not necessary to add metadata
-    if(!create)return 'E';
-    // add missing metadata
-    setMeta(it);
-  // return object ID
-  } return it[META].i;
-};
-var getWeak = function(it, create){
-  if(!_has(it, META)){
-    // can't set metadata to uncaught frozen object
-    if(!isExtensible(it))return true;
-    // not necessary to add metadata
-    if(!create)return false;
-    // add missing metadata
-    setMeta(it);
-  // return hash weak collections IDs
-  } return it[META].w;
-};
-// add metadata on freeze-family methods calling
-var onFreeze = function(it){
-  if(FREEZE && meta.NEED && isExtensible(it) && !_has(it, META))setMeta(it);
-  return it;
-};
-var meta = module.exports = {
-  KEY:      META,
-  NEED:     false,
-  fastKey:  fastKey,
-  getWeak:  getWeak,
-  onFreeze: onFreeze
-};
 });
 
 var defineProperty$4 = _objectDp.f;
@@ -2143,18 +2400,6 @@ var _keyof = function(object, el){
   while(length > index)if(O[key = keys[index++]] === el)return key;
 };
 
-var f$2 = Object.getOwnPropertySymbols;
-
-var _objectGops = {
-	f: f$2
-};
-
-var f$3 = {}.propertyIsEnumerable;
-
-var _objectPie = {
-	f: f$3
-};
-
 // all enumerable object keys, includes symbols
 
 var _enumKeys = function(it){
@@ -2167,12 +2412,6 @@ var _enumKeys = function(it){
       , key;
     while(symbols.length > i)if(isEnum.call(it, key = symbols[i++]))result.push(key);
   } return result;
-};
-
-// 7.2.2 IsArray(argument)
-
-var _isArray = Array.isArray || function isArray(arg){
-  return _cof(arg) == 'Array';
 };
 
 // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
@@ -2227,7 +2466,7 @@ var _objectGopd = {
 // ECMAScript 6 symbols shim
 var META           = _meta.KEY;
 var gOPD           = _objectGopd.f;
-var dP$1             = _objectDp.f;
+var dP$2             = _objectDp.f;
 var gOPN           = _objectGopnExt.f;
 var $Symbol        = _global.Symbol;
 var $JSON          = _global.JSON;
@@ -2247,15 +2486,15 @@ var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChil
 
 // fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
 var setSymbolDesc = _descriptors && _fails(function(){
-  return _objectCreate(dP$1({}, 'a', {
-    get: function(){ return dP$1(this, 'a', {value: 7}).a; }
+  return _objectCreate(dP$2({}, 'a', {
+    get: function(){ return dP$2(this, 'a', {value: 7}).a; }
   })).a != 7;
 }) ? function(it, key, D){
   var protoDesc = gOPD(ObjectProto$1, key);
   if(protoDesc)delete ObjectProto$1[key];
-  dP$1(it, key, D);
-  if(protoDesc && it !== ObjectProto$1)dP$1(ObjectProto$1, key, protoDesc);
-} : dP$1;
+  dP$2(it, key, D);
+  if(protoDesc && it !== ObjectProto$1)dP$2(ObjectProto$1, key, protoDesc);
+} : dP$2;
 
 var wrap = function(tag){
   var sym = AllSymbols[tag] = _objectCreate($Symbol[PROTOTYPE$2]);
@@ -2276,13 +2515,13 @@ var $defineProperty$1 = function defineProperty(it, key, D){
   _anObject(D);
   if(_has(AllSymbols, key)){
     if(!D.enumerable){
-      if(!_has(it, HIDDEN))dP$1(it, HIDDEN, _propertyDesc(1, {}));
+      if(!_has(it, HIDDEN))dP$2(it, HIDDEN, _propertyDesc(1, {}));
       it[HIDDEN][key] = true;
     } else {
       if(_has(it, HIDDEN) && it[HIDDEN][key])it[HIDDEN][key] = false;
       D = _objectCreate(D, {enumerable: _propertyDesc(0, false)});
     } return setSymbolDesc(it, key, D);
-  } return dP$1(it, key, D);
+  } return dP$2(it, key, D);
 };
 var $defineProperties = function defineProperties(it, P){
   _anObject(it);
@@ -2578,282 +2817,11 @@ exports.default = function (subClass, superClass) {
 
 var _inherits = unwrapExports(inherits);
 
-var SPECIES$2  = _wks('species');
-
-var _arraySpeciesConstructor = function(original){
-  var C;
-  if(_isArray(original)){
-    C = original.constructor;
-    // cross-realm fallback
-    if(typeof C == 'function' && (C === Array || _isArray(C.prototype)))C = undefined;
-    if(_isObject(C)){
-      C = C[SPECIES$2];
-      if(C === null)C = undefined;
-    }
-  } return C === undefined ? Array : C;
-};
-
-// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-
-
-var _arraySpeciesCreate = function(original, length){
-  return new (_arraySpeciesConstructor(original))(length);
-};
-
-// 0 -> Array#forEach
-// 1 -> Array#_map
-// 2 -> Array#filter
-// 3 -> Array#some
-// 4 -> Array#every
-// 5 -> Array#find
-// 6 -> Array#findIndex
-
-var _arrayMethods = function(TYPE, $create){
-  var IS_MAP        = TYPE == 1
-    , IS_FILTER     = TYPE == 2
-    , IS_SOME       = TYPE == 3
-    , IS_EVERY      = TYPE == 4
-    , IS_FIND_INDEX = TYPE == 6
-    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX
-    , create        = $create || _arraySpeciesCreate;
-  return function($this, callbackfn, that){
-    var O      = _toObject($this)
-      , self   = _iobject(O)
-      , f      = _ctx(callbackfn, that, 3)
-      , length = _toLength(self.length)
-      , index  = 0
-      , result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined
-      , val, res;
-    for(;length > index; index++)if(NO_HOLES || index in self){
-      val = self[index];
-      res = f(val, index, O);
-      if(TYPE){
-        if(IS_MAP)result[index] = res;            // _map
-        else if(res)switch(TYPE){
-          case 3: return true;                    // some
-          case 5: return val;                     // find
-          case 6: return index;                   // findIndex
-          case 2: result.push(val);               // filter
-        } else if(IS_EVERY)return false;          // every
-      }
-    }
-    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
-  };
-};
-
-// 19.1.2.1 Object.assign(target, source, ...)
-var $assign  = Object.assign;
-
-// should work with symbols and should have deterministic property order (V8 bug)
-var _objectAssign = !$assign || _fails(function(){
-  var A = {}
-    , B = {}
-    , S = Symbol()
-    , K = 'abcdefghijklmnopqrst';
-  A[S] = 7;
-  K.split('').forEach(function(k){ B[k] = k; });
-  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
-}) ? function assign(target, source){ // eslint-disable-line no-unused-vars
-  var T     = _toObject(target)
-    , aLen  = arguments.length
-    , index = 1
-    , getSymbols = _objectGops.f
-    , isEnum     = _objectPie.f;
-  while(aLen > index){
-    var S      = _iobject(arguments[index++])
-      , keys   = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S)
-      , length = keys.length
-      , j      = 0
-      , key;
-    while(length > j)if(isEnum.call(S, key = keys[j++]))T[key] = S[key];
-  } return T;
-} : $assign;
-
-var getWeak           = _meta.getWeak;
-var arrayFind         = _arrayMethods(5);
-var arrayFindIndex    = _arrayMethods(6);
-var id$1                = 0;
-
-// fallback for uncaught frozen keys
-var uncaughtFrozenStore = function(that){
-  return that._l || (that._l = new UncaughtFrozenStore);
-};
-var UncaughtFrozenStore = function(){
-  this.a = [];
-};
-var findUncaughtFrozen = function(store, key){
-  return arrayFind(store.a, function(it){
-    return it[0] === key;
-  });
-};
-UncaughtFrozenStore.prototype = {
-  get: function(key){
-    var entry = findUncaughtFrozen(this, key);
-    if(entry)return entry[1];
-  },
-  has: function(key){
-    return !!findUncaughtFrozen(this, key);
-  },
-  set: function(key, value){
-    var entry = findUncaughtFrozen(this, key);
-    if(entry)entry[1] = value;
-    else this.a.push([key, value]);
-  },
-  'delete': function(key){
-    var index = arrayFindIndex(this.a, function(it){
-      return it[0] === key;
-    });
-    if(~index)this.a.splice(index, 1);
-    return !!~index;
-  }
-};
-
-var _collectionWeak = {
-  getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
-    var C = wrapper(function(that, iterable){
-      _anInstance(that, C, NAME, '_i');
-      that._i = id$1++;      // collection id
-      that._l = undefined; // leak store for uncaught frozen objects
-      if(iterable != undefined)_forOf(iterable, IS_MAP, that[ADDER], that);
-    });
-    _redefineAll(C.prototype, {
-      // 23.3.3.2 WeakMap.prototype.delete(key)
-      // 23.4.3.3 WeakSet.prototype.delete(value)
-      'delete': function(key){
-        if(!_isObject(key))return false;
-        var data = getWeak(key);
-        if(data === true)return uncaughtFrozenStore(this)['delete'](key);
-        return data && _has(data, this._i) && delete data[this._i];
-      },
-      // 23.3.3.4 WeakMap.prototype.has(key)
-      // 23.4.3.4 WeakSet.prototype.has(value)
-      has: function has(key){
-        if(!_isObject(key))return false;
-        var data = getWeak(key);
-        if(data === true)return uncaughtFrozenStore(this).has(key);
-        return data && _has(data, this._i);
-      }
-    });
-    return C;
-  },
-  def: function(that, key, value){
-    var data = getWeak(_anObject(key), true);
-    if(data === true)uncaughtFrozenStore(that).set(key, value);
-    else data[that._i] = value;
-    return that;
-  },
-  ufstore: uncaughtFrozenStore
-};
-
-var dP$2             = _objectDp.f;
-var each           = _arrayMethods(0);
-
-var _collection = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
-  var Base  = _global[NAME]
-    , C     = Base
-    , ADDER = IS_MAP ? 'set' : 'add'
-    , proto = C && C.prototype
-    , O     = {};
-  if(!_descriptors || typeof C != 'function' || !(IS_WEAK || proto.forEach && !_fails(function(){
-    new C().entries().next();
-  }))){
-    // create collection constructor
-    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
-    _redefineAll(C.prototype, methods);
-    _meta.NEED = true;
-  } else {
-    C = wrapper(function(target, iterable){
-      _anInstance(target, C, NAME, '_c');
-      target._c = new Base;
-      if(iterable != undefined)_forOf(iterable, IS_MAP, target[ADDER], target);
-    });
-    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','),function(KEY){
-      var IS_ADDER = KEY == 'add' || KEY == 'set';
-      if(KEY in proto && !(IS_WEAK && KEY == 'clear'))_hide(C.prototype, KEY, function(a, b){
-        _anInstance(this, C, KEY);
-        if(!IS_ADDER && IS_WEAK && !_isObject(a))return KEY == 'get' ? undefined : false;
-        var result = this._c[KEY](a === 0 ? 0 : a, b);
-        return IS_ADDER ? this : result;
-      });
-    });
-    if('size' in proto)dP$2(C.prototype, 'size', {
-      get: function(){
-        return this._c.size;
-      }
-    });
-  }
-
-  _setToStringTag(C, NAME);
-
-  O[NAME] = C;
-  _export(_export.G + _export.W + _export.F, O);
-
-  if(!IS_WEAK)common.setStrong(C, NAME, IS_MAP);
-
-  return C;
-};
-
-var es6_weakMap = createCommonjsModule(function (module) {
-'use strict';
-var each         = _arrayMethods(0)
-  , getWeak      = _meta.getWeak
-  , isExtensible = Object.isExtensible
-  , uncaughtFrozenStore = _collectionWeak.ufstore
-  , tmp          = {}
-  , InternalMap;
-
-var wrapper = function(get){
-  return function WeakMap(){
-    return get(this, arguments.length > 0 ? arguments[0] : undefined);
-  };
-};
-
-var methods = {
-  // 23.3.3.3 WeakMap.prototype.get(key)
-  get: function get(key){
-    if(_isObject(key)){
-      var data = getWeak(key);
-      if(data === true)return uncaughtFrozenStore(this).get(key);
-      return data ? data[this._i] : undefined;
-    }
-  },
-  // 23.3.3.5 WeakMap.prototype.set(key, value)
-  set: function set(key, value){
-    return _collectionWeak.def(this, key, value);
-  }
-};
-
-// 23.3 WeakMap Objects
-var $WeakMap = module.exports = _collection('WeakMap', wrapper, methods, _collectionWeak, true, true);
-
-// IE11 WeakMap frozen keys fix
-if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
-  InternalMap = _collectionWeak.getConstructor(wrapper);
-  _objectAssign(InternalMap.prototype, methods);
-  _meta.NEED = true;
-  each(['delete', 'has', 'get', 'set'], function(key){
-    var proto  = $WeakMap.prototype
-      , method = proto[key];
-    _redefine(proto, key, function(a, b){
-      // store frozen objects on internal weakmap shim
-      if(_isObject(a) && !isExtensible(a)){
-        if(!this._f)this._f = new InternalMap;
-        var result = this._f[key](a, b);
-        return key == 'set' ? this : result;
-      // store all the rest on native weakmap
-      } return method.call(this, a, b);
-    });
-  });
-}
+var eventEmitter_min = createCommonjsModule(function (module, exports) {
+!function(e,t){module.exports=t();}(commonjsGlobal,function(){return function(e){function t(r){if(n[r])return n[r].exports;var i=n[r]={exports:{},id:r,loaded:!1};return e[r].call(i.exports,i,i.exports,t),i.loaded=!0,i.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){var t,n;if(e&&e.__esModule)return e;if(t={},null!=e)for(n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t.default=e,t}function i(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var s,o,u,f;Object.defineProperty(t,"__esModule",{value:!0}),s=function(){function e(e,t){var n,r;for(n=0;n<t.length;n++)r=t[n],r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r);}return function(t,n,r){return n&&e(t.prototype,n),r&&e(t,r),t}}(),o=n(1),u=r(o),f=function(){function e(){i(this,e),this.listeners={},this.maxListeners=10;}return s(e,[{key:"setMaxListeners",value:function(e){this.maxListeners=e;}},{key:"getMaxListeners",value:function(){return this.maxListeners}},{key:"getAllListeners",value:function(){var e=void 0===arguments[0]?null:arguments[0];return e?this.listeners[e]||[]:this.listeners}},{key:"on",value:function(e,t){if(!u.isFunction(t))throw new TypeError("Listener must be a function");this.listeners[e]||(this.listeners[e]=[]);var n=this.listeners[e];n.push(t),n.length>this.maxListeners;}},{key:"once",value:function(e,t){function n(){this.off(e,n),t.apply(this,arguments);}if(!u.isFunction(t))throw new TypeError("Listener must be a function");this.on(e,n);}},{key:"off",value:function(e,t){var n,r,i,s;if(!u.isFunction(t))throw new TypeError("Listener must be a function");if(this.listeners[e])if(n=this.listeners[e],r=n.length,i=-1,1===r)this.listeners[e]=[];else{for(s=0;r>s;s++)if(n[s]===t){i=s;break}if(0>i)return;u.spliceOne(n,i);}}},{key:"emit",value:function(e){var t,n,r,i,s,o;if(this.listeners[e]){for(t=this.listeners[e],n=t.length,r=arguments.length,i=Array(r>1?r-1:0),s=1;r>s;s++)i[s-1]=arguments[s];if(1===n)t[0].apply(this,i);else for(o=0;n>o;o++)t[o].apply(this,i);}}}]),e}(),t.default=f,e.exports=t.default;},function(e,t){"use strict";function n(e){return"[object Function]"===Object.prototype.toString.call(e)}function r(e,t){for(var n=t,r=n+1,i=e.length;i>r;n+=1,r+=1)e[n]=e[r];e.pop();}Object.defineProperty(t,"__esModule",{value:!0}),t.isFunction=n,t.spliceOne=r;}])});
 });
 
-var weakMap$1 = _core.WeakMap;
-
-var weakMap = createCommonjsModule(function (module) {
-module.exports = { "default": weakMap$1, __esModule: true };
-});
-
-var _WeakMap = unwrapExports(weakMap);
+var EventEmitter = unwrapExports(eventEmitter_min);
 
 // 19.1.2.14 Object.keys(O)
 
@@ -2872,9 +2840,13 @@ module.exports = { "default": keys$1, __esModule: true };
 
 var _Object$keys = unwrapExports(keys);
 
-var AbstractCommand = function () {
+var AbstractCommand = function (_EventEmitter) {
+  _inherits(AbstractCommand, _EventEmitter);
+
   function AbstractCommand(action, params) {
     _classCallCheck(this, AbstractCommand);
+
+    var _this = _possibleConstructorReturn(this, (AbstractCommand.__proto__ || _Object$getPrototypeOf(AbstractCommand)).call(this));
 
     if (new.target === AbstractCommand) {
       throw new TypeError('Cannot construct AbstractCommand instance directly');
@@ -2886,11 +2858,12 @@ var AbstractCommand = function () {
       if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) !== 'object') throw new ReferenceError('Invalid params type');
       if (_Object$keys(params).length === 0) throw new ReferenceError('Empty params object');
     }
-    this._map = new _WeakMap();
-    this._map.set(this, {
+    _this._map = new _WeakMap();
+    _this._map.set(_this, {
       action: action,
       params: params
     });
+    return _this;
   }
 
   _createClass(AbstractCommand, [{
@@ -2918,7 +2891,21 @@ var AbstractCommand = function () {
   }]);
 
   return AbstractCommand;
-}();
+}(EventEmitter);
+
+var core_getIterator = _core.getIterator = function(it){
+  var iterFn = core_getIteratorMethod(it);
+  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
+  return _anObject(iterFn.call(it));
+};
+
+var getIterator$1 = core_getIterator;
+
+var getIterator = createCommonjsModule(function (module) {
+module.exports = { "default": getIterator$1, __esModule: true };
+});
+
+var _getIterator = unwrapExports(getIterator);
 
 var $JSON$1 = _core.JSON || (_core.JSON = {stringify: JSON.stringify});
 var stringify$1 = function stringify(it){ // eslint-disable-line no-unused-vars
@@ -3125,7 +3112,7 @@ var fetchBrowser$1 = createCommonjsModule(function (module, exports) {
         }
 
         function Headers(headers) {
-          this._map = {};
+          this.map = {};
 
           if (headers instanceof Headers) {
             headers.forEach(function(value, name) {
@@ -3142,31 +3129,31 @@ var fetchBrowser$1 = createCommonjsModule(function (module, exports) {
         Headers.prototype.append = function(name, value) {
           name = normalizeName(name);
           value = normalizeValue(value);
-          var oldValue = this._map[name];
-          this._map[name] = oldValue ? oldValue+','+value : value;
+          var oldValue = this.map[name];
+          this.map[name] = oldValue ? oldValue+','+value : value;
         };
 
         Headers.prototype['delete'] = function(name) {
-          delete this._map[normalizeName(name)];
+          delete this.map[normalizeName(name)];
         };
 
         Headers.prototype.get = function(name) {
           name = normalizeName(name);
-          return this.has(name) ? this._map[name] : null
+          return this.has(name) ? this.map[name] : null
         };
 
         Headers.prototype.has = function(name) {
-          return this._map.hasOwnProperty(normalizeName(name))
+          return this.map.hasOwnProperty(normalizeName(name))
         };
 
         Headers.prototype.set = function(name, value) {
-          this._map[normalizeName(name)] = normalizeValue(value);
+          this.map[normalizeName(name)] = normalizeValue(value);
         };
 
         Headers.prototype.forEach = function(callback, thisArg) {
-          for (var name in this._map) {
-            if (this._map.hasOwnProperty(name)) {
-              callback.call(thisArg, this._map[name], name, this);
+          for (var name in this.map) {
+            if (this.map.hasOwnProperty(name)) {
+              callback.call(thisArg, this.map[name], name, this);
             }
           }
         };
@@ -3541,13 +3528,13 @@ function assertString(input) {
 module.exports = exports['default'];
 });
 
-var toDate_1 = createCommonjsModule(function (module, exports) {
+var isIP_1 = createCommonjsModule(function (module, exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = toDate;
+exports.default = isIP;
 
 
 
@@ -3555,174 +3542,77 @@ var _assertString2 = _interopRequireDefault(assertString_1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function toDate(date) {
-  (0, _assertString2.default)(date);
-  date = Date.parse(date);
-  return !isNaN(date) ? new Date(date) : null;
-}
-module.exports = exports['default'];
-});
+var ipv4Maybe = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+var ipv6Block = /^[0-9A-F]{1,4}$/i;
 
-var toFloat_1 = createCommonjsModule(function (module, exports) {
-'use strict';
+function isIP(str) {
+  var version = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = toFloat;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function toFloat(str) {
   (0, _assertString2.default)(str);
-  return parseFloat(str);
-}
-module.exports = exports['default'];
-});
-
-var toInt_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = toInt;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function toInt(str, radix) {
-  (0, _assertString2.default)(str);
-  return parseInt(str, radix || 10);
-}
-module.exports = exports['default'];
-});
-
-var toBoolean_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = toBoolean;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function toBoolean(str, strict) {
-  (0, _assertString2.default)(str);
-  if (strict) {
-    return str === '1' || str === 'true';
-  }
-  return str !== '0' && str !== 'false' && str !== '';
-}
-module.exports = exports['default'];
-});
-
-var equals_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = equals;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function equals(str, comparison) {
-  (0, _assertString2.default)(str);
-  return str === comparison;
-}
-module.exports = exports['default'];
-});
-
-var toString_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.default = toString;
-function toString(input) {
-  if ((typeof input === 'undefined' ? 'undefined' : _typeof(input)) === 'object' && input !== null) {
-    if (typeof input.toString === 'function') {
-      input = input.toString();
-    } else {
-      input = '[object Object]';
+  version = String(version);
+  if (!version) {
+    return isIP(str, 4) || isIP(str, 6);
+  } else if (version === '4') {
+    if (!ipv4Maybe.test(str)) {
+      return false;
     }
-  } else if (input === null || typeof input === 'undefined' || isNaN(input) && !input.length) {
-    input = '';
+    var parts = str.split('.').sort(function (a, b) {
+      return a - b;
+    });
+    return parts[3] <= 255;
+  } else if (version === '6') {
+    var blocks = str.split(':');
+    var foundOmissionBlock = false; // marker to indicate ::
+
+    // At least some OS accept the last 32 bits of an IPv6 address
+    // (i.e. 2 of the blocks) in IPv4 notation, and RFC 3493 says
+    // that '::ffff:a.b.c.d' is valid for IPv4-mapped IPv6 addresses,
+    // and '::a.b.c.d' is deprecated, but also valid.
+    var foundIPv4TransitionBlock = isIP(blocks[blocks.length - 1], 4);
+    var expectedNumberOfBlocks = foundIPv4TransitionBlock ? 7 : 8;
+
+    if (blocks.length > expectedNumberOfBlocks) {
+      return false;
+    }
+    // initial or final ::
+    if (str === '::') {
+      return true;
+    } else if (str.substr(0, 2) === '::') {
+      blocks.shift();
+      blocks.shift();
+      foundOmissionBlock = true;
+    } else if (str.substr(str.length - 2) === '::') {
+      blocks.pop();
+      blocks.pop();
+      foundOmissionBlock = true;
+    }
+
+    for (var i = 0; i < blocks.length; ++i) {
+      // test for a :: which can not be at the string start/end
+      // since those cases have been handled above
+      if (blocks[i] === '' && i > 0 && i < blocks.length - 1) {
+        if (foundOmissionBlock) {
+          return false; // multiple :: in address
+        }
+        foundOmissionBlock = true;
+      } else if (foundIPv4TransitionBlock && i === blocks.length - 1) {
+        // it has been checked before that the last
+        // block is a valid IPv4 address
+      } else if (!ipv6Block.test(blocks[i])) {
+        return false;
+      }
+    }
+    if (foundOmissionBlock) {
+      return blocks.length >= 1;
+    }
+    return blocks.length === expectedNumberOfBlocks;
   }
-  return String(input);
+  return false;
 }
 module.exports = exports['default'];
 });
 
-var contains_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = contains;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _toString2 = _interopRequireDefault(toString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function contains(str, elem) {
-  (0, _assertString2.default)(str);
-  return str.indexOf((0, _toString2.default)(elem)) >= 0;
-}
-module.exports = exports['default'];
-});
-
-var matches_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = matches;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function matches(str, pattern, modifiers) {
-  (0, _assertString2.default)(str);
-  if (Object.prototype.toString.call(pattern) !== '[object RegExp]') {
-    pattern = new RegExp(pattern, modifiers);
-  }
-  return pattern.test(str);
-}
-module.exports = exports['default'];
-});
+var isIP = unwrapExports(isIP_1);
 
 var merge_1 = createCommonjsModule(function (module, exports) {
 'use strict';
@@ -3741,42 +3631,6 @@ function merge() {
     }
   }
   return obj;
-}
-module.exports = exports['default'];
-});
-
-var isByteLength_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.default = isByteLength;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* eslint-disable prefer-rest-params */
-function isByteLength(str, options) {
-  (0, _assertString2.default)(str);
-  var min = void 0;
-  var max = void 0;
-  if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) === 'object') {
-    min = options.min || 0;
-    max = options.max;
-  } else {
-    // backwards compatibility: isByteLength(str, min [, max])
-    min = arguments[1];
-    max = arguments[2];
-  }
-  var len = encodeURI(str).split(/%..|./).length - 1;
-  return len >= min && (typeof max === 'undefined' || len <= max);
 }
 module.exports = exports['default'];
 });
@@ -3841,6 +3695,44 @@ function isFDQN(str, options) {
     }
   }
   return true;
+}
+module.exports = exports['default'];
+});
+
+var isFQDN$1 = unwrapExports(isFQDN);
+
+var isByteLength_1 = createCommonjsModule(function (module, exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.default = isByteLength;
+
+
+
+var _assertString2 = _interopRequireDefault(assertString_1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* eslint-disable prefer-rest-params */
+function isByteLength(str, options) {
+  (0, _assertString2.default)(str);
+  var min = void 0;
+  var max = void 0;
+  if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) === 'object') {
+    min = options.min || 0;
+    max = options.max;
+  } else {
+    // backwards compatibility: isByteLength(str, min [, max])
+    min = arguments[1];
+    max = arguments[2];
+  }
+  var len = encodeURI(str).split(/%..|./).length - 1;
+  return len >= min && (typeof max === 'undefined' || len <= max);
 }
 module.exports = exports['default'];
 });
@@ -3937,613 +3829,7 @@ function isEmail(str, options) {
 module.exports = exports['default'];
 });
 
-var isIP_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isIP;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var ipv4Maybe = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-var ipv6Block = /^[0-9A-F]{1,4}$/i;
-
-function isIP(str) {
-  var version = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-  (0, _assertString2.default)(str);
-  version = String(version);
-  if (!version) {
-    return isIP(str, 4) || isIP(str, 6);
-  } else if (version === '4') {
-    if (!ipv4Maybe.test(str)) {
-      return false;
-    }
-    var parts = str.split('.').sort(function (a, b) {
-      return a - b;
-    });
-    return parts[3] <= 255;
-  } else if (version === '6') {
-    var blocks = str.split(':');
-    var foundOmissionBlock = false; // marker to indicate ::
-
-    // At least some OS accept the last 32 bits of an IPv6 address
-    // (i.e. 2 of the blocks) in IPv4 notation, and RFC 3493 says
-    // that '::ffff:a.b.c.d' is valid for IPv4-mapped IPv6 addresses,
-    // and '::a.b.c.d' is deprecated, but also valid.
-    var foundIPv4TransitionBlock = isIP(blocks[blocks.length - 1], 4);
-    var expectedNumberOfBlocks = foundIPv4TransitionBlock ? 7 : 8;
-
-    if (blocks.length > expectedNumberOfBlocks) {
-      return false;
-    }
-    // initial or final ::
-    if (str === '::') {
-      return true;
-    } else if (str.substr(0, 2) === '::') {
-      blocks.shift();
-      blocks.shift();
-      foundOmissionBlock = true;
-    } else if (str.substr(str.length - 2) === '::') {
-      blocks.pop();
-      blocks.pop();
-      foundOmissionBlock = true;
-    }
-
-    for (var i = 0; i < blocks.length; ++i) {
-      // test for a :: which can not be at the string start/end
-      // since those cases have been handled above
-      if (blocks[i] === '' && i > 0 && i < blocks.length - 1) {
-        if (foundOmissionBlock) {
-          return false; // multiple :: in address
-        }
-        foundOmissionBlock = true;
-      } else if (foundIPv4TransitionBlock && i === blocks.length - 1) {
-        // it has been checked before that the last
-        // block is a valid IPv4 address
-      } else if (!ipv6Block.test(blocks[i])) {
-        return false;
-      }
-    }
-    if (foundOmissionBlock) {
-      return blocks.length >= 1;
-    }
-    return blocks.length === expectedNumberOfBlocks;
-  }
-  return false;
-}
-module.exports = exports['default'];
-});
-
-var isURL_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isURL;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _isFQDN2 = _interopRequireDefault(isFQDN);
-
-
-
-var _isIP2 = _interopRequireDefault(isIP_1);
-
-
-
-var _merge2 = _interopRequireDefault(merge_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var default_url_options = {
-  protocols: ['http', 'https', 'ftp'],
-  require_tld: true,
-  require_protocol: false,
-  require_host: true,
-  require_valid_protocol: true,
-  allow_underscores: false,
-  allow_trailing_dot: false,
-  allow_protocol_relative_urls: false
-};
-
-var wrapped_ipv6 = /^\[([^\]]+)\](?::([0-9]+))?$/;
-
-function isRegExp(obj) {
-  return Object.prototype.toString.call(obj) === '[object RegExp]';
-}
-
-function checkHost(host, matches) {
-  for (var i = 0; i < matches.length; i++) {
-    var match = matches[i];
-    if (host === match || isRegExp(match) && match.test(host)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isURL(url, options) {
-  (0, _assertString2.default)(url);
-  if (!url || url.length >= 2083 || /[\s<>]/.test(url)) {
-    return false;
-  }
-  if (url.indexOf('mailto:') === 0) {
-    return false;
-  }
-  options = (0, _merge2.default)(options, default_url_options);
-  var protocol = void 0,
-      auth = void 0,
-      host = void 0,
-      hostname = void 0,
-      port = void 0,
-      port_str = void 0,
-      split = void 0,
-      ipv6 = void 0;
-
-  split = url.split('#');
-  url = split.shift();
-
-  split = url.split('?');
-  url = split.shift();
-
-  split = url.split('://');
-  if (split.length > 1) {
-    protocol = split.shift();
-    if (options.require_valid_protocol && options.protocols.indexOf(protocol) === -1) {
-      return false;
-    }
-  } else if (options.require_protocol) {
-    return false;
-  } else if (options.allow_protocol_relative_urls && url.substr(0, 2) === '//') {
-    split[0] = url.substr(2);
-  }
-  url = split.join('://');
-
-  if (url === '') {
-    return false;
-  }
-
-  split = url.split('/');
-  url = split.shift();
-
-  if (url === '' && !options.require_host) {
-    return true;
-  }
-
-  split = url.split('@');
-  if (split.length > 1) {
-    auth = split.shift();
-    if (auth.indexOf(':') >= 0 && auth.split(':').length > 2) {
-      return false;
-    }
-  }
-  hostname = split.join('@');
-
-  port_str = null;
-  ipv6 = null;
-  var ipv6_match = hostname.match(wrapped_ipv6);
-  if (ipv6_match) {
-    host = '';
-    ipv6 = ipv6_match[1];
-    port_str = ipv6_match[2] || null;
-  } else {
-    split = hostname.split(':');
-    host = split.shift();
-    if (split.length) {
-      port_str = split.join(':');
-    }
-  }
-
-  if (port_str !== null) {
-    port = parseInt(port_str, 10);
-    if (!/^[0-9]+$/.test(port_str) || port <= 0 || port > 65535) {
-      return false;
-    }
-  }
-
-  if (!(0, _isIP2.default)(host) && !(0, _isFQDN2.default)(host, options) && (!ipv6 || !(0, _isIP2.default)(ipv6, 6))) {
-    return false;
-  }
-
-  host = host || ipv6;
-
-  if (options.host_whitelist && !checkHost(host, options.host_whitelist)) {
-    return false;
-  }
-  if (options.host_blacklist && checkHost(host, options.host_blacklist)) {
-    return false;
-  }
-
-  return true;
-}
-module.exports = exports['default'];
-});
-
-var isMACAddress_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isMACAddress;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var macAddress = /^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$/;
-
-function isMACAddress(str) {
-  (0, _assertString2.default)(str);
-  return macAddress.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isBoolean_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isBoolean;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isBoolean(str) {
-  (0, _assertString2.default)(str);
-  return ['true', 'false', '1', '0'].indexOf(str) >= 0;
-}
-module.exports = exports['default'];
-});
-
-var alpha_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var alpha = exports.alpha = {
-  'en-US': /^[A-Z]+$/i,
-  'cs-CZ': /^[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]+$/i,
-  'da-DK': /^[A-ZÆØÅ]+$/i,
-  'de-DE': /^[A-ZÄÖÜß]+$/i,
-  'es-ES': /^[A-ZÁÉÍÑÓÚÜ]+$/i,
-  'fr-FR': /^[A-ZÀÂÆÇÉÈÊËÏÎÔŒÙÛÜŸ]+$/i,
-  'nl-NL': /^[A-ZÉËÏÓÖÜ]+$/i,
-  'hu-HU': /^[A-ZÁÉÍÓÖŐÚÜŰ]+$/i,
-  'pl-PL': /^[A-ZĄĆĘŚŁŃÓŻŹ]+$/i,
-  'pt-PT': /^[A-ZÃÁÀÂÇÉÊÍÕÓÔÚÜ]+$/i,
-  'ru-RU': /^[А-ЯЁ]+$/i,
-  'sr-RS@latin': /^[A-ZČĆŽŠĐ]+$/i,
-  'sr-RS': /^[А-ЯЂЈЉЊЋЏ]+$/i,
-  'tr-TR': /^[A-ZÇĞİıÖŞÜ]+$/i,
-  'uk-UA': /^[А-ЩЬЮЯЄIЇҐ]+$/i,
-  ar: /^[ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوىيًٌٍَُِّْٰ]+$/
-};
-
-var alphanumeric = exports.alphanumeric = {
-  'en-US': /^[0-9A-Z]+$/i,
-  'cs-CZ': /^[0-9A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]+$/i,
-  'da-DK': /^[0-9A-ZÆØÅ]$/i,
-  'de-DE': /^[0-9A-ZÄÖÜß]+$/i,
-  'es-ES': /^[0-9A-ZÁÉÍÑÓÚÜ]+$/i,
-  'fr-FR': /^[0-9A-ZÀÂÆÇÉÈÊËÏÎÔŒÙÛÜŸ]+$/i,
-  'hu-HU': /^[0-9A-ZÁÉÍÓÖŐÚÜŰ]+$/i,
-  'nl-NL': /^[0-9A-ZÉËÏÓÖÜ]+$/i,
-  'pl-PL': /^[0-9A-ZĄĆĘŚŁŃÓŻŹ]+$/i,
-  'pt-PT': /^[0-9A-ZÃÁÀÂÇÉÊÍÕÓÔÚÜ]+$/i,
-  'ru-RU': /^[0-9А-ЯЁ]+$/i,
-  'sr-RS@latin': /^[0-9A-ZČĆŽŠĐ]+$/i,
-  'sr-RS': /^[0-9А-ЯЂЈЉЊЋЏ]+$/i,
-  'tr-TR': /^[0-9A-ZÇĞİıÖŞÜ]+$/i,
-  'uk-UA': /^[0-9А-ЩЬЮЯЄIЇҐ]+$/i,
-  ar: /^[٠١٢٣٤٥٦٧٨٩0-9ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوىيًٌٍَُِّْٰ]+$/
-};
-
-var englishLocales = exports.englishLocales = ['AU', 'GB', 'HK', 'IN', 'NZ', 'ZA', 'ZM'];
-
-for (var locale, i = 0; i < englishLocales.length; i++) {
-  locale = 'en-' + englishLocales[i];
-  alpha[locale] = alpha['en-US'];
-  alphanumeric[locale] = alphanumeric['en-US'];
-}
-
-alpha['pt-BR'] = alpha['pt-PT'];
-alphanumeric['pt-BR'] = alphanumeric['pt-PT'];
-
-// Source: http://www.localeplanet.com/java/
-var arabicLocales = exports.arabicLocales = ['AE', 'BH', 'DZ', 'EG', 'IQ', 'JO', 'KW', 'LB', 'LY', 'MA', 'QM', 'QA', 'SA', 'SD', 'SY', 'TN', 'YE'];
-
-for (var _locale, _i = 0; _i < arabicLocales.length; _i++) {
-  _locale = 'ar-' + arabicLocales[_i];
-  alpha[_locale] = alpha.ar;
-  alphanumeric[_locale] = alphanumeric.ar;
-}
-});
-
-var isAlpha_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isAlpha;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isAlpha(str) {
-  var locale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'en-US';
-
-  (0, _assertString2.default)(str);
-  if (locale in alpha_1.alpha) {
-    return alpha_1.alpha[locale].test(str);
-  }
-  throw new Error('Invalid locale \'' + locale + '\'');
-}
-module.exports = exports['default'];
-});
-
-var isAlphanumeric_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isAlphanumeric;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isAlphanumeric(str) {
-  var locale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'en-US';
-
-  (0, _assertString2.default)(str);
-  if (locale in alpha_1.alphanumeric) {
-    return alpha_1.alphanumeric[locale].test(str);
-  }
-  throw new Error('Invalid locale \'' + locale + '\'');
-}
-module.exports = exports['default'];
-});
-
-var isNumeric_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isNumeric;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var numeric = /^[-+]?[0-9]+$/;
-
-function isNumeric(str) {
-  (0, _assertString2.default)(str);
-  return numeric.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isLowercase_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isLowercase;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isLowercase(str) {
-  (0, _assertString2.default)(str);
-  return str === str.toLowerCase();
-}
-module.exports = exports['default'];
-});
-
-var isUppercase_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isUppercase;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isUppercase(str) {
-  (0, _assertString2.default)(str);
-  return str === str.toUpperCase();
-}
-module.exports = exports['default'];
-});
-
-var isAscii_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isAscii;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* eslint-disable no-control-regex */
-var ascii = /^[\x00-\x7F]+$/;
-/* eslint-enable no-control-regex */
-
-function isAscii(str) {
-  (0, _assertString2.default)(str);
-  return ascii.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isFullWidth_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.fullWidth = undefined;
-exports.default = isFullWidth;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var fullWidth = exports.fullWidth = /[^\u0020-\u007E\uFF61-\uFF9F\uFFA0-\uFFDC\uFFE8-\uFFEE0-9a-zA-Z]/;
-
-function isFullWidth(str) {
-  (0, _assertString2.default)(str);
-  return fullWidth.test(str);
-}
-});
-
-var isHalfWidth_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.halfWidth = undefined;
-exports.default = isHalfWidth;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var halfWidth = exports.halfWidth = /[\u0020-\u007E\uFF61-\uFF9F\uFFA0-\uFFDC\uFFE8-\uFFEE0-9a-zA-Z]/;
-
-function isHalfWidth(str) {
-  (0, _assertString2.default)(str);
-  return halfWidth.test(str);
-}
-});
-
-var isVariableWidth_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isVariableWidth;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isVariableWidth(str) {
-  (0, _assertString2.default)(str);
-  return isFullWidth_1.fullWidth.test(str) && isHalfWidth_1.halfWidth.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isMultibyte_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isMultibyte;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* eslint-disable no-control-regex */
-var multibyte = /[^\x00-\x7F]/;
-/* eslint-enable no-control-regex */
-
-function isMultibyte(str) {
-  (0, _assertString2.default)(str);
-  return multibyte.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isSurrogatePair_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isSurrogatePair;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var surrogatePair = /[\uD800-\uDBFF][\uDC00-\uDFFF]/;
-
-function isSurrogatePair(str) {
-  (0, _assertString2.default)(str);
-  return surrogatePair.test(str);
-}
-module.exports = exports['default'];
-});
+var isEmail = unwrapExports(isEmail_1);
 
 var isInt_1 = createCommonjsModule(function (module, exports) {
 'use strict';
@@ -4581,13 +3867,15 @@ function isInt(str, options) {
 module.exports = exports['default'];
 });
 
-var isFloat_1 = createCommonjsModule(function (module, exports) {
+var isInt = unwrapExports(isInt_1);
+
+var matches_1 = createCommonjsModule(function (module, exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = isFloat;
+exports.default = matches;
 
 
 
@@ -4595,1545 +3883,17 @@ var _assertString2 = _interopRequireDefault(assertString_1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var float = /^(?:[-+])?(?:[0-9]+)?(?:\.[0-9]*)?(?:[eE][\+\-]?(?:[0-9]+))?$/;
-
-function isFloat(str, options) {
+function matches(str, pattern, modifiers) {
   (0, _assertString2.default)(str);
-  options = options || {};
-  if (str === '' || str === '.') {
-    return false;
+  if (Object.prototype.toString.call(pattern) !== '[object RegExp]') {
+    pattern = new RegExp(pattern, modifiers);
   }
-  return float.test(str) && (!options.hasOwnProperty('min') || str >= options.min) && (!options.hasOwnProperty('max') || str <= options.max) && (!options.hasOwnProperty('lt') || str < options.lt) && (!options.hasOwnProperty('gt') || str > options.gt);
+  return pattern.test(str);
 }
 module.exports = exports['default'];
 });
 
-var isDecimal_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isDecimal;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var decimal = /^[-+]?([0-9]+|\.[0-9]+|[0-9]+\.[0-9]+)$/;
-
-function isDecimal(str) {
-  (0, _assertString2.default)(str);
-  return str !== '' && decimal.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isHexadecimal_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isHexadecimal;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var hexadecimal = /^[0-9A-F]+$/i;
-
-function isHexadecimal(str) {
-  (0, _assertString2.default)(str);
-  return hexadecimal.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isDivisibleBy_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isDivisibleBy;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _toFloat2 = _interopRequireDefault(toFloat_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isDivisibleBy(str, num) {
-  (0, _assertString2.default)(str);
-  return (0, _toFloat2.default)(str) % parseInt(num, 10) === 0;
-}
-module.exports = exports['default'];
-});
-
-var isHexColor_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isHexColor;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var hexcolor = /^#?([0-9A-F]{3}|[0-9A-F]{6})$/i;
-
-function isHexColor(str) {
-  (0, _assertString2.default)(str);
-  return hexcolor.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isISRC_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isISRC;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// see http://isrc.ifpi.org/en/isrc-standard/code-syntax
-var isrc = /^[A-Z]{2}[0-9A-Z]{3}\d{2}\d{5}$/;
-
-function isISRC(str) {
-  (0, _assertString2.default)(str);
-  return isrc.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isMD5_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isMD5;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var md5 = /^[a-f0-9]{32}$/;
-
-function isMD5(str) {
-  (0, _assertString2.default)(str);
-  return md5.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isJSON_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.default = isJSON;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isJSON(str) {
-  (0, _assertString2.default)(str);
-  try {
-    var obj = JSON.parse(str);
-    return !!obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object';
-  } catch (e) {/* ignore */}
-  return false;
-}
-module.exports = exports['default'];
-});
-
-var isEmpty_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isEmpty;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isEmpty(str) {
-  (0, _assertString2.default)(str);
-  return str.length === 0;
-}
-module.exports = exports['default'];
-});
-
-var isLength_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.default = isLength;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* eslint-disable prefer-rest-params */
-function isLength(str, options) {
-  (0, _assertString2.default)(str);
-  var min = void 0;
-  var max = void 0;
-  if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) === 'object') {
-    min = options.min || 0;
-    max = options.max;
-  } else {
-    // backwards compatibility: isLength(str, min [, max])
-    min = arguments[1];
-    max = arguments[2];
-  }
-  var surrogatePairs = str.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g) || [];
-  var len = str.length - surrogatePairs.length;
-  return len >= min && (typeof max === 'undefined' || len <= max);
-}
-module.exports = exports['default'];
-});
-
-var isUUID_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isUUID;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var uuid = {
-  3: /^[0-9A-F]{8}-[0-9A-F]{4}-3[0-9A-F]{3}-[0-9A-F]{4}-[0-9A-F]{12}$/i,
-  4: /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
-  5: /^[0-9A-F]{8}-[0-9A-F]{4}-5[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
-  all: /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i
-};
-
-function isUUID(str) {
-  var version = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'all';
-
-  (0, _assertString2.default)(str);
-  var pattern = uuid[version];
-  return pattern && pattern.test(str);
-}
-module.exports = exports['default'];
-});
-
-var isMongoId_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isMongoId;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _isHexadecimal2 = _interopRequireDefault(isHexadecimal_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isMongoId(str) {
-  (0, _assertString2.default)(str);
-  return (0, _isHexadecimal2.default)(str) && str.length === 24;
-}
-module.exports = exports['default'];
-});
-
-var isAfter_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isAfter;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _toDate2 = _interopRequireDefault(toDate_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isAfter(str) {
-  var date = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : String(new Date());
-
-  (0, _assertString2.default)(str);
-  var comparison = (0, _toDate2.default)(date);
-  var original = (0, _toDate2.default)(str);
-  return !!(original && comparison && original > comparison);
-}
-module.exports = exports['default'];
-});
-
-var isBefore_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isBefore;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _toDate2 = _interopRequireDefault(toDate_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isBefore(str) {
-  var date = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : String(new Date());
-
-  (0, _assertString2.default)(str);
-  var comparison = (0, _toDate2.default)(date);
-  var original = (0, _toDate2.default)(str);
-  return !!(original && comparison && original < comparison);
-}
-module.exports = exports['default'];
-});
-
-var isIn_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.default = isIn;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _toString2 = _interopRequireDefault(toString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isIn(str, options) {
-  (0, _assertString2.default)(str);
-  var i = void 0;
-  if (Object.prototype.toString.call(options) === '[object Array]') {
-    var array = [];
-    for (i in options) {
-      if ({}.hasOwnProperty.call(options, i)) {
-        array[i] = (0, _toString2.default)(options[i]);
-      }
-    }
-    return array.indexOf(str) >= 0;
-  } else if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) === 'object') {
-    return options.hasOwnProperty(str);
-  } else if (options && typeof options.indexOf === 'function') {
-    return options.indexOf(str) >= 0;
-  }
-  return false;
-}
-module.exports = exports['default'];
-});
-
-var isCreditCard_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isCreditCard;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* eslint-disable max-len */
-var creditCard = /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|(222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11}|62[0-9]{14})$/;
-/* eslint-enable max-len */
-
-function isCreditCard(str) {
-  (0, _assertString2.default)(str);
-  var sanitized = str.replace(/[- ]+/g, '');
-  if (!creditCard.test(sanitized)) {
-    return false;
-  }
-  var sum = 0;
-  var digit = void 0;
-  var tmpNum = void 0;
-  var shouldDouble = void 0;
-  for (var i = sanitized.length - 1; i >= 0; i--) {
-    digit = sanitized.substring(i, i + 1);
-    tmpNum = parseInt(digit, 10);
-    if (shouldDouble) {
-      tmpNum *= 2;
-      if (tmpNum >= 10) {
-        sum += tmpNum % 10 + 1;
-      } else {
-        sum += tmpNum;
-      }
-    } else {
-      sum += tmpNum;
-    }
-    shouldDouble = !shouldDouble;
-  }
-  return !!(sum % 10 === 0 ? sanitized : false);
-}
-module.exports = exports['default'];
-});
-
-var isISIN_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isISIN;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var isin = /^[A-Z]{2}[0-9A-Z]{9}[0-9]$/;
-
-function isISIN(str) {
-  (0, _assertString2.default)(str);
-  if (!isin.test(str)) {
-    return false;
-  }
-
-  var checksumStr = str.replace(/[A-Z]/g, function (character) {
-    return parseInt(character, 36);
-  });
-
-  var sum = 0;
-  var digit = void 0;
-  var tmpNum = void 0;
-  var shouldDouble = true;
-  for (var i = checksumStr.length - 2; i >= 0; i--) {
-    digit = checksumStr.substring(i, i + 1);
-    tmpNum = parseInt(digit, 10);
-    if (shouldDouble) {
-      tmpNum *= 2;
-      if (tmpNum >= 10) {
-        sum += tmpNum + 1;
-      } else {
-        sum += tmpNum;
-      }
-    } else {
-      sum += tmpNum;
-    }
-    shouldDouble = !shouldDouble;
-  }
-
-  return parseInt(str.substr(str.length - 1), 10) === (10000 - sum) % 10;
-}
-module.exports = exports['default'];
-});
-
-var isISBN_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isISBN;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var isbn10Maybe = /^(?:[0-9]{9}X|[0-9]{10})$/;
-var isbn13Maybe = /^(?:[0-9]{13})$/;
-var factor = [1, 3];
-
-function isISBN(str) {
-  var version = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-  (0, _assertString2.default)(str);
-  version = String(version);
-  if (!version) {
-    return isISBN(str, 10) || isISBN(str, 13);
-  }
-  var sanitized = str.replace(/[\s-]+/g, '');
-  var checksum = 0;
-  var i = void 0;
-  if (version === '10') {
-    if (!isbn10Maybe.test(sanitized)) {
-      return false;
-    }
-    for (i = 0; i < 9; i++) {
-      checksum += (i + 1) * sanitized.charAt(i);
-    }
-    if (sanitized.charAt(9) === 'X') {
-      checksum += 10 * 10;
-    } else {
-      checksum += 10 * sanitized.charAt(9);
-    }
-    if (checksum % 11 === 0) {
-      return !!sanitized;
-    }
-  } else if (version === '13') {
-    if (!isbn13Maybe.test(sanitized)) {
-      return false;
-    }
-    for (i = 0; i < 12; i++) {
-      checksum += factor[i % 2] * sanitized.charAt(i);
-    }
-    if (sanitized.charAt(12) - (10 - checksum % 10) % 10 === 0) {
-      return !!sanitized;
-    }
-  }
-  return false;
-}
-module.exports = exports['default'];
-});
-
-var isISSN_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isISSN;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var issn = '^\\d{4}-?\\d{3}[\\dX]$';
-
-function isISSN(str) {
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  (0, _assertString2.default)(str);
-  var testIssn = issn;
-  testIssn = options.require_hyphen ? testIssn.replace('?', '') : testIssn;
-  testIssn = options.case_sensitive ? new RegExp(testIssn) : new RegExp(testIssn, 'i');
-  if (!testIssn.test(str)) {
-    return false;
-  }
-  var issnDigits = str.replace('-', '');
-  var position = 8;
-  var checksum = 0;
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = issnDigits[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var digit = _step.value;
-
-      var digitValue = digit.toUpperCase() === 'X' ? 10 : +digit;
-      checksum += digitValue * position;
-      --position;
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
-
-  return checksum % 11 === 0;
-}
-module.exports = exports['default'];
-});
-
-var isMobilePhone_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isMobilePhone;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* eslint-disable max-len */
-var phones = {
-  'ar-DZ': /^(\+?213|0)(5|6|7)\d{8}$/,
-  'ar-SY': /^(!?(\+?963)|0)?9\d{8}$/,
-  'ar-SA': /^(!?(\+?966)|0)?5\d{8}$/,
-  'en-US': /^(\+?1)?[2-9]\d{2}[2-9](?!11)\d{6}$/,
-  'cs-CZ': /^(\+?420)? ?[1-9][0-9]{2} ?[0-9]{3} ?[0-9]{3}$/,
-  'de-DE': /^(\+?49[ \.\-])?([\(]{1}[0-9]{1,6}[\)])?([0-9 \.\-\/]{3,20})((x|ext|extension)[ ]?[0-9]{1,4})?$/,
-  'da-DK': /^(\+?45)?(\d{8})$/,
-  'el-GR': /^(\+?30)?(69\d{8})$/,
-  'en-AU': /^(\+?61|0)4\d{8}$/,
-  'en-GB': /^(\+?44|0)7\d{9}$/,
-  'en-HK': /^(\+?852\-?)?[569]\d{3}\-?\d{4}$/,
-  'en-IN': /^(\+?91|0)?[789]\d{9}$/,
-  'en-KE': /^(\+?254|0)?[7]\d{8}$/,
-  'en-NG': /^(\+?234|0)?[789]\d{9}$/,
-  'en-NZ': /^(\+?64|0)2\d{7,9}$/,
-  'en-UG': /^(\+?256|0)?[7]\d{8}$/,
-  'en-RW': /^(\+?250|0)?[7]\d{8}$/,
-  'en-TZ': /^(\+?255|0)?[67]\d{8}$/,
-  'en-ZA': /^(\+?27|0)\d{9}$/,
-  'en-ZM': /^(\+?26)?09[567]\d{7}$/,
-  'es-ES': /^(\+?34)?(6\d{1}|7[1234])\d{7}$/,
-  'fi-FI': /^(\+?358|0)\s?(4(0|1|2|4|5|6)?|50)\s?(\d\s?){4,8}\d$/,
-  'fa-IR': /^(\+?98[\-\s]?|0)9[0-39]\d[\-\s]?\d{3}[\-\s]?\d{4}$/,
-  'fr-FR': /^(\+?33|0)[67]\d{8}$/,
-  'he-IL': /^(\+972|0)([23489]|5[0248]|77)[1-9]\d{6}/,
-  'hu-HU': /^(\+?36)(20|30|70)\d{7}$/,
-  'lt-LT': /^(\+370|8)\d{8}$/,
-  'id-ID': /^(\+?62|0[1-9])[\s|\d]+$/,
-  'it-IT': /^(\+?39)?\s?3\d{2} ?\d{6,7}$/,
-  'ko-KR': /^((\+?82)[ \-]?)?0?1([0|1|6|7|8|9]{1})[ \-]?\d{3,4}[ \-]?\d{4}$/,
-  'ja-JP': /^(\+?81|0)\d{1,4}[ \-]?\d{1,4}[ \-]?\d{4}$/,
-  'ms-MY': /^(\+?6?01){1}(([145]{1}(\-|\s)?\d{7,8})|([236789]{1}(\s|\-)?\d{7}))$/,
-  'nb-NO': /^(\+?47)?[49]\d{7}$/,
-  'nl-BE': /^(\+?32|0)4?\d{8}$/,
-  'nn-NO': /^(\+?47)?[49]\d{7}$/,
-  'pl-PL': /^(\+?48)? ?[5-8]\d ?\d{3} ?\d{2} ?\d{2}$/,
-  'pt-BR': /^(\+?55|0)\-?[1-9]{2}\-?[2-9]{1}\d{3,4}\-?\d{4}$/,
-  'pt-PT': /^(\+?351)?9[1236]\d{7}$/,
-  'ro-RO': /^(\+?4?0)\s?7\d{2}(\/|\s|\.|\-)?\d{3}(\s|\.|\-)?\d{3}$/,
-  'en-PK': /^((\+92)|(0092))-{0,1}\d{3}-{0,1}\d{7}$|^\d{11}$|^\d{4}-\d{7}$/,
-  'ru-RU': /^(\+?7|8)?9\d{9}$/,
-  'sr-RS': /^(\+3816|06)[- \d]{5,9}$/,
-  'tr-TR': /^(\+?90|0)?5\d{9}$/,
-  'vi-VN': /^(\+?84|0)?((1(2([0-9])|6([2-9])|88|99))|(9((?!5)[0-9])))([0-9]{7})$/,
-  'zh-CN': /^(\+?0?86\-?)?1[345789]\d{9}$/,
-  'zh-TW': /^(\+?886\-?|0)?9\d{8}$/
-};
-/* eslint-enable max-len */
-
-// aliases
-phones['en-CA'] = phones['en-US'];
-phones['fr-BE'] = phones['nl-BE'];
-phones['zh-HK'] = phones['en-HK'];
-
-function isMobilePhone(str, locale) {
-  (0, _assertString2.default)(str);
-  if (locale in phones) {
-    return phones[locale].test(str);
-  } else if (locale === 'any') {
-    return !!Object.values(phones).find(function (phone) {
-      return phone.test(str);
-    });
-  }
-  throw new Error('Invalid locale \'' + locale + '\'');
-}
-module.exports = exports['default'];
-});
-
-var isCurrency_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isCurrency;
-
-
-
-var _merge2 = _interopRequireDefault(merge_1);
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function currencyRegex(options) {
-  var symbol = '(\\' + options.symbol.replace(/\./g, '\\.') + ')' + (options.require_symbol ? '' : '?'),
-      negative = '-?',
-      whole_dollar_amount_without_sep = '[1-9]\\d*',
-      whole_dollar_amount_with_sep = '[1-9]\\d{0,2}(\\' + options.thousands_separator + '\\d{3})*',
-      valid_whole_dollar_amounts = ['0', whole_dollar_amount_without_sep, whole_dollar_amount_with_sep],
-      whole_dollar_amount = '(' + valid_whole_dollar_amounts.join('|') + ')?',
-      decimal_amount = '(\\' + options.decimal_separator + '\\d{2})?';
-  var pattern = whole_dollar_amount + decimal_amount;
-
-  // default is negative sign before symbol, but there are two other options (besides parens)
-  if (options.allow_negatives && !options.parens_for_negatives) {
-    if (options.negative_sign_after_digits) {
-      pattern += negative;
-    } else if (options.negative_sign_before_digits) {
-      pattern = negative + pattern;
-    }
-  }
-
-  // South African Rand, for example, uses R 123 (space) and R-123 (no space)
-  if (options.allow_negative_sign_placeholder) {
-    pattern = '( (?!\\-))?' + pattern;
-  } else if (options.allow_space_after_symbol) {
-    pattern = ' ?' + pattern;
-  } else if (options.allow_space_after_digits) {
-    pattern += '( (?!$))?';
-  }
-
-  if (options.symbol_after_digits) {
-    pattern += symbol;
-  } else {
-    pattern = symbol + pattern;
-  }
-
-  if (options.allow_negatives) {
-    if (options.parens_for_negatives) {
-      pattern = '(\\(' + pattern + '\\)|' + pattern + ')';
-    } else if (!(options.negative_sign_before_digits || options.negative_sign_after_digits)) {
-      pattern = negative + pattern;
-    }
-  }
-
-  // ensure there's a dollar and/or decimal amount, and that
-  // it doesn't start with a space or a negative sign followed by a space
-  return new RegExp('^(?!-? )(?=.*\\d)' + pattern + '$');
-}
-
-var default_currency_options = {
-  symbol: '$',
-  require_symbol: false,
-  allow_space_after_symbol: false,
-  symbol_after_digits: false,
-  allow_negatives: true,
-  parens_for_negatives: false,
-  negative_sign_before_digits: false,
-  negative_sign_after_digits: false,
-  allow_negative_sign_placeholder: false,
-  thousands_separator: ',',
-  decimal_separator: '.',
-  allow_space_after_digits: false
-};
-
-function isCurrency(str, options) {
-  (0, _assertString2.default)(str);
-  options = (0, _merge2.default)(options, default_currency_options);
-  return currencyRegex(options).test(str);
-}
-module.exports = exports['default'];
-});
-
-var isISO8601 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.iso8601 = undefined;
-
-exports.default = function (str) {
-  (0, _assertString2.default)(str);
-  return iso8601.test(str);
-};
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* eslint-disable max-len */
-// from http://goo.gl/0ejHHW
-var iso8601 = exports.iso8601 = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
-/* eslint-enable max-len */
-});
-
-var isBase64_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isBase64;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var notBase64 = /[^A-Z0-9+\/=]/i;
-
-function isBase64(str) {
-  (0, _assertString2.default)(str);
-  var len = str.length;
-  if (!len || len % 4 !== 0 || notBase64.test(str)) {
-    return false;
-  }
-  var firstPaddingChar = str.indexOf('=');
-  return firstPaddingChar === -1 || firstPaddingChar === len - 1 || firstPaddingChar === len - 2 && str[len - 1] === '=';
-}
-module.exports = exports['default'];
-});
-
-var isDataURI_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isDataURI;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var dataURI = /^\s*data:([a-z]+\/[a-z0-9\-\+]+(;[a-z\-]+=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9!\$&',\(\)\*\+,;=\-\._~:@\/\?%\s]*\s*$/i; // eslint-disable-line max-len
-
-function isDataURI(str) {
-  (0, _assertString2.default)(str);
-  return dataURI.test(str);
-}
-module.exports = exports['default'];
-});
-
-var ltrim_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = ltrim;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ltrim(str, chars) {
-  (0, _assertString2.default)(str);
-  var pattern = chars ? new RegExp('^[' + chars + ']+', 'g') : /^\s+/g;
-  return str.replace(pattern, '');
-}
-module.exports = exports['default'];
-});
-
-var rtrim_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = rtrim;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function rtrim(str, chars) {
-  (0, _assertString2.default)(str);
-  var pattern = chars ? new RegExp('[' + chars + ']') : /\s/;
-
-  var idx = str.length - 1;
-  while (idx >= 0 && pattern.test(str[idx])) {
-    idx--;
-  }
-
-  return idx < str.length ? str.substr(0, idx + 1) : str;
-}
-module.exports = exports['default'];
-});
-
-var trim_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = trim;
-
-
-
-var _rtrim2 = _interopRequireDefault(rtrim_1);
-
-
-
-var _ltrim2 = _interopRequireDefault(ltrim_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function trim(str, chars) {
-  return (0, _rtrim2.default)((0, _ltrim2.default)(str, chars), chars);
-}
-module.exports = exports['default'];
-});
-
-var _escape = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = escape;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function escape(str) {
-  (0, _assertString2.default)(str);
-  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').replace(/\\/g, '&#x5C;').replace(/`/g, '&#96;');
-}
-module.exports = exports['default'];
-});
-
-var _unescape = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = unescape;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function unescape(str) {
-  (0, _assertString2.default)(str);
-  return str.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#x2F;/g, '/').replace(/&#96;/g, '`');
-}
-module.exports = exports['default'];
-});
-
-var blacklist_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = blacklist;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function blacklist(str, chars) {
-  (0, _assertString2.default)(str);
-  return str.replace(new RegExp('[' + chars + ']+', 'g'), '');
-}
-module.exports = exports['default'];
-});
-
-var stripLow_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = stripLow;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-
-
-var _blacklist2 = _interopRequireDefault(blacklist_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function stripLow(str, keep_new_lines) {
-  (0, _assertString2.default)(str);
-  var chars = keep_new_lines ? '\\x00-\\x09\\x0B\\x0C\\x0E-\\x1F\\x7F' : '\\x00-\\x1F\\x7F';
-  return (0, _blacklist2.default)(str, chars);
-}
-module.exports = exports['default'];
-});
-
-var whitelist_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = whitelist;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function whitelist(str, chars) {
-  (0, _assertString2.default)(str);
-  return str.replace(new RegExp('[^' + chars + ']+', 'g'), '');
-}
-module.exports = exports['default'];
-});
-
-var isWhitelisted_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = isWhitelisted;
-
-
-
-var _assertString2 = _interopRequireDefault(assertString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isWhitelisted(str, chars) {
-  (0, _assertString2.default)(str);
-  for (var i = str.length - 1; i >= 0; i--) {
-    if (chars.indexOf(str[i]) === -1) {
-      return false;
-    }
-  }
-  return true;
-}
-module.exports = exports['default'];
-});
-
-var normalizeEmail_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = normalizeEmail;
-
-
-
-var _isEmail2 = _interopRequireDefault(isEmail_1);
-
-
-
-var _merge2 = _interopRequireDefault(merge_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var default_normalize_email_options = {
-  // The following options apply to all email addresses
-  // Lowercases the local part of the email address.
-  // Please note this may violate RFC 5321 as per http://stackoverflow.com/a/9808332/192024).
-  // The domain is always lowercased, as per RFC 1035
-  all_lowercase: true,
-
-  // The following conversions are specific to GMail
-  // Lowercases the local part of the GMail address (known to be case-insensitive)
-  gmail_lowercase: true,
-  // Removes dots from the local part of the email address, as that's ignored by GMail
-  gmail_remove_dots: true,
-  // Removes the subaddress (e.g. "+foo") from the email address
-  gmail_remove_subaddress: true,
-  // Conversts the googlemail.com domain to gmail.com
-  gmail_convert_googlemaildotcom: true,
-
-  // The following conversions are specific to Outlook.com / Windows Live / Hotmail
-  // Lowercases the local part of the Outlook.com address (known to be case-insensitive)
-  outlookdotcom_lowercase: true,
-  // Removes the subaddress (e.g. "+foo") from the email address
-  outlookdotcom_remove_subaddress: true,
-
-  // The following conversions are specific to Yahoo
-  // Lowercases the local part of the Yahoo address (known to be case-insensitive)
-  yahoo_lowercase: true,
-  // Removes the subaddress (e.g. "-foo") from the email address
-  yahoo_remove_subaddress: true,
-
-  // The following conversions are specific to iCloud
-  // Lowercases the local part of the iCloud address (known to be case-insensitive)
-  icloud_lowercase: true,
-  // Removes the subaddress (e.g. "+foo") from the email address
-  icloud_remove_subaddress: true
-};
-
-// List of domains used by iCloud
-var icloud_domains = ['icloud.com', 'me.com'];
-
-// List of domains used by Outlook.com and its predecessors
-// This list is likely incomplete.
-// Partial reference:
-// https://blogs.office.com/2013/04/17/outlook-com-gets-two-step-verification-sign-in-by-alias-and-new-international-domains/
-var outlookdotcom_domains = ['hotmail.at', 'hotmail.be', 'hotmail.ca', 'hotmail.cl', 'hotmail.co.il', 'hotmail.co.nz', 'hotmail.co.th', 'hotmail.co.uk', 'hotmail.com', 'hotmail.com.ar', 'hotmail.com.au', 'hotmail.com.br', 'hotmail.com.gr', 'hotmail.com.mx', 'hotmail.com.pe', 'hotmail.com.tr', 'hotmail.com.vn', 'hotmail.cz', 'hotmail.de', 'hotmail.dk', 'hotmail.es', 'hotmail.fr', 'hotmail.hu', 'hotmail.id', 'hotmail.ie', 'hotmail.in', 'hotmail.it', 'hotmail.jp', 'hotmail.kr', 'hotmail.lv', 'hotmail.my', 'hotmail.ph', 'hotmail.pt', 'hotmail.sa', 'hotmail.sg', 'hotmail.sk', 'live.be', 'live.co.uk', 'live.com', 'live.com.ar', 'live.com.mx', 'live.de', 'live.es', 'live.eu', 'live.fr', 'live.it', 'live.nl', 'msn.com', 'outlook.at', 'outlook.be', 'outlook.cl', 'outlook.co.il', 'outlook.co.nz', 'outlook.co.th', 'outlook.com', 'outlook.com.ar', 'outlook.com.au', 'outlook.com.br', 'outlook.com.gr', 'outlook.com.pe', 'outlook.com.tr', 'outlook.com.vn', 'outlook.cz', 'outlook.de', 'outlook.dk', 'outlook.es', 'outlook.fr', 'outlook.hu', 'outlook.id', 'outlook.ie', 'outlook.in', 'outlook.it', 'outlook.jp', 'outlook.kr', 'outlook.lv', 'outlook.my', 'outlook.ph', 'outlook.pt', 'outlook.sa', 'outlook.sg', 'outlook.sk', 'passport.com'];
-
-// List of domains used by Yahoo Mail
-// This list is likely incomplete
-var yahoo_domains = ['rocketmail.com', 'yahoo.ca', 'yahoo.co.uk', 'yahoo.com', 'yahoo.de', 'yahoo.fr', 'yahoo.in', 'yahoo.it', 'ymail.com'];
-
-function normalizeEmail(email, options) {
-  options = (0, _merge2.default)(options, default_normalize_email_options);
-
-  if (!(0, _isEmail2.default)(email)) {
-    return false;
-  }
-
-  var raw_parts = email.split('@');
-  var domain = raw_parts.pop();
-  var user = raw_parts.join('@');
-  var parts = [user, domain];
-
-  // The domain is always lowercased, as it's case-insensitive per RFC 1035
-  parts[1] = parts[1].toLowerCase();
-
-  if (parts[1] === 'gmail.com' || parts[1] === 'googlemail.com') {
-    // Address is GMail
-    if (options.gmail_remove_subaddress) {
-      parts[0] = parts[0].split('+')[0];
-    }
-    if (options.gmail_remove_dots) {
-      parts[0] = parts[0].replace(/\./g, '');
-    }
-    if (!parts[0].length) {
-      return false;
-    }
-    if (options.all_lowercase || options.gmail_lowercase) {
-      parts[0] = parts[0].toLowerCase();
-    }
-    parts[1] = options.gmail_convert_googlemaildotcom ? 'gmail.com' : parts[1];
-  } else if (~icloud_domains.indexOf(parts[1])) {
-    // Address is iCloud
-    if (options.icloud_remove_subaddress) {
-      parts[0] = parts[0].split('+')[0];
-    }
-    if (!parts[0].length) {
-      return false;
-    }
-    if (options.all_lowercase || options.icloud_lowercase) {
-      parts[0] = parts[0].toLowerCase();
-    }
-  } else if (~outlookdotcom_domains.indexOf(parts[1])) {
-    // Address is Outlook.com
-    if (options.outlookdotcom_remove_subaddress) {
-      parts[0] = parts[0].split('+')[0];
-    }
-    if (!parts[0].length) {
-      return false;
-    }
-    if (options.all_lowercase || options.outlookdotcom_lowercase) {
-      parts[0] = parts[0].toLowerCase();
-    }
-  } else if (~yahoo_domains.indexOf(parts[1])) {
-    // Address is Yahoo
-    if (options.yahoo_remove_subaddress) {
-      var components = parts[0].split('-');
-      parts[0] = components.length > 1 ? components.slice(0, -1).join('-') : components[0];
-    }
-    if (!parts[0].length) {
-      return false;
-    }
-    if (options.all_lowercase || options.yahoo_lowercase) {
-      parts[0] = parts[0].toLowerCase();
-    }
-  } else if (options.all_lowercase) {
-    // Any other address
-    parts[0] = parts[0].toLowerCase();
-  }
-  return parts.join('@');
-}
-module.exports = exports['default'];
-});
-
-var index$3 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-
-
-var _toDate2 = _interopRequireDefault(toDate_1);
-
-
-
-var _toFloat2 = _interopRequireDefault(toFloat_1);
-
-
-
-var _toInt2 = _interopRequireDefault(toInt_1);
-
-
-
-var _toBoolean2 = _interopRequireDefault(toBoolean_1);
-
-
-
-var _equals2 = _interopRequireDefault(equals_1);
-
-
-
-var _contains2 = _interopRequireDefault(contains_1);
-
-
-
-var _matches2 = _interopRequireDefault(matches_1);
-
-
-
-var _isEmail2 = _interopRequireDefault(isEmail_1);
-
-
-
-var _isURL2 = _interopRequireDefault(isURL_1);
-
-
-
-var _isMACAddress2 = _interopRequireDefault(isMACAddress_1);
-
-
-
-var _isIP2 = _interopRequireDefault(isIP_1);
-
-
-
-var _isFQDN2 = _interopRequireDefault(isFQDN);
-
-
-
-var _isBoolean2 = _interopRequireDefault(isBoolean_1);
-
-
-
-var _isAlpha2 = _interopRequireDefault(isAlpha_1);
-
-
-
-var _isAlphanumeric2 = _interopRequireDefault(isAlphanumeric_1);
-
-
-
-var _isNumeric2 = _interopRequireDefault(isNumeric_1);
-
-
-
-var _isLowercase2 = _interopRequireDefault(isLowercase_1);
-
-
-
-var _isUppercase2 = _interopRequireDefault(isUppercase_1);
-
-
-
-var _isAscii2 = _interopRequireDefault(isAscii_1);
-
-
-
-var _isFullWidth2 = _interopRequireDefault(isFullWidth_1);
-
-
-
-var _isHalfWidth2 = _interopRequireDefault(isHalfWidth_1);
-
-
-
-var _isVariableWidth2 = _interopRequireDefault(isVariableWidth_1);
-
-
-
-var _isMultibyte2 = _interopRequireDefault(isMultibyte_1);
-
-
-
-var _isSurrogatePair2 = _interopRequireDefault(isSurrogatePair_1);
-
-
-
-var _isInt2 = _interopRequireDefault(isInt_1);
-
-
-
-var _isFloat2 = _interopRequireDefault(isFloat_1);
-
-
-
-var _isDecimal2 = _interopRequireDefault(isDecimal_1);
-
-
-
-var _isHexadecimal2 = _interopRequireDefault(isHexadecimal_1);
-
-
-
-var _isDivisibleBy2 = _interopRequireDefault(isDivisibleBy_1);
-
-
-
-var _isHexColor2 = _interopRequireDefault(isHexColor_1);
-
-
-
-var _isISRC2 = _interopRequireDefault(isISRC_1);
-
-
-
-var _isMD2 = _interopRequireDefault(isMD5_1);
-
-
-
-var _isJSON2 = _interopRequireDefault(isJSON_1);
-
-
-
-var _isEmpty2 = _interopRequireDefault(isEmpty_1);
-
-
-
-var _isLength2 = _interopRequireDefault(isLength_1);
-
-
-
-var _isByteLength2 = _interopRequireDefault(isByteLength_1);
-
-
-
-var _isUUID2 = _interopRequireDefault(isUUID_1);
-
-
-
-var _isMongoId2 = _interopRequireDefault(isMongoId_1);
-
-
-
-var _isAfter2 = _interopRequireDefault(isAfter_1);
-
-
-
-var _isBefore2 = _interopRequireDefault(isBefore_1);
-
-
-
-var _isIn2 = _interopRequireDefault(isIn_1);
-
-
-
-var _isCreditCard2 = _interopRequireDefault(isCreditCard_1);
-
-
-
-var _isISIN2 = _interopRequireDefault(isISIN_1);
-
-
-
-var _isISBN2 = _interopRequireDefault(isISBN_1);
-
-
-
-var _isISSN2 = _interopRequireDefault(isISSN_1);
-
-
-
-var _isMobilePhone2 = _interopRequireDefault(isMobilePhone_1);
-
-
-
-var _isCurrency2 = _interopRequireDefault(isCurrency_1);
-
-
-
-var _isISO2 = _interopRequireDefault(isISO8601);
-
-
-
-var _isBase2 = _interopRequireDefault(isBase64_1);
-
-
-
-var _isDataURI2 = _interopRequireDefault(isDataURI_1);
-
-
-
-var _ltrim2 = _interopRequireDefault(ltrim_1);
-
-
-
-var _rtrim2 = _interopRequireDefault(rtrim_1);
-
-
-
-var _trim2 = _interopRequireDefault(trim_1);
-
-
-
-var _escape2 = _interopRequireDefault(_escape);
-
-
-
-var _unescape2 = _interopRequireDefault(_unescape);
-
-
-
-var _stripLow2 = _interopRequireDefault(stripLow_1);
-
-
-
-var _whitelist2 = _interopRequireDefault(whitelist_1);
-
-
-
-var _blacklist2 = _interopRequireDefault(blacklist_1);
-
-
-
-var _isWhitelisted2 = _interopRequireDefault(isWhitelisted_1);
-
-
-
-var _normalizeEmail2 = _interopRequireDefault(normalizeEmail_1);
-
-
-
-var _toString2 = _interopRequireDefault(toString_1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var version = '8.0.0';
-
-var validator = {
-  version: version,
-  toDate: _toDate2.default,
-  toFloat: _toFloat2.default,
-  toInt: _toInt2.default,
-  toBoolean: _toBoolean2.default,
-  equals: _equals2.default,
-  contains: _contains2.default,
-  matches: _matches2.default,
-  isEmail: _isEmail2.default,
-  isURL: _isURL2.default,
-  isMACAddress: _isMACAddress2.default,
-  isIP: _isIP2.default,
-  isFQDN: _isFQDN2.default,
-  isBoolean: _isBoolean2.default,
-  isAlpha: _isAlpha2.default,
-  isAlphanumeric: _isAlphanumeric2.default,
-  isNumeric: _isNumeric2.default,
-  isLowercase: _isLowercase2.default,
-  isUppercase: _isUppercase2.default,
-  isAscii: _isAscii2.default,
-  isFullWidth: _isFullWidth2.default,
-  isHalfWidth: _isHalfWidth2.default,
-  isVariableWidth: _isVariableWidth2.default,
-  isMultibyte: _isMultibyte2.default,
-  isSurrogatePair: _isSurrogatePair2.default,
-  isInt: _isInt2.default,
-  isFloat: _isFloat2.default,
-  isDecimal: _isDecimal2.default,
-  isHexadecimal: _isHexadecimal2.default,
-  isDivisibleBy: _isDivisibleBy2.default,
-  isHexColor: _isHexColor2.default,
-  isISRC: _isISRC2.default,
-  isMD5: _isMD2.default,
-  isJSON: _isJSON2.default,
-  isEmpty: _isEmpty2.default,
-  isLength: _isLength2.default,
-  isByteLength: _isByteLength2.default,
-  isUUID: _isUUID2.default,
-  isMongoId: _isMongoId2.default,
-  isAfter: _isAfter2.default,
-  isBefore: _isBefore2.default,
-  isIn: _isIn2.default,
-  isCreditCard: _isCreditCard2.default,
-  isISIN: _isISIN2.default,
-  isISBN: _isISBN2.default,
-  isISSN: _isISSN2.default,
-  isMobilePhone: _isMobilePhone2.default,
-  isCurrency: _isCurrency2.default,
-  isISO8601: _isISO2.default,
-  isBase64: _isBase2.default,
-  isDataURI: _isDataURI2.default,
-  ltrim: _ltrim2.default,
-  rtrim: _rtrim2.default,
-  trim: _trim2.default,
-  escape: _escape2.default,
-  unescape: _unescape2.default,
-  stripLow: _stripLow2.default,
-  whitelist: _whitelist2.default,
-  blacklist: _blacklist2.default,
-  isWhitelisted: _isWhitelisted2.default,
-  normalizeEmail: _normalizeEmail2.default,
-  toString: _toString2.default
-};
-
-exports.default = validator;
-module.exports = exports['default'];
-});
-
-var validator = unwrapExports(index$3);
+var matches = unwrapExports(matches_1);
 
 /* eslint-disable import/extensions */
 
@@ -6155,25 +3915,21 @@ var validator = unwrapExports(index$3);
 //
 // @app.route('/api/status', methods=['GET'])
 
-// todo: makeUrl('/api/:version/:method:arguments', {}, {key: 'test_key'})
 var IP = 'ip';
 var HASH = 'hash';
 var SCAN = 'scan';
-var AUTH = 'auth';
 var STATUS = 'status';
 var DNS = 'dns';
 var ME = 'me';
-var EMAIL_LEAKS = 'email/leaks';
+// export const EMAIL_LEAKS = 'email/leaks'
 
 var endpoint = Object.freeze({
 	IP: IP,
 	HASH: HASH,
 	SCAN: SCAN,
-	AUTH: AUTH,
 	STATUS: STATUS,
 	DNS: DNS,
-	ME: ME,
-	EMAIL_LEAKS: EMAIL_LEAKS
+	ME: ME
 });
 
 var defineProperty$5 = createCommonjsModule(function (module, exports) {
@@ -6209,19 +3965,9 @@ var _argument;
 
 var mode = ['detailed', 'simple', 'blacklist', 'geoip'];
 
-var argument = (_argument = {}, _defineProperty$1(_argument, EMAIL_LEAKS, [{
-  arg: 'email',
-  required: true,
-  check: {
-    func: 'isEmail',
-    args: [{
-      require_display_name: false,
-      allow_display_name: false,
-      allow_utf8_local_part: true
-    }]
-  }
-}]), _defineProperty$1(_argument, SCAN, [{
+var argument = (_argument = {}, _defineProperty$1(_argument, SCAN, [{
   arg: 'ip',
+  alias: 'ipaddr',
   required: true,
   check: {
     func: 'isIP',
@@ -6297,19 +4043,26 @@ var InsufficientFundsError = function (_Error) {
   return InsufficientFundsError;
 }(Error);
 
-var _specification;
-
-var specification = (_specification = {}, _defineProperty$1(_specification, STATUS, {
+var specification = _defineProperty$1({}, STATUS, {
   version: false
-}), _defineProperty$1(_specification, EMAIL_LEAKS, {
-  version: false
-}), _specification);
+  // [EMAIL_LEAKS]: {
+  //   version: false
+  // }
+});
 
 /* global fetch:false */
 /* eslint-disable no-unused-vars */
 // import 'babel-polyfill'
 var _fetchPonyfill = fetchBrowser$1();
 var fetch$1 = _fetchPonyfill.fetch;
+
+var validator = {
+  isIP: isIP,
+  isInt: isInt,
+  isFQDN: isFQDN$1,
+  isEmail: isEmail,
+  matches: matches
+};
 
 var FetchCommand = function (_AbstractCommand) {
   _inherits(FetchCommand, _AbstractCommand);
@@ -6342,16 +4095,6 @@ var FetchCommand = function (_AbstractCommand) {
     _this._map.get(_this).balance_remaining = undefined;
     _this._map.get(_this).balance_lastbill = undefined;
     _this._map.get(_this).balance_reset = undefined;
-    // return new Proxy(this, {
-    //   get (target, name) {
-    //     console.log('PROXY', name)
-    //     // if (name.startsWith('_')) {
-    //     //   throw new TypeError('Accessing to a private property is not allowed')
-    //     // } else {
-    //     return target[name]
-    //     // }
-    //   }
-    // })
     return _this;
   }
 
@@ -6411,11 +4154,21 @@ var FetchCommand = function (_AbstractCommand) {
                 if (arg.check) {
                   if (Array.isArray(arg.check)) {
                     if (!arg.check.includes(_argValue)) throw new TypeError('Method optional param \'' + arg.arg + '\' validation error');
-                    returnArgs.push({
-                      val: _argValue,
-                      arg: _argName
-                    });
+                  } else if (_typeof(arg.check) === 'object') {
+                    var _validator$_func;
+
+                    var _arg$check2 = arg.check,
+                        _func = _arg$check2.func,
+                        _args2 = _arg$check2.args;
+
+                    if (!_func) throw new TypeError('Method optional params validation function not found!');
+                    var _validation = (_validator$_func = validator[_func]).bind.apply(_validator$_func, [_this2, _argValue + ''].concat(_toConsumableArray(_args2))); // to string
+                    if (!_validation()) throw new TypeError('Method optional param \'' + arg.arg + '\' validation error');
                   }
+                  returnArgs.push({
+                    val: _argValue,
+                    arg: _argName
+                  });
                 }
               }
             }
@@ -6451,6 +4204,9 @@ var FetchCommand = function (_AbstractCommand) {
                   headers = {
                     'Content-Type': 'application/json'
                   };
+                  if (typeof module !== 'undefined' && module.exports) {
+                    headers['User-Agent'] = os.type() + '_' + process.arch + ' Node ' + process.version + ' - TempicoLabs SDK';
+                  }
                 }
                 options = {
                   headers: headers
@@ -6462,25 +4218,31 @@ var FetchCommand = function (_AbstractCommand) {
                   }
                 }
                 options.method = method;
-                _context.next = 11;
+                // console.log(options)
+                this.emit('fetch', options, this);
+                _context.next = 12;
                 return fetchFunc(url, options);
 
-              case 11:
+              case 12:
                 response = _context.sent;
+
+                this.emit('raw_response', response, this);
                 return _context.abrupt('return', response);
 
-              case 15:
-                _context.prev = 15;
+              case 17:
+                _context.prev = 17;
                 _context.t0 = _context['catch'](3);
 
-                console.error(_context.t0);
+                this._map.get(this).error = true;
+                this.emit('error', _context.t0, this);
+                throw _context.t0;
 
-              case 18:
+              case 22:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[3, 15]]);
+        }, _callee, this, [[3, 17]]);
       }));
 
       function _makeRequest(_x) {
@@ -6503,17 +4265,20 @@ var FetchCommand = function (_AbstractCommand) {
         var _this3 = this;
 
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var params, method, fetchResponse, args, response, headers, status, statusText, content, contentType, headersList, billHeaders;
+
+        var params, method, headers, fetchResponse, args, response, _headers, status, statusText, content, contentType, responseHeaders, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, header, billHeaders;
+
         return index.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 params = {};
                 method = options.method || 'GET';
+                headers = options.headers || false;
 
                 if (options.key !== undefined && typeof options.key === 'string') this._map.get(this).key = options.key;else {}
                 fetchResponse = void 0;
-                _context2.prev = 4;
+                _context2.prev = 5;
 
                 // console.log('FETCH', options);
                 args = this._checkArguments(options);
@@ -6521,95 +4286,169 @@ var FetchCommand = function (_AbstractCommand) {
                 params = {
                   method: method
                 };
+                if (headers !== false) params.headers = headers;
                 this._map.get(this).args = params.body = args;
                 // console.log(this.url);
                 // console.log(params);
-                _context2.next = 10;
+                _context2.next = 12;
                 return this._makeRequest(this.url, params);
 
-              case 10:
+              case 12:
                 response = _context2.sent;
-                headers = response.headers, status = response.status, statusText = response.statusText;
+
+                if (!response) {
+                  _context2.next = 62;
+                  break;
+                }
+
+                _headers = response.headers, status = response.status, statusText = response.statusText;
                 content = void 0;
-                contentType = headers.get('Content-Type');
+                contentType = _headers.get('Content-Type');
 
                 if (!(contentType.indexOf('text/html') !== -1)) {
-                  _context2.next = 20;
+                  _context2.next = 23;
                   break;
                 }
 
-                _context2.next = 17;
+                _context2.next = 20;
                 return response.text();
 
-              case 17:
+              case 20:
                 content = _context2.sent;
-                _context2.next = 24;
+                _context2.next = 27;
                 break;
 
-              case 20:
+              case 23:
                 if (!(contentType.indexOf('application/json') !== -1)) {
-                  _context2.next = 24;
+                  _context2.next = 27;
                   break;
                 }
 
-                _context2.next = 23;
+                _context2.next = 26;
                 return response.json();
 
-              case 23:
+              case 26:
                 content = _context2.sent;
 
-              case 24:
+              case 27:
                 fetchResponse = {
                   content: content,
                   headers: {},
-                  error: !response.ok,
+                  error: !response.ok && ![404].includes(status),
                   status: status,
                   statusText: statusText
                 };
                 this._map.get(this).content = content;
-                if (headers._headers) {
-                  headersList = headers._headers;
+                responseHeaders = {};
+
+                if (!_headers._headers) {
+                  _context2.next = 34;
+                  break;
+                }
+
+                responseHeaders = _headers._headers;
+                _context2.next = 53;
+                break;
+
+              case 34:
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context2.prev = 37;
+
+                for (_iterator = _getIterator(_headers.entries()); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  header = _step.value;
+
+                  responseHeaders[header[0]] = header[1];
+                }
+                _context2.next = 45;
+                break;
+
+              case 41:
+                _context2.prev = 41;
+                _context2.t0 = _context2['catch'](37);
+                _didIteratorError = true;
+                _iteratorError = _context2.t0;
+
+              case 45:
+                _context2.prev = 45;
+                _context2.prev = 46;
+
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                  _iterator.return();
+                }
+
+              case 48:
+                _context2.prev = 48;
+
+                if (!_didIteratorError) {
+                  _context2.next = 51;
+                  break;
+                }
+
+                throw _iteratorError;
+
+              case 51:
+                return _context2.finish(48);
+
+              case 52:
+                return _context2.finish(45);
+
+              case 53:
+                if (responseHeaders) {
                   billHeaders = ['remaining', 'lastbill', 'reset'];
 
                   billHeaders.forEach(function (suffix) {
-                    _this3._map.get(_this3)['balance_' + suffix] = headersList['x-balance-' + suffix];
+                    _this3._map.get(_this3)['balance_' + suffix] = responseHeaders['x-balance-' + suffix];
                   });
-                  fetchResponse.headers = headersList;
+                  fetchResponse.headers = responseHeaders;
                 }
                 _Object$keys(fetchResponse).forEach(function (key) {
                   _this3._map.get(_this3)[key] = fetchResponse[key];
                 });
 
                 if (!(!response.ok && content && content.error)) {
-                  _context2.next = 32;
+                  _context2.next = 60;
                   break;
                 }
 
                 this._map.get(this).errorText = content.error;
 
                 if (!(status === 429)) {
-                  _context2.next = 32;
+                  _context2.next = 59;
                   break;
                 }
 
                 throw new InsufficientFundsError(content.error);
 
-              case 32:
+              case 59:
+                this.emit('error', new Error(content.error), this);
+
+              case 60:
+                _context2.next = 63;
+                break;
+
+              case 62:
+                throw new Error('Response is empty!');
+
+              case 63:
+                this.emit('response', fetchResponse, this);
                 return _context2.abrupt('return', fetchResponse);
 
-              case 35:
-                _context2.prev = 35;
-                _context2.t0 = _context2['catch'](4);
+              case 67:
+                _context2.prev = 67;
+                _context2.t1 = _context2['catch'](5);
 
                 this._map.get(this).error = true;
-                throw _context2.t0;
+                this.emit('error', _context2.t1, this);
+                throw _context2.t1;
 
-              case 39:
+              case 72:
               case 'end':
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[4, 35]]);
+        }, _callee2, this, [[5, 67], [37, 41, 45, 53], [46,, 48, 52]]);
       }));
 
       function fetch() {
@@ -6734,111 +4573,6 @@ var FetchCommand = function (_AbstractCommand) {
   return FetchCommand;
 }(AbstractCommand);
 
-var AuthorizeCommand = function (_FetchCommand) {
-  _inherits(AuthorizeCommand, _FetchCommand);
-
-  function AuthorizeCommand(params) {
-    _classCallCheck(this, AuthorizeCommand);
-
-    var _this = _possibleConstructorReturn(this, (AuthorizeCommand.__proto__ || _Object$getPrototypeOf(AuthorizeCommand)).call(this, {
-      method: AUTH
-    }));
-
-    var key = void 0;
-    if (typeof params === 'string') key = params;else if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) === 'object') {
-      key = params.key;
-    } else {
-      throw new TypeError('Invalid argument type');
-    }
-    if (!key) throw new TypeError("Empty required param 'key'");
-    _this._map.get(_this).key = key;
-    return _this;
-  }
-
-  _createClass(AuthorizeCommand, [{
-    key: 'login',
-    value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee() {
-        return index.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                return _context.abrupt('return', this.fetch({
-                  data: {
-                    key: this.key
-                  },
-                  method: 'POST'
-                }));
-
-              case 1:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function login() {
-        return _ref.apply(this, arguments);
-      }
-
-      return login;
-    }()
-  }, {
-    key: 'logout',
-    value: function () {
-      var _ref2 = _asyncToGenerator(index.mark(function _callee2() {
-        return index.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                return _context2.abrupt('return', this.fetch({
-                  data: {
-                    logout: true
-                  },
-                  method: 'GET'
-                }));
-
-              case 1:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function logout() {
-        return _ref2.apply(this, arguments);
-      }
-
-      return logout;
-    }()
-  }, {
-    key: 'run',
-    value: function () {
-      var _ref3 = _asyncToGenerator(index.mark(function _callee3(options) {
-        return index.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function run(_x) {
-        return _ref3.apply(this, arguments);
-      }
-
-      return run;
-    }()
-  }]);
-
-  return AuthorizeCommand;
-}(FetchCommand);
-
 // 19.1.3.1 Object.assign(target, source)
 
 
@@ -6852,7 +4586,7 @@ module.exports = { "default": assign$1, __esModule: true };
 
 var _Object$assign = unwrapExports(assign);
 
-var AuthorizeCommand$2 = function (_FetchCommand) {
+var AuthorizeCommand = function (_FetchCommand) {
   _inherits(AuthorizeCommand, _FetchCommand);
 
   function AuthorizeCommand(params) {
@@ -6911,11 +4645,7 @@ var Command = function (_AbstractCommand) {
     }
     return _ret = new Proxy(_this, {
       get: function get(target, name) {
-        if (name.startsWith('_')) {
-          throw new TypeError('Accessing to a private property is not allowed');
-        } else {
-          if (['run', 'instance', 'class'].includes(name)) return target[name];else return target.instance[name];
-        }
+        if (['run', 'instance', 'class'].includes(name)) return target[name];else return target.instance[name];
       }
     }), _possibleConstructorReturn(_this, _ret);
   }
@@ -6940,10 +4670,8 @@ var Command = function (_AbstractCommand) {
       switch (action) {
         case 'fetch':
           return FetchCommand;
-        case 'auth':
-          return AuthorizeCommand;
         case 'status':
-          return AuthorizeCommand$2;
+          return AuthorizeCommand;
         default:
           throw new ReferenceError('Action not found');
       }
@@ -6953,9 +4681,123 @@ var Command = function (_AbstractCommand) {
   return Command;
 }(AbstractCommand);
 
+// import * as Constants from './constant';
+
+var TmLabs$1 = function (_EventEmitter) {
+  _inherits(TmLabs, _EventEmitter);
+
+  function TmLabs(options) {
+    _classCallCheck(this, TmLabs);
+
+    var _this = _possibleConstructorReturn(this, (TmLabs.__proto__ || _Object$getPrototypeOf(TmLabs)).call(this));
+
+    var key = options && options.key ? options.key : false;
+    var history = [];
+    _this._map = new _WeakMap();
+    _this._map.set(_this, {
+      key: key,
+      history: history
+    });
+    return _this;
+  }
+
+  _createClass(TmLabs, [{
+    key: 'fetch',
+    value: function () {
+      var _ref = _asyncToGenerator(index.mark(function _callee(method) {
+        var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var answer;
+        return index.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (this.key) params.key = this.key;
+                _context.next = 3;
+                return this.doCommand(new Command('fetch', {
+                  method: method
+                }), params);
+
+              case 3:
+                answer = _context.sent;
+                return _context.abrupt('return', answer);
+
+              case 5:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function fetch(_x) {
+        return _ref.apply(this, arguments);
+      }
+
+      return fetch;
+    }()
+  }, {
+    key: 'doCommand',
+    value: function () {
+      var _ref2 = _asyncToGenerator(index.mark(function _callee2(command, params) {
+        var _this2 = this;
+
+        var answer;
+        return index.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this._map.get(this).history.push(command);
+                this.emit('command', command, params);
+                command.on('error', function (error, cmd) {
+                  _this2.emit('error', error, cmd);
+                });
+                command.on('fetch', function (options, cmd) {
+                  _this2.emit('fetch', cmd, options);
+                });
+                command.on('response', function (response, cmd) {
+                  _this2.emit('response', cmd, response);
+                });
+                command.on('raw_response', function (response, cmd) {
+                  _this2.emit('raw_response', cmd, response);
+                });
+                _context2.next = 8;
+                return command.run(params);
+
+              case 8:
+                answer = _context2.sent;
+                return _context2.abrupt('return', answer);
+
+              case 10:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function doCommand(_x3, _x4) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return doCommand;
+    }()
+  }, {
+    key: 'history',
+    get: function get() {
+      return this._map.get(this).history;
+    }
+  }, {
+    key: 'key',
+    get: function get() {
+      return this._map.get(this).key;
+    }
+  }]);
+
+  return TmLabs;
+}(EventEmitter);
+
 var _this = undefined;
 
-//
 var fetch = function () {
   var _ref = _asyncToGenerator(index.mark(function _callee(params) {
     var command, answer;
@@ -6965,7 +4807,7 @@ var fetch = function () {
           case 0:
             command = new Command('fetch', params);
             _context.next = 3;
-            return command.do();
+            return command.do(params);
 
           case 3:
             answer = _context.sent;
@@ -6984,5 +4826,5 @@ var fetch = function () {
   };
 }();
 
-export { TmLabs$1 as TmLabs, Command, fetch };export default TmLabs$1;
-//# sourceMappingURL=tmlabs.es.js._map
+export { TmLabs$1 as TmLabs, Command, fetch, FetchCommand };export default TmLabs$1;
+//# sourceMappingURL=tmlabs.es.js.map

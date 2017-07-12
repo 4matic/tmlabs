@@ -25,7 +25,7 @@ To install TmLabs for use in node or the browser with `require('tmlabs')`, run:
 npm install tmlabs
 ```
 
-To install a `tmlabs` [command line program](https://github.com/4matic/tmlabs-cli), run:
+To install a `tmlabs` [command line program](https://github.com/TempicoLabs/tmlabs-cli), run:
 
 ```bash
 npm install tmlabs-cli -g
@@ -39,7 +39,7 @@ npm install tmlabs-cli -g
 
 ### Usage
 
-TmLabs is the wrapper for API. It uses [isomorphic-fetch](https://github.com/matthew-andrews/isomorphic-fetch) for HTTP requests.
+TmLabs is the wrapper for API. It uses [fetch-ponyfill](https://github.com/qubyte/fetch-ponyfill) for HTTP requests.
 
 #### In the browser
 
@@ -54,8 +54,8 @@ TmLabs is the wrapper for API. It uses [isomorphic-fetch](https://github.com/mat
       console.info('response', response);
       console.log('balanceRemaining', command.balanceRemaining); // return Remaining Balance
     });
-    TmLabs.on('command', function(args, command){
-      console.log('history', TmLabs.history) // get array of one completed commands
+    TmLabs.on('command', function(args, command){ // on command start 
+      console.log('command', command)
     });
     TmLabs.fetch('dns', {
       domain: 'google.com'
@@ -87,8 +87,11 @@ TmLabs also works in node.js, using the *same npm package!*
     console.log('response', response);
     console.log('balanceRemaining', command.balanceRemaining); // return Remaining Balance
   });
-  TmLabs.getDNS('google.com');
+  TmLabs.fetch('dns', {
+    domain: 'google.com'
+  });
 ```
+** You can use bundled version in `dist/tmlabs.umd.js`
 
 Package also contain FetchCommand Class for customizing fetch data from API.
 For example in ES6:
@@ -111,12 +114,13 @@ For example in ES6:
   })
   console.log(response) // API response. same as command.content
 ```
+** You can use bundled version in `dist/tmlabs.es.js` for ES6
 
 ##### More examples you can find in [examples directory](examples)
 
 #### As a command line app
 
-TmLabs is also available as a [command line app](https://github.com/4matic/tmlabs-cli). Here's how to use it:
+TmLabs is also available as a [command line app](https://github.com/TempicoLabs/tmlabs-cli). Here's how to use it:
 
 ```bash
 $ npm install tmlabs-cli -g

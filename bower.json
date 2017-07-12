@@ -1,0 +1,22 @@
+{
+  "name": "tmlabs",
+  "description": "NodeJS SDK for TempicoLabs API",
+  "main": "dist/tmlabs.min.js",
+  "authors": [
+    "Maxim Maximov <root@4matikku.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "tempicolabs",
+    "api",
+    "sdk",
+    "security",
+    "es6"
+  ],
+  "homepage": "https://tempicolabs.com/",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test"
+  ]
+}

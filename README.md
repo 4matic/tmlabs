@@ -2,7 +2,7 @@
   <br>
   <a href="https://tempicolabs.com"><img src="https://www.tempicolabs.com/img/logo_tl_H_black.png" alt="TempicoLabs" width="400"></a>
   <br>
-  TmLabs SDK
+  Tempico Labs SDK
   <br>
   <br>
 </h1>
@@ -10,7 +10,9 @@
 <h4 align="center">Tempico Labs SDK for API. For node.js and the web.</h4>
 
 <p align="center">
-  <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" alt="js-standard-style"></a>
+  <a href="https://standardjs.com"><img src="https://img.shields.io/npm/v/@tempicolabs/tmlabs.svg" alt="Npm version"></a>
+  <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code/style-standard-brightgreen.svg" alt="Javascipt Standart Style"></a>
+  <a href="https://standardjs.com"><img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence"></a>
 </p>
 <br>
 
@@ -19,16 +21,22 @@ It is written in clean ES6 Javascript.
 
 ### Install
 
-To install TmLabs for use in node or the browser with `require('tmlabs')`, run:
+To install TmLabs for use in node or the browser with `require('@tempicolabs/tmlabs')`, run:
 
 ```bash
-npm install tmlabs
+npm i @tempicolabs/tmlabs --save
+```
+
+Or alternatively using Bower, run:
+
+```bash
+bower install tmlabs --save
 ```
 
 To install a `tmlabs` [command line program](https://github.com/TempicoLabs/tmlabs-cli), run:
 
 ```bash
-npm install tmlabs-cli -g
+npm install @tempicolabs/tmlabs-cli -g
 ```
 
 ### TmLabs API Documentation
@@ -78,7 +86,7 @@ TmLabs is the wrapper for API. It uses [fetch-ponyfill](https://github.com/qubyt
 TmLabs also works in node.js, using the *same npm package!*
 
 ```javascript
-  import TmLabs from 'tmlabs'
+  import TmLabs from '@tempicolabs/tmlabs'
   
   TmLabs.on('error', (error, command) => {
     console.error(error);
@@ -97,7 +105,7 @@ Package also contain FetchCommand Class for customizing fetch data from API.
 For example in ES6:
 
 ```javascript
-  import { FetchCommand } from 'tmlabs'
+  import { FetchCommand } from '@tempicolabs/tmlabs'
   
   const command = new FetchCommand({
     method: 'ip'
@@ -123,7 +131,7 @@ For example in ES6:
 TmLabs is also available as a [command line app](https://github.com/TempicoLabs/tmlabs-cli). Here's how to use it:
 
 ```bash
-$ npm install tmlabs-cli -g
+$ npm install @tempicolabs/tmlabs-cli -g
 $ tmlabs --help
 ```
 

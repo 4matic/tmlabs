@@ -1950,74 +1950,55 @@ exports.default = function (fn) {
 
 var _asyncToGenerator = unwrapExports(asyncToGenerator);
 
-// 7.2.2 IsArray(argument)
+var f$1 = {}.propertyIsEnumerable;
 
-var _isArray = Array.isArray || function isArray(arg){
-  return _cof(arg) == 'Array';
+var _objectPie = {
+	f: f$1
 };
 
-var SPECIES$2  = _wks('species');
-
-var _arraySpeciesConstructor = function(original){
-  var C;
-  if(_isArray(original)){
-    C = original.constructor;
-    // cross-realm fallback
-    if(typeof C == 'function' && (C === Array || _isArray(C.prototype)))C = undefined;
-    if(_isObject(C)){
-      C = C[SPECIES$2];
-      if(C === null)C = undefined;
-    }
-  } return C === undefined ? Array : C;
-};
-
-// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-
-
-var _arraySpeciesCreate = function(original, length){
-  return new (_arraySpeciesConstructor(original))(length);
-};
-
-// 0 -> Array#forEach
-// 1 -> Array#map
-// 2 -> Array#filter
-// 3 -> Array#some
-// 4 -> Array#every
-// 5 -> Array#find
-// 6 -> Array#findIndex
-
-var _arrayMethods = function(TYPE, $create){
-  var IS_MAP        = TYPE == 1
-    , IS_FILTER     = TYPE == 2
-    , IS_SOME       = TYPE == 3
-    , IS_EVERY      = TYPE == 4
-    , IS_FIND_INDEX = TYPE == 6
-    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX
-    , create        = $create || _arraySpeciesCreate;
-  return function($this, callbackfn, that){
-    var O      = _toObject($this)
-      , self   = _iobject(O)
-      , f      = _ctx(callbackfn, that, 3)
-      , length = _toLength(self.length)
-      , index  = 0
-      , result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined
-      , val, res;
-    for(;length > index; index++)if(NO_HOLES || index in self){
-      val = self[index];
-      res = f(val, index, O);
-      if(TYPE){
-        if(IS_MAP)result[index] = res;            // map
-        else if(res)switch(TYPE){
-          case 3: return true;                    // some
-          case 5: return val;                     // find
-          case 6: return index;                   // findIndex
-          case 2: result.push(val);               // filter
-        } else if(IS_EVERY)return false;          // every
-      }
-    }
-    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+var isEnum    = _objectPie.f;
+var _objectToArray = function(isEntries){
+  return function(it){
+    var O      = _toIobject(it)
+      , keys   = _objectKeys(O)
+      , length = keys.length
+      , i      = 0
+      , result = []
+      , key;
+    while(length > i)if(isEnum.call(O, key = keys[i++])){
+      result.push(isEntries ? [key, O[key]] : O[key]);
+    } return result;
   };
 };
+
+// https://github.com/tc39/proposal-object-values-entries
+var $values = _objectToArray(false);
+
+_export(_export.S, 'Object', {
+  values: function values(it){
+    return $values(it);
+  }
+});
+
+var values$1 = _core.Object.values;
+
+var values = createCommonjsModule(function (module) {
+module.exports = { "default": values$1, __esModule: true };
+});
+
+var _Object$values = unwrapExports(values);
+
+var f$2 = _wks;
+
+var _wksExt = {
+	f: f$2
+};
+
+var iterator$2 = _wksExt.f('iterator');
+
+var iterator = createCommonjsModule(function (module) {
+module.exports = { "default": iterator$2, __esModule: true };
+});
 
 var _meta = createCommonjsModule(function (module) {
 var META     = _uid('meta')
@@ -2073,332 +2054,10 @@ var meta = module.exports = {
 };
 });
 
-var f$1 = Object.getOwnPropertySymbols;
-
-var _objectGops = {
-	f: f$1
-};
-
-var f$2 = {}.propertyIsEnumerable;
-
-var _objectPie = {
-	f: f$2
-};
-
-// 19.1.2.1 Object.assign(target, source, ...)
-var $assign  = Object.assign;
-
-// should work with symbols and should have deterministic property order (V8 bug)
-var _objectAssign = !$assign || _fails(function(){
-  var A = {}
-    , B = {}
-    , S = Symbol()
-    , K = 'abcdefghijklmnopqrst';
-  A[S] = 7;
-  K.split('').forEach(function(k){ B[k] = k; });
-  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
-}) ? function assign(target, source){ // eslint-disable-line no-unused-vars
-  var T     = _toObject(target)
-    , aLen  = arguments.length
-    , index = 1
-    , getSymbols = _objectGops.f
-    , isEnum     = _objectPie.f;
-  while(aLen > index){
-    var S      = _iobject(arguments[index++])
-      , keys   = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S)
-      , length = keys.length
-      , j      = 0
-      , key;
-    while(length > j)if(isEnum.call(S, key = keys[j++]))T[key] = S[key];
-  } return T;
-} : $assign;
-
-var getWeak           = _meta.getWeak;
-var arrayFind         = _arrayMethods(5);
-var arrayFindIndex    = _arrayMethods(6);
-var id$1                = 0;
-
-// fallback for uncaught frozen keys
-var uncaughtFrozenStore = function(that){
-  return that._l || (that._l = new UncaughtFrozenStore);
-};
-var UncaughtFrozenStore = function(){
-  this.a = [];
-};
-var findUncaughtFrozen = function(store, key){
-  return arrayFind(store.a, function(it){
-    return it[0] === key;
-  });
-};
-UncaughtFrozenStore.prototype = {
-  get: function(key){
-    var entry = findUncaughtFrozen(this, key);
-    if(entry)return entry[1];
-  },
-  has: function(key){
-    return !!findUncaughtFrozen(this, key);
-  },
-  set: function(key, value){
-    var entry = findUncaughtFrozen(this, key);
-    if(entry)entry[1] = value;
-    else this.a.push([key, value]);
-  },
-  'delete': function(key){
-    var index = arrayFindIndex(this.a, function(it){
-      return it[0] === key;
-    });
-    if(~index)this.a.splice(index, 1);
-    return !!~index;
-  }
-};
-
-var _collectionWeak = {
-  getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
-    var C = wrapper(function(that, iterable){
-      _anInstance(that, C, NAME, '_i');
-      that._i = id$1++;      // collection id
-      that._l = undefined; // leak store for uncaught frozen objects
-      if(iterable != undefined)_forOf(iterable, IS_MAP, that[ADDER], that);
-    });
-    _redefineAll(C.prototype, {
-      // 23.3.3.2 WeakMap.prototype.delete(key)
-      // 23.4.3.3 WeakSet.prototype.delete(value)
-      'delete': function(key){
-        if(!_isObject(key))return false;
-        var data = getWeak(key);
-        if(data === true)return uncaughtFrozenStore(this)['delete'](key);
-        return data && _has(data, this._i) && delete data[this._i];
-      },
-      // 23.3.3.4 WeakMap.prototype.has(key)
-      // 23.4.3.4 WeakSet.prototype.has(value)
-      has: function has(key){
-        if(!_isObject(key))return false;
-        var data = getWeak(key);
-        if(data === true)return uncaughtFrozenStore(this).has(key);
-        return data && _has(data, this._i);
-      }
-    });
-    return C;
-  },
-  def: function(that, key, value){
-    var data = getWeak(_anObject(key), true);
-    if(data === true)uncaughtFrozenStore(that).set(key, value);
-    else data[that._i] = value;
-    return that;
-  },
-  ufstore: uncaughtFrozenStore
-};
-
-var dP$1             = _objectDp.f;
-var each           = _arrayMethods(0);
-
-var _collection = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
-  var Base  = _global[NAME]
-    , C     = Base
-    , ADDER = IS_MAP ? 'set' : 'add'
-    , proto = C && C.prototype
-    , O     = {};
-  if(!_descriptors || typeof C != 'function' || !(IS_WEAK || proto.forEach && !_fails(function(){
-    new C().entries().next();
-  }))){
-    // create collection constructor
-    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
-    _redefineAll(C.prototype, methods);
-    _meta.NEED = true;
-  } else {
-    C = wrapper(function(target, iterable){
-      _anInstance(target, C, NAME, '_c');
-      target._c = new Base;
-      if(iterable != undefined)_forOf(iterable, IS_MAP, target[ADDER], target);
-    });
-    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','),function(KEY){
-      var IS_ADDER = KEY == 'add' || KEY == 'set';
-      if(KEY in proto && !(IS_WEAK && KEY == 'clear'))_hide(C.prototype, KEY, function(a, b){
-        _anInstance(this, C, KEY);
-        if(!IS_ADDER && IS_WEAK && !_isObject(a))return KEY == 'get' ? undefined : false;
-        var result = this._c[KEY](a === 0 ? 0 : a, b);
-        return IS_ADDER ? this : result;
-      });
-    });
-    if('size' in proto)dP$1(C.prototype, 'size', {
-      get: function(){
-        return this._c.size;
-      }
-    });
-  }
-
-  _setToStringTag(C, NAME);
-
-  O[NAME] = C;
-  _export(_export.G + _export.W + _export.F, O);
-
-  if(!IS_WEAK)common.setStrong(C, NAME, IS_MAP);
-
-  return C;
-};
-
-var es6_weakMap = createCommonjsModule(function (module) {
-'use strict';
-var each         = _arrayMethods(0)
-  , getWeak      = _meta.getWeak
-  , isExtensible = Object.isExtensible
-  , uncaughtFrozenStore = _collectionWeak.ufstore
-  , tmp          = {}
-  , InternalMap;
-
-var wrapper = function(get){
-  return function WeakMap(){
-    return get(this, arguments.length > 0 ? arguments[0] : undefined);
-  };
-};
-
-var methods = {
-  // 23.3.3.3 WeakMap.prototype.get(key)
-  get: function get(key){
-    if(_isObject(key)){
-      var data = getWeak(key);
-      if(data === true)return uncaughtFrozenStore(this).get(key);
-      return data ? data[this._i] : undefined;
-    }
-  },
-  // 23.3.3.5 WeakMap.prototype.set(key, value)
-  set: function set(key, value){
-    return _collectionWeak.def(this, key, value);
-  }
-};
-
-// 23.3 WeakMap Objects
-var $WeakMap = module.exports = _collection('WeakMap', wrapper, methods, _collectionWeak, true, true);
-
-// IE11 WeakMap frozen keys fix
-if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
-  InternalMap = _collectionWeak.getConstructor(wrapper);
-  _objectAssign(InternalMap.prototype, methods);
-  _meta.NEED = true;
-  each(['delete', 'has', 'get', 'set'], function(key){
-    var proto  = $WeakMap.prototype
-      , method = proto[key];
-    _redefine(proto, key, function(a, b){
-      // store frozen objects on internal weakmap shim
-      if(_isObject(a) && !isExtensible(a)){
-        if(!this._f)this._f = new InternalMap;
-        var result = this._f[key](a, b);
-        return key == 'set' ? this : result;
-      // store all the rest on native weakmap
-      } return method.call(this, a, b);
-    });
-  });
-}
-});
-
-var weakMap$1 = _core.WeakMap;
-
-var weakMap = createCommonjsModule(function (module) {
-module.exports = { "default": weakMap$1, __esModule: true };
-});
-
-var _WeakMap = unwrapExports(weakMap);
-
-// most Object methods by ES6 should accept primitives
-
-var _objectSap = function(KEY, exec){
-  var fn  = (_core.Object || {})[KEY] || Object[KEY]
-    , exp = {};
-  exp[KEY] = exec(fn);
-  _export(_export.S + _export.F * _fails(function(){ fn(1); }), 'Object', exp);
-};
-
-// 19.1.2.9 Object.getPrototypeOf(O)
-
-
-_objectSap('getPrototypeOf', function(){
-  return function getPrototypeOf(it){
-    return _objectGpo(_toObject(it));
-  };
-});
-
-var getPrototypeOf$1 = _core.Object.getPrototypeOf;
-
-var getPrototypeOf = createCommonjsModule(function (module) {
-module.exports = { "default": getPrototypeOf$1, __esModule: true };
-});
-
-var _Object$getPrototypeOf = unwrapExports(getPrototypeOf);
-
-var classCallCheck = createCommonjsModule(function (module, exports) {
-"use strict";
-
-exports.__esModule = true;
-
-exports.default = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-});
-
-var _classCallCheck = unwrapExports(classCallCheck);
-
-// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
-_export(_export.S + _export.F * !_descriptors, 'Object', {defineProperty: _objectDp.f});
-
-var $Object = _core.Object;
-var defineProperty$2 = function defineProperty(it, key, desc){
-  return $Object.defineProperty(it, key, desc);
-};
-
-var defineProperty = createCommonjsModule(function (module) {
-module.exports = { "default": defineProperty$2, __esModule: true };
-});
-
-var createClass = createCommonjsModule(function (module, exports) {
-"use strict";
-
-exports.__esModule = true;
-
-
-
-var _defineProperty2 = _interopRequireDefault(defineProperty);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      (0, _defineProperty2.default)(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-});
-
-var _createClass = unwrapExports(createClass);
-
-var f$3 = _wks;
-
-var _wksExt = {
-	f: f$3
-};
-
-var iterator$2 = _wksExt.f('iterator');
-
-var iterator = createCommonjsModule(function (module) {
-module.exports = { "default": iterator$2, __esModule: true };
-});
-
-var defineProperty$4 = _objectDp.f;
+var defineProperty = _objectDp.f;
 var _wksDefine = function(name){
   var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
-  if(name.charAt(0) != '_' && !(name in $Symbol))defineProperty$4($Symbol, name, {value: _wksExt.f(name)});
+  if(name.charAt(0) != '_' && !(name in $Symbol))defineProperty($Symbol, name, {value: _wksExt.f(name)});
 };
 
 var _keyof = function(object, el){
@@ -2408,6 +2067,12 @@ var _keyof = function(object, el){
     , index  = 0
     , key;
   while(length > index)if(O[key = keys[index++]] === el)return key;
+};
+
+var f$3 = Object.getOwnPropertySymbols;
+
+var _objectGops = {
+	f: f$3
 };
 
 // all enumerable object keys, includes symbols
@@ -2422,6 +2087,12 @@ var _enumKeys = function(it){
       , key;
     while(symbols.length > i)if(isEnum.call(it, key = symbols[i++]))result.push(key);
   } return result;
+};
+
+// 7.2.2 IsArray(argument)
+
+var _isArray = Array.isArray || function isArray(arg){
+  return _cof(arg) == 'Array';
 };
 
 // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
@@ -2476,7 +2147,7 @@ var _objectGopd = {
 // ECMAScript 6 symbols shim
 var META           = _meta.KEY;
 var gOPD           = _objectGopd.f;
-var dP$2             = _objectDp.f;
+var dP$1             = _objectDp.f;
 var gOPN           = _objectGopnExt.f;
 var $Symbol        = _global.Symbol;
 var $JSON          = _global.JSON;
@@ -2484,7 +2155,7 @@ var _stringify     = $JSON && $JSON.stringify;
 var PROTOTYPE$2      = 'prototype';
 var HIDDEN         = _wks('_hidden');
 var TO_PRIMITIVE   = _wks('toPrimitive');
-var isEnum         = {}.propertyIsEnumerable;
+var isEnum$1         = {}.propertyIsEnumerable;
 var SymbolRegistry = _shared('symbol-registry');
 var AllSymbols     = _shared('symbols');
 var OPSymbols      = _shared('op-symbols');
@@ -2496,15 +2167,15 @@ var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChil
 
 // fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
 var setSymbolDesc = _descriptors && _fails(function(){
-  return _objectCreate(dP$2({}, 'a', {
-    get: function(){ return dP$2(this, 'a', {value: 7}).a; }
+  return _objectCreate(dP$1({}, 'a', {
+    get: function(){ return dP$1(this, 'a', {value: 7}).a; }
   })).a != 7;
 }) ? function(it, key, D){
   var protoDesc = gOPD(ObjectProto$1, key);
   if(protoDesc)delete ObjectProto$1[key];
-  dP$2(it, key, D);
-  if(protoDesc && it !== ObjectProto$1)dP$2(ObjectProto$1, key, protoDesc);
-} : dP$2;
+  dP$1(it, key, D);
+  if(protoDesc && it !== ObjectProto$1)dP$1(ObjectProto$1, key, protoDesc);
+} : dP$1;
 
 var wrap = function(tag){
   var sym = AllSymbols[tag] = _objectCreate($Symbol[PROTOTYPE$2]);
@@ -2525,13 +2196,13 @@ var $defineProperty$1 = function defineProperty(it, key, D){
   _anObject(D);
   if(_has(AllSymbols, key)){
     if(!D.enumerable){
-      if(!_has(it, HIDDEN))dP$2(it, HIDDEN, _propertyDesc(1, {}));
+      if(!_has(it, HIDDEN))dP$1(it, HIDDEN, _propertyDesc(1, {}));
       it[HIDDEN][key] = true;
     } else {
       if(_has(it, HIDDEN) && it[HIDDEN][key])it[HIDDEN][key] = false;
       D = _objectCreate(D, {enumerable: _propertyDesc(0, false)});
     } return setSymbolDesc(it, key, D);
-  } return dP$2(it, key, D);
+  } return dP$1(it, key, D);
 };
 var $defineProperties = function defineProperties(it, P){
   _anObject(it);
@@ -2546,7 +2217,7 @@ var $create = function create(it, P){
   return P === undefined ? _objectCreate(it) : $defineProperties(_objectCreate(it), P);
 };
 var $propertyIsEnumerable = function propertyIsEnumerable(key){
-  var E = isEnum.call(this, key = _toPrimitive(key, true));
+  var E = isEnum$1.call(this, key = _toPrimitive(key, true));
   if(this === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key))return false;
   return E || !_has(this, key) || !_has(AllSymbols, key) || _has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
 };
@@ -2720,6 +2391,367 @@ exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.d
 
 var _typeof = unwrapExports(_typeof_1);
 
+var SPECIES$2  = _wks('species');
+
+var _arraySpeciesConstructor = function(original){
+  var C;
+  if(_isArray(original)){
+    C = original.constructor;
+    // cross-realm fallback
+    if(typeof C == 'function' && (C === Array || _isArray(C.prototype)))C = undefined;
+    if(_isObject(C)){
+      C = C[SPECIES$2];
+      if(C === null)C = undefined;
+    }
+  } return C === undefined ? Array : C;
+};
+
+// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+
+
+var _arraySpeciesCreate = function(original, length){
+  return new (_arraySpeciesConstructor(original))(length);
+};
+
+// 0 -> Array#forEach
+// 1 -> Array#map
+// 2 -> Array#filter
+// 3 -> Array#some
+// 4 -> Array#every
+// 5 -> Array#find
+// 6 -> Array#findIndex
+
+var _arrayMethods = function(TYPE, $create){
+  var IS_MAP        = TYPE == 1
+    , IS_FILTER     = TYPE == 2
+    , IS_SOME       = TYPE == 3
+    , IS_EVERY      = TYPE == 4
+    , IS_FIND_INDEX = TYPE == 6
+    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX
+    , create        = $create || _arraySpeciesCreate;
+  return function($this, callbackfn, that){
+    var O      = _toObject($this)
+      , self   = _iobject(O)
+      , f      = _ctx(callbackfn, that, 3)
+      , length = _toLength(self.length)
+      , index  = 0
+      , result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined
+      , val, res;
+    for(;length > index; index++)if(NO_HOLES || index in self){
+      val = self[index];
+      res = f(val, index, O);
+      if(TYPE){
+        if(IS_MAP)result[index] = res;            // map
+        else if(res)switch(TYPE){
+          case 3: return true;                    // some
+          case 5: return val;                     // find
+          case 6: return index;                   // findIndex
+          case 2: result.push(val);               // filter
+        } else if(IS_EVERY)return false;          // every
+      }
+    }
+    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+  };
+};
+
+// 19.1.2.1 Object.assign(target, source, ...)
+var $assign  = Object.assign;
+
+// should work with symbols and should have deterministic property order (V8 bug)
+var _objectAssign = !$assign || _fails(function(){
+  var A = {}
+    , B = {}
+    , S = Symbol()
+    , K = 'abcdefghijklmnopqrst';
+  A[S] = 7;
+  K.split('').forEach(function(k){ B[k] = k; });
+  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+}) ? function assign(target, source){ // eslint-disable-line no-unused-vars
+  var T     = _toObject(target)
+    , aLen  = arguments.length
+    , index = 1
+    , getSymbols = _objectGops.f
+    , isEnum     = _objectPie.f;
+  while(aLen > index){
+    var S      = _iobject(arguments[index++])
+      , keys   = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S)
+      , length = keys.length
+      , j      = 0
+      , key;
+    while(length > j)if(isEnum.call(S, key = keys[j++]))T[key] = S[key];
+  } return T;
+} : $assign;
+
+var getWeak           = _meta.getWeak;
+var arrayFind         = _arrayMethods(5);
+var arrayFindIndex    = _arrayMethods(6);
+var id$1                = 0;
+
+// fallback for uncaught frozen keys
+var uncaughtFrozenStore = function(that){
+  return that._l || (that._l = new UncaughtFrozenStore);
+};
+var UncaughtFrozenStore = function(){
+  this.a = [];
+};
+var findUncaughtFrozen = function(store, key){
+  return arrayFind(store.a, function(it){
+    return it[0] === key;
+  });
+};
+UncaughtFrozenStore.prototype = {
+  get: function(key){
+    var entry = findUncaughtFrozen(this, key);
+    if(entry)return entry[1];
+  },
+  has: function(key){
+    return !!findUncaughtFrozen(this, key);
+  },
+  set: function(key, value){
+    var entry = findUncaughtFrozen(this, key);
+    if(entry)entry[1] = value;
+    else this.a.push([key, value]);
+  },
+  'delete': function(key){
+    var index = arrayFindIndex(this.a, function(it){
+      return it[0] === key;
+    });
+    if(~index)this.a.splice(index, 1);
+    return !!~index;
+  }
+};
+
+var _collectionWeak = {
+  getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
+    var C = wrapper(function(that, iterable){
+      _anInstance(that, C, NAME, '_i');
+      that._i = id$1++;      // collection id
+      that._l = undefined; // leak store for uncaught frozen objects
+      if(iterable != undefined)_forOf(iterable, IS_MAP, that[ADDER], that);
+    });
+    _redefineAll(C.prototype, {
+      // 23.3.3.2 WeakMap.prototype.delete(key)
+      // 23.4.3.3 WeakSet.prototype.delete(value)
+      'delete': function(key){
+        if(!_isObject(key))return false;
+        var data = getWeak(key);
+        if(data === true)return uncaughtFrozenStore(this)['delete'](key);
+        return data && _has(data, this._i) && delete data[this._i];
+      },
+      // 23.3.3.4 WeakMap.prototype.has(key)
+      // 23.4.3.4 WeakSet.prototype.has(value)
+      has: function has(key){
+        if(!_isObject(key))return false;
+        var data = getWeak(key);
+        if(data === true)return uncaughtFrozenStore(this).has(key);
+        return data && _has(data, this._i);
+      }
+    });
+    return C;
+  },
+  def: function(that, key, value){
+    var data = getWeak(_anObject(key), true);
+    if(data === true)uncaughtFrozenStore(that).set(key, value);
+    else data[that._i] = value;
+    return that;
+  },
+  ufstore: uncaughtFrozenStore
+};
+
+var dP$2             = _objectDp.f;
+var each           = _arrayMethods(0);
+
+var _collection = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
+  var Base  = _global[NAME]
+    , C     = Base
+    , ADDER = IS_MAP ? 'set' : 'add'
+    , proto = C && C.prototype
+    , O     = {};
+  if(!_descriptors || typeof C != 'function' || !(IS_WEAK || proto.forEach && !_fails(function(){
+    new C().entries().next();
+  }))){
+    // create collection constructor
+    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+    _redefineAll(C.prototype, methods);
+    _meta.NEED = true;
+  } else {
+    C = wrapper(function(target, iterable){
+      _anInstance(target, C, NAME, '_c');
+      target._c = new Base;
+      if(iterable != undefined)_forOf(iterable, IS_MAP, target[ADDER], target);
+    });
+    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','),function(KEY){
+      var IS_ADDER = KEY == 'add' || KEY == 'set';
+      if(KEY in proto && !(IS_WEAK && KEY == 'clear'))_hide(C.prototype, KEY, function(a, b){
+        _anInstance(this, C, KEY);
+        if(!IS_ADDER && IS_WEAK && !_isObject(a))return KEY == 'get' ? undefined : false;
+        var result = this._c[KEY](a === 0 ? 0 : a, b);
+        return IS_ADDER ? this : result;
+      });
+    });
+    if('size' in proto)dP$2(C.prototype, 'size', {
+      get: function(){
+        return this._c.size;
+      }
+    });
+  }
+
+  _setToStringTag(C, NAME);
+
+  O[NAME] = C;
+  _export(_export.G + _export.W + _export.F, O);
+
+  if(!IS_WEAK)common.setStrong(C, NAME, IS_MAP);
+
+  return C;
+};
+
+var es6_weakMap = createCommonjsModule(function (module) {
+'use strict';
+var each         = _arrayMethods(0)
+  , getWeak      = _meta.getWeak
+  , isExtensible = Object.isExtensible
+  , uncaughtFrozenStore = _collectionWeak.ufstore
+  , tmp          = {}
+  , InternalMap;
+
+var wrapper = function(get){
+  return function WeakMap(){
+    return get(this, arguments.length > 0 ? arguments[0] : undefined);
+  };
+};
+
+var methods = {
+  // 23.3.3.3 WeakMap.prototype.get(key)
+  get: function get(key){
+    if(_isObject(key)){
+      var data = getWeak(key);
+      if(data === true)return uncaughtFrozenStore(this).get(key);
+      return data ? data[this._i] : undefined;
+    }
+  },
+  // 23.3.3.5 WeakMap.prototype.set(key, value)
+  set: function set(key, value){
+    return _collectionWeak.def(this, key, value);
+  }
+};
+
+// 23.3 WeakMap Objects
+var $WeakMap = module.exports = _collection('WeakMap', wrapper, methods, _collectionWeak, true, true);
+
+// IE11 WeakMap frozen keys fix
+if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
+  InternalMap = _collectionWeak.getConstructor(wrapper);
+  _objectAssign(InternalMap.prototype, methods);
+  _meta.NEED = true;
+  each(['delete', 'has', 'get', 'set'], function(key){
+    var proto  = $WeakMap.prototype
+      , method = proto[key];
+    _redefine(proto, key, function(a, b){
+      // store frozen objects on internal weakmap shim
+      if(_isObject(a) && !isExtensible(a)){
+        if(!this._f)this._f = new InternalMap;
+        var result = this._f[key](a, b);
+        return key == 'set' ? this : result;
+      // store all the rest on native weakmap
+      } return method.call(this, a, b);
+    });
+  });
+}
+});
+
+var weakMap$1 = _core.WeakMap;
+
+var weakMap = createCommonjsModule(function (module) {
+module.exports = { "default": weakMap$1, __esModule: true };
+});
+
+var _WeakMap = unwrapExports(weakMap);
+
+// most Object methods by ES6 should accept primitives
+
+var _objectSap = function(KEY, exec){
+  var fn  = (_core.Object || {})[KEY] || Object[KEY]
+    , exp = {};
+  exp[KEY] = exec(fn);
+  _export(_export.S + _export.F * _fails(function(){ fn(1); }), 'Object', exp);
+};
+
+// 19.1.2.9 Object.getPrototypeOf(O)
+
+
+_objectSap('getPrototypeOf', function(){
+  return function getPrototypeOf(it){
+    return _objectGpo(_toObject(it));
+  };
+});
+
+var getPrototypeOf$1 = _core.Object.getPrototypeOf;
+
+var getPrototypeOf = createCommonjsModule(function (module) {
+module.exports = { "default": getPrototypeOf$1, __esModule: true };
+});
+
+var _Object$getPrototypeOf = unwrapExports(getPrototypeOf);
+
+var classCallCheck = createCommonjsModule(function (module, exports) {
+"use strict";
+
+exports.__esModule = true;
+
+exports.default = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+});
+
+var _classCallCheck = unwrapExports(classCallCheck);
+
+// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
+_export(_export.S + _export.F * !_descriptors, 'Object', {defineProperty: _objectDp.f});
+
+var $Object = _core.Object;
+var defineProperty$3 = function defineProperty(it, key, desc){
+  return $Object.defineProperty(it, key, desc);
+};
+
+var defineProperty$1 = createCommonjsModule(function (module) {
+module.exports = { "default": defineProperty$3, __esModule: true };
+});
+
+var createClass = createCommonjsModule(function (module, exports) {
+"use strict";
+
+exports.__esModule = true;
+
+
+
+var _defineProperty2 = _interopRequireDefault(defineProperty$1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      (0, _defineProperty2.default)(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+});
+
+var _createClass = unwrapExports(createClass);
+
 var possibleConstructorReturn = createCommonjsModule(function (module, exports) {
 "use strict";
 
@@ -2832,6 +2864,193 @@ var eventEmitter_min = createCommonjsModule(function (module, exports) {
 });
 
 var EventEmitter = unwrapExports(eventEmitter_min);
+
+// Port of lower_bound from http://en.cppreference.com/w/cpp/algorithm/lower_bound
+// Used to compute insertion index to keep queue sorted after insertion
+function lowerBound(array, value, comp) {
+	let first = 0;
+	let count = array.length;
+
+	while (count > 0) {
+		const step = (count / 2) | 0;
+		let it = first + step;
+
+		if (comp(array[it], value) <= 0) {
+			first = ++it;
+			count -= step + 1;
+		} else {
+			count = step;
+		}
+	}
+
+	return first;
+}
+
+class PriorityQueue {
+	constructor() {
+		this._queue = [];
+	}
+	enqueue(run, opts) {
+		opts = Object.assign({
+			priority: 0
+		}, opts);
+
+		const element = {priority: opts.priority, run};
+
+		if (this.size && this._queue[this.size - 1].priority >= opts.priority) {
+			this._queue.push(element);
+			return;
+		}
+
+		const index = lowerBound(this._queue, element, (a, b) => b.priority - a.priority);
+		this._queue.splice(index, 0, element);
+	}
+	dequeue() {
+		return this._queue.shift().run;
+	}
+	get size() {
+		return this._queue.length;
+	}
+}
+
+class PQueue {
+	constructor(opts) {
+		opts = Object.assign({
+			concurrency: Infinity,
+			queueClass: PriorityQueue
+		}, opts);
+
+		if (opts.concurrency < 1) {
+			throw new TypeError('Expected `concurrency` to be a number from 1 and up');
+		}
+
+		this.queue = new opts.queueClass(); // eslint-disable-line new-cap
+		this._queueClass = opts.queueClass;
+		this._pendingCount = 0;
+		this._concurrency = opts.concurrency;
+		this._resolveEmpty = () => {};
+	}
+	_next() {
+		this._pendingCount--;
+
+		if (this.queue.size > 0) {
+			this.queue.dequeue()();
+		} else {
+			this._resolveEmpty();
+		}
+	}
+	add(fn, opts) {
+		return new Promise((resolve, reject) => {
+			const run = () => {
+				this._pendingCount++;
+
+				fn().then(
+					val => {
+						resolve(val);
+						this._next();
+					},
+					err => {
+						reject(err);
+						this._next();
+					}
+				);
+			};
+
+			if (this._pendingCount < this._concurrency) {
+				run();
+			} else {
+				this.queue.enqueue(run, opts);
+			}
+		});
+	}
+
+	clear() {
+		this.queue = new this._queueClass(); // eslint-disable-line new-cap
+	}
+
+	onEmpty() {
+		return new Promise(resolve => {
+			const existingResolve = this._resolveEmpty;
+			this._resolveEmpty = () => {
+				existingResolve();
+				resolve();
+			};
+		});
+	}
+	get size() {
+		return this.queue.size;
+	}
+	get pending() {
+		return this._pendingCount;
+	}
+}
+
+var index$3 = PQueue;
+
+var index$5 = (iterable, mapper, opts) => new Promise((resolve, reject) => {
+	opts = Object.assign({
+		concurrency: Infinity
+	}, opts);
+
+	const concurrency = opts.concurrency;
+
+	if (concurrency < 1) {
+		throw new TypeError('Expected `concurrency` to be a number from 1 and up');
+	}
+
+	const ret = [];
+	const iterator = iterable[Symbol.iterator]();
+	let isRejected = false;
+	let iterableDone = false;
+	let resolvingCount = 0;
+	let currentIdx = 0;
+
+	const next = () => {
+		if (isRejected) {
+			return;
+		}
+
+		const nextItem = iterator.next();
+		const i = currentIdx;
+		currentIdx++;
+
+		if (nextItem.done) {
+			iterableDone = true;
+
+			if (resolvingCount === 0) {
+				resolve(ret);
+			}
+
+			return;
+		}
+
+		resolvingCount++;
+
+		Promise.resolve(nextItem.value)
+			.then(el => mapper(el, i))
+			.then(
+				val => {
+					ret[i] = val;
+					resolvingCount--;
+					next();
+				},
+				err => {
+					isRejected = true;
+					reject(err);
+				}
+			);
+	};
+
+	for (let i = 0; i < concurrency; i++) {
+		next();
+
+		if (iterableDone) {
+			break;
+		}
+	}
+});
+
+var index$4 = (iterable, opts) => index$5(iterable, el => el(), opts);
 
 // 19.1.2.14 Object.keys(O)
 
@@ -2992,38 +3211,6 @@ exports.default = function (arr) {
 });
 
 var _toConsumableArray = unwrapExports(toConsumableArray);
-
-var isEnum$1    = _objectPie.f;
-var _objectToArray = function(isEntries){
-  return function(it){
-    var O      = _toIobject(it)
-      , keys   = _objectKeys(O)
-      , length = keys.length
-      , i      = 0
-      , result = []
-      , key;
-    while(length > i)if(isEnum$1.call(O, key = keys[i++])){
-      result.push(isEntries ? [key, O[key]] : O[key]);
-    } return result;
-  };
-};
-
-// https://github.com/tc39/proposal-object-values-entries
-var $values = _objectToArray(false);
-
-_export(_export.S, 'Object', {
-  values: function values(it){
-    return $values(it);
-  }
-});
-
-var values$1 = _core.Object.values;
-
-var values = createCommonjsModule(function (module) {
-module.exports = { "default": values$1, __esModule: true };
-});
-
-var _Object$values = unwrapExports(values);
 
 var BOMChar = '\uFEFF';
 
@@ -6255,7 +6442,7 @@ var require$$3 = ( gbkAdded$1 && gbkAdded ) || gbkAdded$1;
 
 var require$$4 = ( gb18030Ranges$1 && gb18030Ranges ) || gb18030Ranges$1;
 
-var require$$5$2 = ( cp949$1 && cp949 ) || cp949$1;
+var require$$5$1 = ( cp949$1 && cp949 ) || cp949$1;
 
 var require$$6 = ( cp950$1 && cp950 ) || cp950$1;
 
@@ -6379,7 +6566,7 @@ var dbcsData = {
     '949': 'cp949',
     'cp949': {
         type: '_dbcs',
-        table: function() { return require$$5$2 },
+        table: function() { return require$$5$1 },
     },
 
     'cseuckr': 'cp949',
@@ -6436,7 +6623,7 @@ var dbcsData = {
     'xxbig5': 'big5hkscs',
 };
 
-var index$7 = createCommonjsModule(function (module, exports) {
+var index$11 = createCommonjsModule(function (module, exports) {
 "use strict";
 
 // Update this array if you add/rename/remove files in this directory.
@@ -6795,7 +6982,7 @@ var extendNode = function (iconv) {
     };
 };
 
-var index$5 = createCommonjsModule(function (module) {
+var index$9 = createCommonjsModule(function (module) {
 "use strict";
 
 // Some environments don't have global Buffer (e.g. React Native).
@@ -6859,7 +7046,7 @@ iconv.fromEncoding = iconv.decode;
 iconv._codecDataCache = {};
 iconv.getCodec = function getCodec(encoding) {
     if (!iconv.encodings)
-        iconv.encodings = index$7; // Lazy load all encoding definitions.
+        iconv.encodings = index$11; // Lazy load all encoding definitions.
     
     // Canonicalize encoding name: strip all non-alphanumeric chars and appended year.
     var enc = (''+encoding).toLowerCase().replace(/[^0-9a-z]|:\d{4}$/g, "");
@@ -7043,11 +7230,11 @@ function convertIconv(str, to, from) {
  */
 function convertIconvLite(str, to, from) {
     if (to === 'UTF-8') {
-        return index$5.decode(str, from);
+        return index$9.decode(str, from);
     } else if (from === 'UTF-8') {
-        return index$5.encode(str, to);
+        return index$9.encode(str, to);
     } else {
-        return index$5.encode(index$5.decode(str, from), to);
+        return index$9.encode(index$9.decode(str, from), to);
     }
 }
 
@@ -7071,7 +7258,7 @@ var encoding = {
 	convert: convert_1
 };
 
-var index$9 = createCommonjsModule(function (module) {
+var index$13 = createCommonjsModule(function (module) {
 'use strict';
 
 var isStream = module.exports = function (stream) {
@@ -7372,7 +7559,7 @@ Body.prototype._clone = function(instance) {
 
 	// check that body is a stream and not form-data object
 	// note: we can't clone the form-data object without having it as a dependency
-	if (index$9(body) && typeof body.getBoundary !== 'function') {
+	if (index$13(body) && typeof body.getBoundary !== 'function') {
 		// tee instance body
 		p1 = new PassThrough();
 		p2 = new PassThrough();
@@ -7655,7 +7842,7 @@ Request.prototype.clone = function() {
 	return new Request(this);
 };
 
-var index$3 = createCommonjsModule(function (module) {
+var index$7 = createCommonjsModule(function (module) {
 /**
  * index.js
  *
@@ -7949,14 +8136,14 @@ var fetchNode$1 = function (context) {
   // given the way `node-fetch` is implemented, this is the only way to make
   // it work at all.
   if (context && context.Promise) {
-    index$3.Promise = context.Promise;
+    index$7.Promise = context.Promise;
   }
 
   return {
-    fetch: wrapFetchForNode(index$3),
-    Headers: index$3.Headers,
-    Request: index$3.Request,
-    Response: index$3.Response
+    fetch: wrapFetchForNode(index$7),
+    Headers: index$7.Headers,
+    Request: index$7.Request,
+    Response: index$7.Response
   };
 };
 
@@ -9546,7 +9733,7 @@ exports.__esModule = true;
 
 
 
-var _defineProperty2 = _interopRequireDefault(defineProperty);
+var _defineProperty2 = _interopRequireDefault(defineProperty$1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9843,10 +10030,11 @@ var FetchCommand = function (_AbstractCommand) {
                 _context.t0 = _context['catch'](3);
 
                 this._map.get(this).error = true;
+                this._map.get(this).errorText = _context.t0.message;
                 this.emit('error', _context.t0, this);
                 throw _context.t0;
 
-              case 22:
+              case 23:
               case 'end':
                 return _context.stop();
             }
@@ -10008,7 +10196,7 @@ var FetchCommand = function (_AbstractCommand) {
                   billHeaders = ['remaining', 'lastbill', 'reset'];
 
                   billHeaders.forEach(function (suffix) {
-                    _this3._map.get(_this3)['balance_' + suffix] = responseHeaders['x-balance-' + suffix];
+                    _this3._map.get(_this3)['balance_' + suffix] = responseHeaders['x-balance-' + suffix][0];
                   });
                   fetchResponse.headers = responseHeaders;
                 }
@@ -10016,7 +10204,7 @@ var FetchCommand = function (_AbstractCommand) {
                   _this3._map.get(_this3)[key] = fetchResponse[key];
                 });
 
-                if (!(!response.ok && content && content.error)) {
+                if (!(fetchResponse.error && content && content.error)) {
                   _context2.next = 60;
                   break;
                 }
@@ -10049,10 +10237,11 @@ var FetchCommand = function (_AbstractCommand) {
                 _context2.t1 = _context2['catch'](5);
 
                 this._map.get(this).error = true;
+                this._map.get(this).errorText = _context2.t1.message;
                 this.emit('error', _context2.t1, this);
                 throw _context2.t1;
 
-              case 72:
+              case 73:
               case 'end':
                 return _context2.stop();
             }
@@ -10301,94 +10490,329 @@ var TmLabs$1 = function (_EventEmitter) {
     var _this = _possibleConstructorReturn(this, (TmLabs.__proto__ || _Object$getPrototypeOf(TmLabs)).call(this));
 
     var key = options && options.key ? options.key : false;
+    var limit = options && options.limit ? options.limit : Infinity;
+    var queue = new index$3({ concurrency: limit });
     var history = [];
     _this._map = new _WeakMap();
     _this._map.set(_this, {
       key: key,
+      limit: limit,
+      queue: queue,
       history: history
     });
     return _this;
   }
 
+  /**
+   *
+   * @param {{command: string, params: object}} commands Array of command objects which contain command key and it params key for command run options
+   * @param options
+   * @returns {Promise.<Array>}
+   */
+
+
   _createClass(TmLabs, [{
-    key: 'fetch',
+    key: 'runBatch',
     value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee(method) {
-        var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var answer;
+      var _ref = _asyncToGenerator(index.mark(function _callee() {
+        var _this2 = this;
+
+        var commands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var batchResponse, methods, i, commandObj, command, response, promises;
         return index.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (this.key) params.key = this.key;
-                _context.next = 3;
-                return this.doCommand(new Command('fetch', {
-                  method: method
-                }), params);
+                batchResponse = [];
+                methods = FetchCommand.getMethods();
 
-              case 3:
-                answer = _context.sent;
-                return _context.abrupt('return', answer);
+                if (options.throw) {
+                  _context.next = 28;
+                  break;
+                }
 
-              case 5:
+                i = 0;
+
+              case 4:
+                if (!(i < commands.length)) {
+                  _context.next = 26;
+                  break;
+                }
+
+                commandObj = commands[i];
+                _context.prev = 6;
+
+                if (commandObj) {
+                  _context.next = 9;
+                  break;
+                }
+
+                throw new TypeError('Empty command');
+
+              case 9:
+                if (!((typeof commandObj === 'undefined' ? 'undefined' : _typeof(commandObj)) !== 'object')) {
+                  _context.next = 11;
+                  break;
+                }
+
+                throw new ReferenceError('Invalid command type');
+
+              case 11:
+                if (commandObj.command) {
+                  _context.next = 13;
+                  break;
+                }
+
+                throw new TypeError("Empty required param 'method'");
+
+              case 13:
+                command = commandObj.command;
+                // if (!Object.values(methods).includes(command.method)) throw new TypeError('Only command instance could be')
+
+                _context.next = 16;
+                return this.runCommand(command, commandObj.params);
+
+              case 16:
+                response = _context.sent;
+
+                batchResponse.push(response);
+                _context.next = 23;
+                break;
+
+              case 20:
+                _context.prev = 20;
+                _context.t0 = _context['catch'](6);
+
+                batchResponse.push({
+                  error: true,
+                  errorText: _context.t0.message
+                });
+
+              case 23:
+                i++;
+                _context.next = 4;
+                break;
+
+              case 26:
+                _context.next = 33;
+                break;
+
+              case 28:
+                promises = [];
+
+                commands.forEach(function (commandObj) {
+                  if (!commandObj) throw new TypeError('Empty command');
+                  if ((typeof commandObj === 'undefined' ? 'undefined' : _typeof(commandObj)) !== 'object') throw new ReferenceError('Invalid command type');
+                  if (!commandObj.command) throw new TypeError("Empty required param 'method'");
+                  var command = commandObj.command;
+                  promises.push(function () {
+                    return _this2.runCommand(command, commandObj.params);
+                  });
+                });
+                _context.next = 32;
+                return index$4(promises, { concurrency: this.limit });
+
+              case 32:
+                batchResponse = _context.sent;
+
+              case 33:
+                return _context.abrupt('return', batchResponse);
+
+              case 34:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this);
+        }, _callee, this, [[6, 20]]);
       }));
 
-      function fetch(_x) {
+      function runBatch() {
         return _ref.apply(this, arguments);
       }
 
-      return fetch;
+      return runBatch;
     }()
-  }, {
-    key: 'doCommand',
-    value: function () {
-      var _ref2 = _asyncToGenerator(index.mark(function _callee2(command, params) {
-        var _this2 = this;
 
-        var answer;
+    /**
+     * Fetch specific method multiple times with different params
+     * @param {string} method API method dns|ip, etc
+     * @param {[object]} objects array of request parameters
+     * @param options additional options
+     * @returns {Promise.<Array>}
+     */
+
+  }, {
+    key: 'fetchBatch',
+    value: function () {
+      var _ref2 = _asyncToGenerator(index.mark(function _callee2(method) {
+        var _this3 = this;
+
+        var objects = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var batchResponse, methods, i, response, promises;
         return index.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                this._map.get(this).history.push(command);
-                this.emit('command', command, params);
-                command.on('error', function (error, cmd) {
-                  _this2.emit('error', error, cmd);
-                });
-                command.on('fetch', function (options, cmd) {
-                  _this2.emit('fetch', cmd, options);
-                });
-                command.on('response', function (response, cmd) {
-                  _this2.emit('response', cmd, response);
-                });
-                command.on('raw_response', function (response, cmd) {
-                  _this2.emit('raw_response', cmd, response);
-                });
-                _context2.next = 8;
-                return command.run(params);
+                batchResponse = [];
+                methods = FetchCommand.getMethods();
+
+                if (method) {
+                  _context2.next = 4;
+                  break;
+                }
+
+                throw new TypeError("Empty required param 'method'");
+
+              case 4:
+                if (_Object$values(methods).includes(method)) {
+                  _context2.next = 6;
+                  break;
+                }
+
+                throw new TypeError('Invalid method param');
+
+              case 6:
+                if (options.throw) {
+                  _context2.next = 24;
+                  break;
+                }
+
+                i = 0;
 
               case 8:
-                answer = _context2.sent;
-                return _context2.abrupt('return', answer);
+                if (!(i < objects.length)) {
+                  _context2.next = 22;
+                  break;
+                }
 
-              case 10:
+                _context2.prev = 9;
+                _context2.next = 12;
+                return this.fetch(method, objects[i]);
+
+              case 12:
+                response = _context2.sent;
+
+                batchResponse.push(response);
+                _context2.next = 19;
+                break;
+
+              case 16:
+                _context2.prev = 16;
+                _context2.t0 = _context2['catch'](9);
+
+                batchResponse.push({
+                  error: true,
+                  errorText: _context2.t0.message
+                });
+
+              case 19:
+                i++;
+                _context2.next = 8;
+                break;
+
+              case 22:
+                _context2.next = 29;
+                break;
+
+              case 24:
+                promises = [];
+
+                objects.forEach(function (params) {
+                  promises.push(_this3.fetch(method, params));
+                });
+                _context2.next = 28;
+                return index$4(promises, { concurrency: this.limit });
+
+              case 28:
+                batchResponse = _context2.sent;
+
+              case 29:
+                return _context2.abrupt('return', batchResponse);
+
+              case 30:
               case 'end':
                 return _context2.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee2, this, [[9, 16]]);
       }));
 
-      function doCommand(_x3, _x4) {
+      function fetchBatch(_x3) {
         return _ref2.apply(this, arguments);
       }
 
-      return doCommand;
+      return fetchBatch;
+    }()
+
+    /**
+     * Fetch specific method
+     * @param {string} method API method dns|ip, etc
+     * @param {object} params method parameters
+     * @returns {Promise}
+     */
+
+  }, {
+    key: 'fetch',
+    value: function fetch(method) {
+      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (this.key) params.key = this.key;
+      var answer = this.runCommand(new Command('fetch', {
+        method: method
+      }), params);
+      return answer;
+    }
+
+    /**
+     * Run command with params
+     * @param {Command} command
+     * @param params command params
+     * @returns {Promise}
+     */
+
+  }, {
+    key: 'runCommand',
+    value: function () {
+      var _ref3 = _asyncToGenerator(index.mark(function _callee3(command, params) {
+        var _this4 = this;
+
+        var answer;
+        return index.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this._map.get(this).history.push(command);
+                this.emit('command', command, params);
+                command.on('error', function (error, cmd) {
+                  _this4.emit('error', error, cmd);
+                });
+                command.on('fetch', function (options, cmd) {
+                  _this4.emit('fetch', cmd, options);
+                });
+                command.on('response', function (response, cmd) {
+                  _this4.emit('response', cmd, response);
+                });
+                command.on('raw_response', function (response, cmd) {
+                  _this4.emit('raw_response', cmd, response);
+                });
+                answer = command.run(params);
+                return _context3.abrupt('return', answer);
+
+              case 8:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function runCommand(_x7, _x8) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return runCommand;
     }()
   }, {
     key: 'history',
@@ -10399,6 +10823,22 @@ var TmLabs$1 = function (_EventEmitter) {
     key: 'key',
     get: function get() {
       return this._map.get(this).key;
+    }
+  }, {
+    key: 'limit',
+    get: function get() {
+      return this._map.get(this).limit;
+    }
+
+    /**
+     * Get number of pending requests
+     * @returns {number}
+     */
+
+  }, {
+    key: 'pending',
+    get: function get() {
+      return this._map.get(this).queue.pending;
     }
   }]);
 

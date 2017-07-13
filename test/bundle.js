@@ -10,7 +10,6 @@ chai.use(chaiString)
 describe('Bundle Tests', () => {
   it('Main class object initialization', () => {
     const tmLabs = new TmLabs()
-    console.log('TmLabs', tmLabs)
     assert.isEmpty(tmLabs.history)
   })
   it('FetchCommand class object initialization. throw error', () => {

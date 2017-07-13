@@ -106,6 +106,11 @@ export default class FetchCommand extends AbstractCommand {
           }
         })
       }
+      if (spec) {
+        if (spec['version'] !== 'undefined') {
+          this.version = spec['version']
+        }
+      }
       return returnArgs
     }
   }
@@ -139,6 +144,7 @@ export default class FetchCommand extends AbstractCommand {
       return response
     } catch (err) {
       this._map.get(this).error = true
+      this._map.get(this).errorText = err.message
       this.emit('error', err, this)
       throw err
     }
@@ -220,14 +226,16 @@ export default class FetchCommand extends AbstractCommand {
         if (responseHeaders) {
           const billHeaders = ['remaining', 'lastbill', 'reset']
           billHeaders.forEach((suffix) => {
-            this._map.get(this)[`balance_${suffix}`] = responseHeaders[`x-balance-${suffix}`]
+            let value = responseHeaders[`x-balance-${suffix}`]
+            if (Array.isArray(value)) value = value[0]
+            this._map.get(this)[`balance_${suffix}`] = parseFloat(value)
           })
           fetchResponse.headers = responseHeaders
         }
         Object.keys(fetchResponse).forEach((key) => {
           this._map.get(this)[key] = fetchResponse[key]
         })
-        if (!response.ok && content && content.error) {
+        if (fetchResponse.error && content && content.error) {
           this._map.get(this).errorText = content.error
           if (status === 429) throw new error.InsufficientFundsError(content.error)
           this.emit('error', new Error(content.error), this)
@@ -239,6 +247,7 @@ export default class FetchCommand extends AbstractCommand {
       return fetchResponse
     } catch (err) {
       this._map.get(this).error = true
+      this._map.get(this).errorText = err.message
       this.emit('error', err, this)
       throw err
     }

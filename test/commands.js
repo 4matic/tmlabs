@@ -151,6 +151,26 @@ describe('Commands Tests', () => {
         assert.equal(command.error, true, 'error=true')
       })
       describe('Test requests.', () => {
+        describe('method email/leaks', () => {
+          it('method email/leaks', async () => {
+            const email = 'email@example.com'
+            const command = new Command('fetch', {
+              method: 'email/leaks'
+            })
+            await command.run({
+              email
+            })
+            assert.equal(command.status, 200, 'code 200')
+            assert.equal(command.error, false, 'error=true')
+            assert.startsWith(command.url, `https://tempicolabs.com/api/email/leaks/${email}`, 'correct url')
+            assert.deepEqual(command.args, [{
+              'arg': 'email',
+              'val': email
+            }], 'arguments')
+            assert.equal(command.statusText, 'OK')
+            assert.hasAllKeys(command.content, ['mtime', 'payload', 'source'])
+          })
+        })
         describe('method ip', () => {
           it('do command. fetch ip data. error for bad ip(127.0.0.1)', async () => {
             const command = new Command('fetch', {
@@ -249,7 +269,7 @@ describe('Commands Tests', () => {
         })
         describe('method hash', () => {
           it('do command. checking file hash', async () => {
-            const hash = 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051';
+            const hash = 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051'
             const command = new Command('fetch', {
               method: 'hash'
             })
@@ -297,7 +317,7 @@ describe('Commands Tests', () => {
             await command.run({
               ipaddr: ip,
               portmin,
-              portmax,
+              portmax
             })
             assert.equal(command.status, 200)
             assert.equal(command.error, false, 'error=false')

@@ -111,6 +111,9 @@
     "es6-promise": "^4.1.1",
     "fetch-ponyfill": "^4.0.0",
     "isomorphic-fetch": "^2.2.1",
+    "p-all": "^1.0.0",
+    "p-cancelable": "^0.3.0",
+    "p-queue": "^1.1.0",
     "smelly-event-emitter": "^0.1.1",
     "validator": "^8.0.0"
   }

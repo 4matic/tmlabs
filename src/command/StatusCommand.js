@@ -1,7 +1,7 @@
 import FetchCommand from './FetchCommand'
 import { endpoint } from '../constant'
 
-export default class AuthorizeCommand extends FetchCommand {
+export default class StatusCommand extends FetchCommand {
   constructor (params) {
     super(Object.assign({}, params, {
       method: endpoint.STATUS,

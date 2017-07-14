@@ -3,7 +3,10 @@
 
 import chai, { assert } from 'chai'
 import chaiString from 'chai-string'
-import { Fetch as FetchCommand } from '../src/command'
+import {
+  Fetch as FetchCommand,
+  Status as StatusCommand
+} from '../src/command'
 import Command from '../src/Command'
 
 chai.use(chaiString)
@@ -397,6 +400,9 @@ describe('Commands Tests', () => {
       it('check balance properties', async () => {
         const command = new Command('status', false)
         await command.run()
+        assert.isNumber(command.balanceLastbill)
+        assert.isNumber(command.balanceRemaining)
+        assert.isNumber(command.balanceReset)
         assert.hasAnyKeys(command.headers, [
           'x-balance-remaining', 'x-balance-lastbill', 'x-balance-reset'
         ], 'has balance keys in headers')
@@ -449,7 +455,7 @@ describe('Commands Tests', () => {
       await command.run({
         ipaddr: '173.194.122.233' // google ip address. using alias
       })
-      assert.equal(command.status, 200, 'code 400')
+      assert.equal(command.status, 200, 'code 200')
       assert.equal(command.error, false, 'error=false')
       assert.deepEqual(command.args, [{
         'arg': 'ipaddr',
@@ -459,6 +465,31 @@ describe('Commands Tests', () => {
       assert.equal(command.statusText, 'OK')
       assert.equal(command.errorText, undefined)
       assert.equal(command.content.isp, 'Google')
+    })
+  })
+  describe('Class StatusCommand', () => {
+    it('init object with undefined params', () => {
+      assert.doesNotThrow(() => {
+        new StatusCommand()
+      }, Error)
+    })
+    it('do command. fetch status data', (done) => {
+      const command = new StatusCommand()
+      const promise = command.run().then((response) => {
+        assert.equal(command.status, 200, 'code 200')
+        assert.equal(command.error, false, 'error=false')
+        assert.startsWith(command.url, 'https://tempicolabs.com/api/status', 'correct url')
+        assert.equal(command.statusText, 'OK')
+        assert.equal(command.errorText, undefined)
+        assert.hasAllKeys(command.content, [
+          'balance', 'stats'
+        ], 'has balance & stats keys in body')
+        done()
+      })
+      assert.equal(command.status, undefined, 'code undefined')
+      console.log('promise', promise)
+      assert.equal(command.pending, true, 'in process')
+      assert.deepEqual(command.args, [], 'arguments')
     })
   })
 })

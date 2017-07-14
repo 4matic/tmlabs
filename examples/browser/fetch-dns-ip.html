@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Testing TempicoLabs SDK</title>
+    <title>Fetch DNS, then IP Example - TempicoLabs SDK</title>
 </head>
 <body>
   <script src="../../dist/tmlabs.min.js"></script>
@@ -24,8 +24,8 @@
 //    command.run({
 //      ip: '127.0.0.2',
 //    });
-    console.log(TmLabs)
     var TmLabs = new TmLabs.default();
+    console.log('TmLabs Object', TmLabs)
     TmLabs.on('error', function(error, command){
       console.error('[ SDK ERROR ]', error);
     });

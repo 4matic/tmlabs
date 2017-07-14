@@ -5,7 +5,7 @@ import babel from 'rollup-plugin-babel'
 import babili from 'rollup-plugin-babili'
 import replace from 'rollup-plugin-replace'
 
-let external = !process.env.production ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util'] : []
+let external = !process.env.production ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : ['crypto']
 
 const replaceOptions = {
   exclude: 'node_modules/**',

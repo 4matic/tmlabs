@@ -2,14 +2,32 @@
 /* eslint-disable no-new */
 
 import chai, { assert } from 'chai'
+import fs from 'fs'
+import ChildProcess from 'child_process'
+import StreamTest from 'streamtest'
 import chaiString from 'chai-string'
 import {
   Fetch as FetchCommand,
-  Status as StatusCommand
+  Status as StatusCommand,
+  Hash as HashCommand
 } from '../src/command'
 import Command from '../src/Command'
 
 chai.use(chaiString)
+
+const execFile = ChildProcess.execFile
+
+const getFileRealHash = (filepath) => {
+  return new Promise((resolve, reject) => {
+    execFile('sha256sum', [filepath], (error, stdout, stderr) => {
+      if (error) {
+        reject(error)
+      }
+      const [hash] = stdout.split(' ')
+      resolve(hash)
+    })
+  })
+}
 
 describe('Commands Tests', () => {
   describe('Class Command', () => {
@@ -44,6 +62,29 @@ describe('Commands Tests', () => {
           method: ''
         })
       }, ReferenceError, 'Action not found')
+    })
+    describe('Action HashCommand', () => {
+      it('run method with invalid hash property. throw error', async () => {
+        const command = new Command('hash', false)
+        let response
+        try {
+          response = await command.run({
+            hash: 'asdasdasdasdasdsad'
+          })
+        } catch (e) {
+          assert.instanceOf(e, TypeError)
+          assert.equal(e.message, "Method required param 'hash' validation error", 'exception message')
+        }
+        assert.isUndefined(response)
+        assert.equal(command.error, true)
+      })
+      it('getFileHash method. get README.md hash by filepath. check it with real hash from sha256sum command', async () => {
+        const filepath = 'README.md'
+        const command = new Command('hash', false)
+        const streamHash = await command.getFileHash(filepath)
+        const realHash = await getFileRealHash(filepath)
+        assert.equal(streamHash, realHash)
+      })
     })
     describe('Action FetchCommand', () => {
       it('init object with valid action and empty required param', () => {
@@ -467,6 +508,100 @@ describe('Commands Tests', () => {
       assert.equal(command.content.isp, 'Google')
     })
   })
+  describe('Class HashCommand', () => {
+    it('init object with undefined params', () => {
+      assert.doesNotThrow(() => {
+        new HashCommand()
+      }, Error)
+    })
+    it('getStreamHash method. get .editorconfig hash from stream. check it with real hash from sha256sum command', async () => {
+      const filepath = '.editorconfig'
+      const command = new HashCommand()
+      const stream = fs.createReadStream(filepath)
+      const streamHash = await command.getStreamHash(stream)
+      const realHash = await getFileRealHash(filepath)
+      assert.equal(streamHash, realHash)
+    })
+    it('getFileHash method. get README.md hash by filepath. check it with real hash from sha256sum command', async () => {
+      const filepath = 'README.md'
+      const command = new HashCommand()
+      const streamHash = await command.getFileHash(filepath)
+      const realHash = await getFileRealHash(filepath)
+      assert.equal(streamHash, realHash)
+    })
+    it('hashStream property. read stream & write to hash stream. check it with real hash from sha256sum command', async () => {
+      const filepath = 'README.md'
+      const command = new HashCommand()
+      const fileStream = fs.createReadStream(filepath)
+      const hashStream = command.hashStream
+      hashStream.on('readable', () => {
+        const data = hashStream.read()
+        assert.equal(data.toString('hex'), realHash)
+      })
+      const realHash = await getFileRealHash(filepath)
+      fileStream.on('data', (chunk) => {
+        hashStream.write(chunk)
+      })
+      fileStream.on('end', (chunk) => {
+        hashStream.end()
+      })
+    })
+    StreamTest.versions.forEach((version) => {
+      it(`For ${version} Streams. hashStream property. piping ReadStream to Hash object. check it with real hash from sha256sum command`, (done) => {
+        const filepath = 'README.md'
+        const command = new HashCommand()
+        const fileStream = fs.createReadStream(filepath)
+        const hashStream = command.hashStream
+        getFileRealHash(filepath).then((realHash) => {
+          fileStream.pipe(hashStream).pipe(StreamTest[version].toText((err, fileHash) => {
+            if (err) {
+              done(err)
+            }
+            assert.equal(fileHash, realHash)
+            done()
+          }))
+        })
+      })
+    })
+    it('run method with empty params. throw error', async () => {
+      const command = new HashCommand()
+      let response
+      try {
+        response = await command.run()
+      } catch (e) {
+        assert.instanceOf(e, TypeError)
+        assert.equal(e.message, 'None of the required parameters was found', 'exception message')
+      }
+      assert.isUndefined(response)
+      assert.equal(command.error, true)
+    })
+    it('run method with invalid hash property. throw error', async () => {
+      const command = new HashCommand()
+      let response
+      try {
+        response = await command.run({
+          hash: 'asdasdasdasdasdsad'
+        })
+      } catch (e) {
+        assert.instanceOf(e, TypeError)
+        assert.equal(e.message, "Method required param 'hash' validation error", 'exception message')
+      }
+      assert.isUndefined(response)
+      assert.equal(command.error, true)
+    })
+    it('run method. get README.md hash by filepath. check it by requesting API', async () => {
+      const filepath = 'README.md'
+      const command = new HashCommand()
+      const response = await command.run({
+        file: filepath
+      })
+      const realHash = await getFileRealHash(filepath)
+      assert.hasAllKeys(command.content, [
+        'mtime', 'mtime-human', 'sha256', 'status'
+      ], 'checking properties')
+      assert.equal(command.content.sha256, realHash)
+    })
+  })
   describe('Class StatusCommand', () => {
     it('init object with undefined params', () => {
       assert.doesNotThrow(() => {
@@ -487,7 +622,6 @@ describe('Commands Tests', () => {
         done()
       })
       assert.equal(command.status, undefined, 'code undefined')
-      console.log('promise', promise)
       assert.equal(command.pending, true, 'in process')
       assert.deepEqual(command.args, [], 'arguments')
     })

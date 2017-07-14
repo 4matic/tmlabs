@@ -1,8 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('os'), require('url'), require('http'), require('https'), require('zlib'), require('stream'), require('buffer'), require('string_decoder'), require('util')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util'], factory) :
-	(factory((global.TmLabs = global.TmLabs || {}),global.os,global.url,global.http,global.https,global.zlib,global.require$$1,global.require$$0,global.string_decoder,global.util));
-}(this, (function (exports,os,url,http,https,zlib,require$$1,require$$0,string_decoder,util) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('os'), require('url'), require('http'), require('https'), require('zlib'), require('stream'), require('buffer'), require('string_decoder'), require('util'), require('fs'), require('crypto')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'fs', 'crypto'], factory) :
+	(factory((global.TmLabs = global.TmLabs || {}),global.os,global.url,global.http,global.https,global.zlib,global.require$$1,global.require$$0,global.string_decoder,global.util,global.fs,global.crypto));
+}(this, (function (exports,os,url,http,https,zlib,require$$1,require$$0,string_decoder,util,fs,crypto) { 'use strict';
 
 os = os && 'default' in os ? os['default'] : os;
 url = url && 'default' in url ? url['default'] : url;
@@ -13,6 +13,8 @@ require$$1 = require$$1 && 'default' in require$$1 ? require$$1['default'] : req
 require$$0 = require$$0 && 'default' in require$$0 ? require$$0['default'] : require$$0;
 string_decoder = string_decoder && 'default' in string_decoder ? string_decoder['default'] : string_decoder;
 util = util && 'default' in util ? util['default'] : util;
+fs = fs && 'default' in fs ? fs['default'] : fs;
+crypto = crypto && 'default' in crypto ? crypto['default'] : crypto;
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -5040,86 +5042,6 @@ class PQueue {
 
 var index$3 = PQueue;
 
-var index$5 = (iterable, mapper, opts) => new Promise((resolve, reject) => {
-	opts = Object.assign({
-		concurrency: Infinity
-	}, opts);
-
-	const concurrency = opts.concurrency;
-
-	if (concurrency < 1) {
-		throw new TypeError('Expected `concurrency` to be a number from 1 and up');
-	}
-
-	const ret = [];
-	const iterator = iterable[Symbol.iterator]();
-	let isRejected = false;
-	let iterableDone = false;
-	let resolvingCount = 0;
-	let currentIdx = 0;
-
-	const next = () => {
-		if (isRejected) {
-			return;
-		}
-
-		const nextItem = iterator.next();
-		const i = currentIdx;
-		currentIdx++;
-
-		if (nextItem.done) {
-			iterableDone = true;
-
-			if (resolvingCount === 0) {
-				resolve(ret);
-			}
-
-			return;
-		}
-
-		resolvingCount++;
-
-		Promise.resolve(nextItem.value)
-			.then(el => mapper(el, i))
-			.then(
-				val => {
-					ret[i] = val;
-					resolvingCount--;
-					next();
-				},
-				err => {
-					isRejected = true;
-					reject(err);
-				}
-			);
-	};
-
-	for (let i = 0; i < concurrency; i++) {
-		next();
-
-		if (iterableDone) {
-			break;
-		}
-	}
-});
-
-var index$4 = (iterable, opts) => index$5(iterable, el => el(), opts);
-
-var index$7 = (promise, onFinally) => {
-	onFinally = onFinally || (() => {});
-
-	return promise.then(
-		val => new Promise(resolve => {
-			resolve(onFinally());
-		}).then(() => val),
-		err => new Promise(resolve => {
-			resolve(onFinally());
-		}).then(() => {
-			throw err;
-		})
-	);
-};
-
 // 19.1.2.14 Object.keys(O)
 
 
@@ -8692,7 +8614,7 @@ var dbcsData = {
     'xxbig5': 'big5hkscs',
 };
 
-var index$12 = createCommonjsModule(function (module, exports) {
+var index$8 = createCommonjsModule(function (module, exports) {
 "use strict";
 
 // Update this array if you add/rename/remove files in this directory.
@@ -9051,7 +8973,7 @@ var extendNode = function (iconv) {
     };
 };
 
-var index$10 = createCommonjsModule(function (module) {
+var index$6 = createCommonjsModule(function (module) {
 "use strict";
 
 // Some environments don't have global Buffer (e.g. React Native).
@@ -9115,7 +9037,7 @@ iconv.fromEncoding = iconv.decode;
 iconv._codecDataCache = {};
 iconv.getCodec = function getCodec(encoding) {
     if (!iconv.encodings)
-        iconv.encodings = index$12; // Lazy load all encoding definitions.
+        iconv.encodings = index$8; // Lazy load all encoding definitions.
     
     // Canonicalize encoding name: strip all non-alphanumeric chars and appended year.
     var enc = (''+encoding).toLowerCase().replace(/[^0-9a-z]|:\d{4}$/g, "");
@@ -9299,11 +9221,11 @@ function convertIconv(str, to, from) {
  */
 function convertIconvLite(str, to, from) {
     if (to === 'UTF-8') {
-        return index$10.decode(str, from);
+        return index$6.decode(str, from);
     } else if (from === 'UTF-8') {
-        return index$10.encode(str, to);
+        return index$6.encode(str, to);
     } else {
-        return index$10.encode(index$10.decode(str, from), to);
+        return index$6.encode(index$6.decode(str, from), to);
     }
 }
 
@@ -9327,7 +9249,7 @@ var encoding = {
 	convert: convert_1
 };
 
-var index$14 = createCommonjsModule(function (module) {
+var index$10 = createCommonjsModule(function (module) {
 'use strict';
 
 var isStream = module.exports = function (stream) {
@@ -9628,7 +9550,7 @@ Body.prototype._clone = function(instance) {
 
 	// check that body is a stream and not form-data object
 	// note: we can't clone the form-data object without having it as a dependency
-	if (index$14(body) && typeof body.getBoundary !== 'function') {
+	if (index$10(body) && typeof body.getBoundary !== 'function') {
 		// tee instance body
 		p1 = new PassThrough();
 		p2 = new PassThrough();
@@ -9911,7 +9833,7 @@ Request.prototype.clone = function() {
 	return new Request(this);
 };
 
-var index$8 = createCommonjsModule(function (module) {
+var index$4 = createCommonjsModule(function (module) {
 /**
  * index.js
  *
@@ -10205,14 +10127,14 @@ var fetchNode$1 = function (context) {
   // given the way `node-fetch` is implemented, this is the only way to make
   // it work at all.
   if (context && context.Promise) {
-    index$8.Promise = context.Promise;
+    index$4.Promise = context.Promise;
   }
 
   return {
-    fetch: wrapFetchForNode(index$8),
-    Headers: index$8.Headers,
-    Request: index$8.Request,
-    Response: index$8.Response
+    fetch: wrapFetchForNode(index$4),
+    Headers: index$4.Headers,
+    Request: index$4.Request,
+    Response: index$4.Response
   };
 };
 
@@ -11982,14 +11904,14 @@ var FetchCommand = function (_AbstractCommand) {
     value: function _checkArguments(data) {
       var _this2 = this;
 
-      if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) !== 'object') throw new TypeError('Method params should be an object');else {
+      if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) !== 'object' && data !== false) throw new TypeError('Method params should be an object');else {
         var _error = false;
         var returnArgs = [];
         var methodSpec = FetchCommand.getMethodSpecifications(this.method);
         var args = methodSpec.args,
             spec = methodSpec.spec;
 
-        if (args) {
+        if (data && args) {
           args.forEach(function (arg) {
             if (arg.required) {
               if (!{}.hasOwnProperty.call(data, arg.arg) && arg.alias && !{}.hasOwnProperty.call(data, arg.alias)) throw new TypeError('Method required params not found');
@@ -12541,6 +12463,324 @@ var StatusCommand = function (_FetchCommand) {
   return StatusCommand;
 }(FetchCommand);
 
+var objectWithoutProperties = createCommonjsModule(function (module, exports) {
+"use strict";
+
+exports.__esModule = true;
+
+exports.default = function (obj, keys) {
+  var target = {};
+
+  for (var i in obj) {
+    if (keys.indexOf(i) >= 0) continue;
+    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+    target[i] = obj[i];
+  }
+
+  return target;
+};
+});
+
+var _objectWithoutProperties = unwrapExports(objectWithoutProperties);
+
+var _extends = createCommonjsModule(function (module, exports) {
+"use strict";
+
+exports.__esModule = true;
+
+
+
+var _assign2 = _interopRequireDefault(assign);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _assign2.default || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+});
+
+var _extends$1 = unwrapExports(_extends);
+
+const hasha = (input, opts) => {
+	opts = opts || {};
+
+	let outputEncoding = opts.encoding || 'hex';
+
+	if (outputEncoding === 'buffer') {
+		outputEncoding = undefined;
+	}
+
+	const hash = crypto.createHash(opts.algorithm || 'sha512');
+
+	const update = buf => {
+		const inputEncoding = typeof buf === 'string' ? 'utf8' : undefined;
+		hash.update(buf, inputEncoding);
+	};
+
+	if (Array.isArray(input)) {
+		input.forEach(update);
+	} else {
+		update(input);
+	}
+
+	return hash.digest(outputEncoding);
+};
+
+hasha.stream = opts => {
+	opts = opts || {};
+
+	let outputEncoding = opts.encoding || 'hex';
+
+	if (outputEncoding === 'buffer') {
+		outputEncoding = undefined;
+	}
+
+	const stream = crypto.createHash(opts.algorithm || 'sha512');
+	stream.setEncoding(outputEncoding);
+	return stream;
+};
+
+hasha.fromStream = (stream, opts) => {
+	if (!index$10(stream)) {
+		return Promise.reject(new TypeError('Expected a stream'));
+	}
+
+	opts = opts || {};
+
+	return new Promise((resolve, reject) => {
+		stream
+			.on('error', reject)
+			.pipe(hasha.stream(opts))
+			.on('error', reject)
+			.on('finish', function () {
+				resolve(this.read());
+			});
+	});
+};
+
+hasha.fromFile = (fp, opts) => hasha.fromStream(fs.createReadStream(fp), opts);
+
+hasha.fromFileSync = (fp, opts) => hasha(fs.readFileSync(fp), opts);
+
+var index$12 = hasha;
+
+/**
+ * HashCommand class for file & stream hashing.
+ * Run method sends hash to API
+ */
+
+var HashCommand = function (_FetchCommand) {
+  _inherits(HashCommand, _FetchCommand);
+
+  function HashCommand(params) {
+    _classCallCheck(this, HashCommand);
+
+    return _possibleConstructorReturn(this, (HashCommand.__proto__ || _Object$getPrototypeOf(HashCommand)).call(this, _extends$1({
+      method: HASH
+    }, params)));
+  }
+
+  /**
+   * Get file or stream hash and check it by sending request to API
+   * @param {{stream: Stream}|{file: string}|{hash: string}} options
+   * @returns {Promise}
+   */
+
+
+  _createClass(HashCommand, [{
+    key: 'run',
+    value: function () {
+      var _ref = _asyncToGenerator(index.mark(function _callee() {
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var fetchHash, runResponse, stream, file, hash, otherOptions;
+        return index.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                fetchHash = void 0;
+                runResponse = void 0;
+                stream = options.stream, file = options.file, hash = options.hash, otherOptions = _objectWithoutProperties(options, ['stream', 'file', 'hash']);
+                _context.prev = 3;
+
+                if (!stream) {
+                  _context.next = 10;
+                  break;
+                }
+
+                _context.next = 7;
+                return this.getStreamHash(stream);
+
+              case 7:
+                fetchHash = _context.sent;
+                _context.next = 21;
+                break;
+
+              case 10:
+                if (!file) {
+                  _context.next = 16;
+                  break;
+                }
+
+                _context.next = 13;
+                return this.getFileHash(file);
+
+              case 13:
+                fetchHash = _context.sent;
+                _context.next = 21;
+                break;
+
+              case 16:
+                if (!hash) {
+                  _context.next = 20;
+                  break;
+                }
+
+                fetchHash = hash;
+                _context.next = 21;
+                break;
+
+              case 20:
+                throw new TypeError('None of the required parameters was found');
+
+              case 21:
+                runResponse = this.fetch(_extends$1({
+                  hash: fetchHash
+                }, otherOptions));
+                _context.next = 30;
+                break;
+
+              case 24:
+                _context.prev = 24;
+                _context.t0 = _context['catch'](3);
+
+                this._map.get(this).error = true;
+                this._map.get(this).errorText = _context.t0.message;
+                this.emit('error', _context.t0, this);
+                throw _context.t0;
+
+              case 30:
+                return _context.abrupt('return', runResponse);
+
+              case 31:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[3, 24]]);
+      }));
+
+      function run() {
+        return _ref.apply(this, arguments);
+      }
+
+      return run;
+    }()
+
+    /**
+     * Get Hash transform object
+     * @see {@link https://nodejs.org/api/crypto.html#crypto_class_hash}
+     */
+
+  }, {
+    key: 'getStreamHash',
+
+
+    /**
+     * Get hash passing stream as parameter
+     * @param {Stream} stream Stream object
+     * @returns {Promise}
+     */
+    value: function () {
+      var _ref2 = _asyncToGenerator(index.mark(function _callee2(stream) {
+        var hash;
+        return index.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return index$12.fromStream(stream, {
+                  algorithm: 'sha256'
+                });
+
+              case 2:
+                hash = _context2.sent;
+                return _context2.abrupt('return', hash);
+
+              case 4:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function getStreamHash(_x2) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return getStreamHash;
+    }()
+
+    /**
+     * Get hash passing only file path
+     * @param {string} filepath
+     * @returns {Promise}
+     */
+
+  }, {
+    key: 'getFileHash',
+    value: function () {
+      var _ref3 = _asyncToGenerator(index.mark(function _callee3(filepath) {
+        var hash;
+        return index.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return index$12.fromFile(filepath, {
+                  algorithm: 'sha256'
+                });
+
+              case 2:
+                hash = _context3.sent;
+                return _context3.abrupt('return', hash);
+
+              case 4:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function getFileHash(_x3) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return getFileHash;
+    }()
+  }, {
+    key: 'hashStream',
+    get: function get() {
+      return index$12.stream({
+        algorithm: 'sha256'
+      });
+    }
+  }]);
+
+  return HashCommand;
+}(FetchCommand);
+
 var Command = function (_AbstractCommand) {
   _inherits(Command, _AbstractCommand);
 
@@ -12558,7 +12798,15 @@ var Command = function (_AbstractCommand) {
     }
     return _ret = new Proxy(_this, {
       get: function get(target, name) {
-        if (['run', 'instance', 'class'].includes(name)) return target[name];else return target.instance[name];
+        if (['run', 'instance', 'class'].includes(name)) return target[name];else if (name.startsWith('get')) return function () {
+          var _target$instance$name;
+
+          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+
+          return (_target$instance$name = target.instance[name]).call.apply(_target$instance$name, [null].concat(args));
+        };else return target.instance[name];
       }
     }), _possibleConstructorReturn(_this, _ret);
   }
@@ -12585,6 +12833,8 @@ var Command = function (_AbstractCommand) {
           return FetchCommand;
         case 'status':
           return StatusCommand;
+        case 'hash':
+          return HashCommand;
         default:
           throw new ReferenceError('Action not found');
       }
@@ -12625,7 +12875,7 @@ var TmLabs$1 = function (_EventEmitter) {
    *
    * @param {{command: string, params: object}} commands Array of command objects which contain command key and it params key for command run options
    * @param options
-   * @returns {Promise.<Array>}
+   * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
    */
 
 
@@ -12637,113 +12887,51 @@ var TmLabs$1 = function (_EventEmitter) {
 
         var commands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var batchResponse, i, commandObj, command, response, promises, limit;
+        var batchResponse, promises;
         return index.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 batchResponse = [];
-
-                if (options.throw) {
-                  _context.next = 27;
-                  break;
-                }
-
-                i = 0;
-
-              case 3:
-                if (!(i < commands.length)) {
-                  _context.next = 25;
-                  break;
-                }
-
-                commandObj = commands[i];
-                _context.prev = 5;
-
-                if (commandObj) {
-                  _context.next = 8;
-                  break;
-                }
-
-                throw new TypeError('Empty command');
-
-              case 8:
-                if (!((typeof commandObj === 'undefined' ? 'undefined' : _typeof(commandObj)) !== 'object')) {
-                  _context.next = 10;
-                  break;
-                }
-
-                throw new ReferenceError('Invalid command type');
-
-              case 10:
-                if (commandObj.command) {
-                  _context.next = 12;
-                  break;
-                }
-
-                throw new TypeError("Empty required param 'method'");
-
-              case 12:
-                command = commandObj.command;
-                // if (!Object.values(methods).includes(command.method)) throw new TypeError('Only command instance could be')
-
-                _context.next = 15;
-                return this.runCommand(command, commandObj.params);
-
-              case 15:
-                response = _context.sent;
-
-                batchResponse.push(response);
-                _context.next = 22;
-                break;
-
-              case 19:
-                _context.prev = 19;
-                _context.t0 = _context['catch'](5);
-
-                batchResponse.push({
-                  error: true,
-                  errorText: _context.t0.message
-                });
-
-              case 22:
-                i++;
-                _context.next = 3;
-                break;
-
-              case 25:
-                _context.next = 34;
-                break;
-
-              case 27:
                 promises = [];
-                limit = this.limit;
 
-                if (options.limit) limit = options.limit;
                 commands.forEach(function (commandObj) {
                   if (!commandObj) throw new TypeError('Empty command');
                   if ((typeof commandObj === 'undefined' ? 'undefined' : _typeof(commandObj)) !== 'object') throw new ReferenceError('Invalid command type');
                   if (!commandObj.command) throw new TypeError("Empty required param 'method'");
                   var command = commandObj.command;
-                  promises.push(function () {
-                    return _this2.runCommand(command, commandObj.params);
-                  });
+                  promises.push(_this2.runCommand(command, commandObj.params));
                 });
-                _context.next = 33;
-                return index$4(promises, { concurrency: limit });
 
-              case 33:
+                if (options.throw) {
+                  _context.next = 9;
+                  break;
+                }
+
+                _context.next = 6;
+                return q.allSettled(promises);
+
+              case 6:
+                batchResponse = _context.sent;
+                _context.next = 12;
+                break;
+
+              case 9:
+                _context.next = 11;
+                return q.all(promises);
+
+              case 11:
                 batchResponse = _context.sent;
 
-              case 34:
+              case 12:
                 return _context.abrupt('return', batchResponse);
 
-              case 35:
+              case 13:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[5, 19]]);
+        }, _callee, this);
       }));
 
       function runBatch() {
@@ -12758,7 +12946,7 @@ var TmLabs$1 = function (_EventEmitter) {
      * @param {string} method API method dns|ip, etc
      * @param {[object]} objects array of request parameters
      * @param options additional options
-     * @returns {Promise.<Array>}
+     * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
      */
 
   }, {
@@ -12884,10 +13072,10 @@ var TmLabs$1 = function (_EventEmitter) {
           _this4.emit('raw_response', cmd, response);
         });
         _this4._map.get(_this4).queue.add(function () {
-          return index$7(command.run(params).then(function (response) {
+          return command.run(params).then(function (response) {
             _this4.emit('resolved', command, response);
             resolve(response);
-          }));
+          });
         });
       });
     }

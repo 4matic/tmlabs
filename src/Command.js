@@ -1,6 +1,7 @@
 import AbstractCommand from './command/AbstractCommand'
 import FetchCommand from './command/FetchCommand'
 import StatusCommand from './command/StatusCommand'
+import HashCommand from './command/HashCommand'
 
 export default class Command extends AbstractCommand {
   constructor (action, params) {
@@ -13,6 +14,7 @@ export default class Command extends AbstractCommand {
     return new Proxy(this, {
       get (target, name) {
         if (['run', 'instance', 'class'].includes(name)) return target[name]
+        else if (name.startsWith('get')) return (...args) => target.instance[name].call(null, ...args)
         else return target.instance[name]
       }
     })
@@ -24,6 +26,8 @@ export default class Command extends AbstractCommand {
         return FetchCommand
       case 'status':
         return StatusCommand
+      case 'hash':
+        return HashCommand
       default:
         throw new ReferenceError('Action not found')
     }

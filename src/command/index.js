@@ -1,5 +1,5 @@
 import Fetch from './FetchCommand'
-import Parse from './ParseCommand'
 import Status from './StatusCommand'
+import Hash from './HashCommand'
 
-export { Fetch, Parse, Status }
+export { Fetch, Hash, Status }

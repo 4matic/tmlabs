@@ -103,17 +103,15 @@
     "rollup-plugin-babili": "^3.1.0",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-json": "^2.3.0",
-    "rollup-plugin-minify": "^1.0.3",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-replace": "^1.1.1"
+    "rollup-plugin-replace": "^1.1.1",
+    "streamtest": "^1.2.2"
   },
   "dependencies": {
     "es6-promise": "^4.1.1",
     "fetch-ponyfill": "^4.0.0",
+    "hasha": "^3.0.0",
     "isomorphic-fetch": "^2.2.1",
-    "p-all": "^1.0.0",
-    "p-cancelable": "^0.3.0",
-    "p-finally": "^1.0.0",
     "p-queue": "^1.1.0",
     "q": "^1.5.0",
     "smelly-event-emitter": "^0.1.1",

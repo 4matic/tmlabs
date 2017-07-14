@@ -72,13 +72,13 @@ export default class FetchCommand extends AbstractCommand {
     return newMethods
   }
   _checkArguments (data) {
-    if (typeof data !== 'object') throw new TypeError(`Method params should be an object`)
+    if (typeof data !== 'object' && data !== false) throw new TypeError(`Method params should be an object`)
     else {
       let error = false
       let returnArgs = []
       const methodSpec = FetchCommand.getMethodSpecifications(this.method)
       const { args, spec } = methodSpec
-      if (args) {
+      if (data && args) {
         args.forEach((arg) => {
           if (arg.required) {
             if (!({}).hasOwnProperty.call(data, arg.arg) && (arg.alias && !({}).hasOwnProperty.call(data, arg.alias))) throw new TypeError(`Method required params not found`)

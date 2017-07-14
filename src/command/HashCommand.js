@@ -30,7 +30,6 @@ export default class HashCommand extends FetchCommand {
       else if (string) fetchHash = await this.getStringHash(string)
       else if (hash) fetchHash = hash
       else throw new TypeError('None of the required parameters was found')
-      console.log('otherOptions', options, otherOptions)
       runResponse = this.fetch({
         hash: fetchHash,
         ...otherOptions

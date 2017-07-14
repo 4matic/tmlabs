@@ -11,6 +11,9 @@
         padding: 5px 15px;
         display: block;
       }
+      .error {
+        background: #ba2535;
+      }
       .response {
         background: #ccc;
       }
@@ -82,11 +85,21 @@
           container.innerHTML += (
             '<div class="group">' +
             '<h3 class="request">' + file.name + ' [ Size: ' + formatBytes(file.size) + ']</h3>' +
-            '<div class="response">Result:<br/> <code>' + JSON.stringify(answer.content) + '</code></div>' +
+            '<div class="response"><strong>Result:</strong><br/> <code>' + JSON.stringify(answer.content) + '</code></div>' +
             '<h5 class="balance">remaining: ' + command.balanceRemaining + '€</h5>' +
             '</div>'
           );
         });
+        command.on('error', function (error, command) {
+          holder.innerHTML = 'Drop file here'
+          container.innerHTML += (
+            '<div class="group">' +
+            '<h3 class="request">' + file.name + ' [ Size: ' + formatBytes(file.size) + ']</h3>' +
+            '<div class="error"><strong>Error:</strong><br/> <code>' + error.message + '</code></div>' +
+            '<h5 class="balance">remaining: ' + command.balanceRemaining + '€</h5>' +
+            '</div>'
+          );
+        })
       }
 
       reader.readAsBinaryString(file);

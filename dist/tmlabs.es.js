@@ -13960,15 +13960,14 @@ var HashCommand = function (_FetchCommand) {
                 throw new TypeError('None of the required parameters was found');
 
               case 27:
-                console.log('otherOptions', options, otherOptions);
                 runResponse = this.fetch(_extends$1({
                   hash: fetchHash
                 }, otherOptions));
-                _context.next = 37;
+                _context.next = 36;
                 break;
 
-              case 31:
-                _context.prev = 31;
+              case 30:
+                _context.prev = 30;
                 _context.t0 = _context['catch'](3);
 
                 this._map.get(this).error = true;
@@ -13976,15 +13975,15 @@ var HashCommand = function (_FetchCommand) {
                 this.emit('error', _context.t0, this);
                 throw _context.t0;
 
-              case 37:
+              case 36:
                 return _context.abrupt('return', runResponse);
 
-              case 38:
+              case 37:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[3, 31]]);
+        }, _callee, this, [[3, 30]]);
       }));
 
       function run() {
@@ -14184,7 +14183,10 @@ var TmLabs$1 = function (_EventEmitter) {
       key: key,
       limit: limit,
       queue: queue,
-      history: history
+      history: history,
+      balance_remaining: undefined,
+      balance_lastbill: undefined,
+      balance_reset: undefined
     });
     _this.on('resolved', function (command) {
       _this._map.get(_this).history.push(command);
@@ -14377,8 +14379,10 @@ var TmLabs$1 = function (_EventEmitter) {
     value: function runCommand(command, params) {
       var _this4 = this;
 
+      var newParams = params;
+      if (this.key) newParams.key = this.key;
       return new _Promise(function (resolve, reject) {
-        _this4.emit('command', command, params);
+        _this4.emit('command', command, newParams);
         command.on('error', function (error, cmd) {
           _this4.emit('error', error, cmd);
           reject(error);
@@ -14388,28 +14392,49 @@ var TmLabs$1 = function (_EventEmitter) {
         });
         command.on('response', function (response, cmd) {
           _this4.emit('response', cmd, response);
+          _this4._map.get(_this4).balance_remaining = cmd.balanceRemaining;
+          _this4._map.get(_this4).balance_lastbill = cmd.balanceLastbill;
+          _this4._map.get(_this4).balance_reset = cmd.balanceReset;
         });
         command.on('raw_response', function (response, cmd) {
           _this4.emit('raw_response', cmd, response);
         });
         _this4._map.get(_this4).queue.add(function () {
-          return command.run(params).then(function (response) {
+          return command.run(newParams).then(function (response) {
             _this4.emit('resolved', command, response);
             resolve(response);
           });
         });
       });
     }
+
+    /**
+     * History array return
+     * @returns {Array}
+     */
+
   }, {
     key: 'history',
     get: function get() {
       return this._map.get(this).history;
     }
+
+    /**
+     * Active key for TmLabs Object
+     * @returns {string}
+     */
+
   }, {
     key: 'key',
     get: function get() {
       return this._map.get(this).key;
     }
+
+    /**
+     * Get number of simultaneously requests
+     * @returns {number}
+     */
+
   }, {
     key: 'limit',
     get: function get() {
@@ -14425,6 +14450,21 @@ var TmLabs$1 = function (_EventEmitter) {
     key: 'pending',
     get: function get() {
       return this._map.get(this).queue.pending;
+    }
+  }, {
+    key: 'balanceRemaining',
+    get: function get() {
+      return this._map.get(this).balance_remaining;
+    }
+  }, {
+    key: 'balanceLastbill',
+    get: function get() {
+      return this._map.get(this).balance_lastbill;
+    }
+  }, {
+    key: 'balanceReset',
+    get: function get() {
+      return this._map.get(this).balance_reset;
     }
   }]);
 

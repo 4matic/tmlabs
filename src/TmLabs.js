@@ -17,7 +17,10 @@ export default class TmLabs extends EventEmitter {
       key,
       limit,
       queue,
-      history
+      history,
+      balance_remaining: undefined,
+      balance_lastbill: undefined,
+      balance_reset: undefined
     })
     this.on('resolved', (command) => {
       this._map.get(this).history.push(command)
@@ -87,8 +90,10 @@ export default class TmLabs extends EventEmitter {
    * @returns {Promise}
    */
   runCommand (command, params) {
+    let newParams = params
+    if (this.key) newParams.key = this.key
     return new Promise((resolve, reject) => {
-      this.emit('command', command, params)
+      this.emit('command', command, newParams)
       command.on('error', (error, cmd) => {
         this.emit('error', error, cmd)
         reject(error)
@@ -98,25 +103,40 @@ export default class TmLabs extends EventEmitter {
       })
       command.on('response', (response, cmd) => {
         this.emit('response', cmd, response)
+        this._map.get(this).balance_remaining = cmd.balanceRemaining
+        this._map.get(this).balance_lastbill = cmd.balanceLastbill
+        this._map.get(this).balance_reset = cmd.balanceReset
       })
       command.on('raw_response', (response, cmd) => {
         this.emit('raw_response', cmd, response)
       })
-      this._map.get(this).queue.add(() => command.run(params).then((response) => {
+      this._map.get(this).queue.add(() => command.run(newParams).then((response) => {
         this.emit('resolved', command, response)
         resolve(response)
       }))
     })
   }
 
+  /**
+   * History array return
+   * @returns {Array}
+   */
   get history () {
     return this._map.get(this).history
   }
 
+  /**
+   * Active key for TmLabs Object
+   * @returns {string}
+   */
   get key () {
     return this._map.get(this).key
   }
 
+  /**
+   * Get number of simultaneously requests
+   * @returns {number}
+   */
   get limit () {
     return this._map.get(this).limit
   }
@@ -127,5 +147,15 @@ export default class TmLabs extends EventEmitter {
    */
   get pending () {
     return this._map.get(this).queue.pending
+  }
+
+  get balanceRemaining () {
+    return this._map.get(this).balance_remaining
+  }
+  get balanceLastbill () {
+    return this._map.get(this).balance_lastbill
+  }
+  get balanceReset () {
+    return this._map.get(this).balance_reset
   }
 }

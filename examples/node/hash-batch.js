@@ -1,4 +1,5 @@
 var TmLabs = require('../../dist/tmlabs.umd')
+var fs = require('fs')
 /* eslint-disable new-cap */
 var tmLabs = new TmLabs['default']({
   limit: 2
@@ -12,7 +13,7 @@ tmLabs.on('error', function (error, command) {
 })
 tmLabs.on('response', function (command, response) {
   console.info("[ RESPONSE '" + command.method + "' ]", response.content)
-  console.log('[ BALANCE ]', command.balanceRemaining) // return Remaining Balance
+  console.log('[ BALANCE ]', tmLabs.balanceRemaining) // return Remaining Balance
 })
 tmLabs.on('command', function (command, args) {
   console.log("[ COMMAND '" + command.method + "' ] history size: ", tmLabs.history.length, ', pending: ', tmLabs.pending)
@@ -20,14 +21,25 @@ tmLabs.on('command', function (command, args) {
 tmLabs.on('resolved', function (command, args) {
   console.log("[ RESOLVED '" + command.method + "' ] history size: ", tmLabs.history.length, ', pending: ', tmLabs.pending)
 })
-var domains = ['google.com', 'facebook.com', 'ibm.com', 'example.com', 'assadasf', '127.0.0.1']
-tmLabs.fetchBatch('dns', domains.map(function (domain) {
-  return {
-    domain: domain
-  }
-}), {throw: true}).then(function (responses) {
+
+const commands = [[new TmLabs.HashCommand(), {
+  hash: 'testing hash'
+}], [new TmLabs.HashCommand(), {
+  hash: 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051' // just check hash
+}], [new TmLabs.HashCommand(), {
+  file: 'bower.json' // file name
+}], [new TmLabs.HashCommand(), {
+  file: 'fetch-dns-ip.js' // file name
+}], [new TmLabs.HashCommand(), {
+  string: 'some string ' // hash string
+}], [new TmLabs.HashCommand(), {
+  stream: fs.createReadStream('fetch-dns-batch.js') // stream
+}]]
+tmLabs.runBatch(commands.map(command => ({
+  command: command[0],
+  params: command[1]
+}))).then(function (responses) {
   console.log('[ RESPONSES ]', responses.length)
   console.log('History after DNS command batch. history size: ', tmLabs.history.length)
   clearInterval(pendingTimerId)
 })
-console.log('History with one pending request. history size: ', tmLabs.history.length, ', pending: ', tmLabs.pending)

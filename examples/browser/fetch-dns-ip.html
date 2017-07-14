@@ -3,52 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <title>Fetch DNS, then IP Example - TempicoLabs SDK</title>
+    <style>
+      .error,
+      .request,
+      .balance,
+      .response {
+        padding: 5px 15px;
+        display: block;
+      }
+      .response {
+        background: #ccc;
+      }
+      .error {
+        background: #ba2535;
+        margin-bottom: 10px;
+      }
+      .request {
+        color: #e8e8e8;
+        background: #26aa57;
+        margin: 5px 0 0;
+      }
+      .group {
+        border: 1px solid #ccc;
+        padding: 10px 15px 15px;
+        margin: 15px 0;
+      }
+      .balance {
+        color: #e8e8e8;
+        background: #287da8;
+      }
+    </style>
 </head>
 <body>
+  <div id="response"></div>
   <script src="../../dist/tmlabs.min.js"></script>
   <script>
-
-//    var command = new TmLabs.FetchCommand({
-//      method: 'ip'
-//    });
-//    command.on('error', function(error, command){
-//      console.log('error', error);
-//    });
-//    command.on('response', function(response, command){
-//      console.log('response', response);
-//      console.log('balanceRemaining', command.balanceRemaining);
-//    });
-//    command.run({
-//      ip: '127',
-//    });
-//    command.run({
-//      ip: '127.0.0.2',
-//    });
-    var TmLabs = new TmLabs.default();
+    var $response = document.getElementById('response')
+    var tmLabs = new TmLabs.default();
     console.log('TmLabs Object', TmLabs)
-    TmLabs.on('error', function(error, command){
+    tmLabs.on('error', function(error, command){
       console.error('[ SDK ERROR ]', error);
+      $response.innerHTML += (
+        '<div class="error"><strong>Arguments:</strong> ' + JSON.stringify(command.rawArgs) + '<br/> <strong>Error:</strong> <code>' + JSON.stringify(error.message) + '</code></div>'
+      )
     });
-    TmLabs.on('response', function(command, response){
+    tmLabs.on('response', function(command, response){
       console.info('response', response);
       console.log('balanceRemaining', command.balanceRemaining); // return Remaining Balance
     });
-    TmLabs.on('command', function(args, command){
+    tmLabs.on('command', function(args, command){
       console.log('history', TmLabs.history) // get array of one completed commands
     });
-    TmLabs.fetch('dns', {
+    tmLabs.on('resolved', function (command, args) {
+      $response.innerHTML += (
+        '<div class="group"><h3 class="request">Resolved request: </h3>' +
+        '<h5 class="balance">remaining: ' + tmLabs.balanceRemaining + '€</h5>' +
+        '<div class="response"><strong>Arguments:</strong> ' + JSON.stringify(command.rawArgs) + '<br/> <strong>Response:</strong> <code>' + JSON.stringify(command.content) + '</code></div></div>'
+      )
+      console.log("[ RESOLVED '" + command.method + "' ] history size: ", tmLabs.history.length, ', pending: ', tmLabs.pending) // get array of one completed commands
+    })
+    tmLabs.fetch('dns', {
       domain: 'google.com'
     }).then(function(answer){
       var ip = answer.content[Object.keys(answer.content)[0]];// because response will be in 'google.com' key
       console.log('History after DNS command', TmLabs.history) // get array of one completed command
-      return TmLabs.fetch('ip', {
+      return tmLabs.fetch('ip', {
         ip: ip
       })
     }).then(function(answer){
       console.info('google ip info', answer.content) // get info about google ip address
-      console.log('History after IP command', TmLabs.history) // get array of two completed commands
+      console.log('History after IP command', tmLabs.history) // get array of two completed commands
     });
-    console.log('History with pending requests', TmLabs.history) // get array of two pending commands
+    console.log('History with pending requests', tmLabs.history) // get array of two pending commands
   </script>
 </body>
 </html>

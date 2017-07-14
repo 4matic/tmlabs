@@ -4,8 +4,10 @@ import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
 import babili from 'rollup-plugin-babili'
 import replace from 'rollup-plugin-replace'
+import builtins from 'rollup-plugin-node-builtins'
+import globals from 'rollup-plugin-node-globals'
 
-let external = !process.env.production ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : ['crypto']
+let external = !process.env.production ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : []
 
 const replaceOptions = {
   exclude: 'node_modules/**',
@@ -25,7 +27,7 @@ export default {
       jsnext: true,
       main: true,
       browser: process.env.production,
-      preferBuiltins: process.env.production
+      preferBuiltins: false
     }),
     commonjs(),
     babel({
@@ -48,6 +50,8 @@ export default {
         'external-helpers'
       ]
     }),
+    // globals(),
+    // builtins({ crypto: true }),
     replace(replaceOptions),
     process.env.production ? babili({
       comments: false,

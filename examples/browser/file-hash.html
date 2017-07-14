@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Check File Hash Example - TempicoLabs SDK</title>
+    <style>
+      .error,
+      .request,
+      .balance,
+      .response {
+        padding: 5px 15px;
+        display: block;
+      }
+      .response {
+        background: #ccc;
+      }
+      .request {
+        color: #e8e8e8;
+        background: #26aa57;
+        margin: 5px 0 0;
+      }
+      .group {
+        border: 1px solid #ccc;
+        padding: 10px 15px 15px;
+        margin: 15px 0;
+      }
+      .balance {
+        color: #e8e8e8;
+        background: #287da8;
+      }
+      #holder {
+        cursor: pointer;
+        border: 10px dashed #ccc;
+        width: 300px;
+        height: 300px;
+        line-height: 300px;
+        vertical-align: middle;
+        text-align: center;
+        font-size: 2.2em;
+        color: #2196F3;
+        font-weight: bold;
+        margin: 50px auto 50px;
+      }
+      #holder:hover {
+        border: 10px dashed #333;
+        color: #2166b2;
+      }
+      h5 {
+        margin: 0;
+      }
+    </style>
+</head>
+<body>
+  <input type="file" id="file" style="display: none;" />
+  <div id="holder">Drop file here</div>
+  <div id="files"></div>
+  <script src="../../dist/tmlabs.min.js"></script>
+  <script>
+    var holder = document.getElementById('holder');
+    var container = document.getElementById('files');
+    var fileInput = document.getElementById('file');
+
+    function formatBytes(bytes,decimals) {
+      if(bytes == 0) return '0 Bytes';
+      var k = 1000,
+        dm = decimals || 2,
+        sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+        i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function processFile(file) {
+      var reader = new FileReader();
+      holder.innerHTML = 'Processing...'
+      reader.onload = function(event) {
+        var binary = event.target.result;
+        var command = new TmLabs.HashCommand()
+        command.run({
+          string: binary,
+        }).then(function(answer){
+          holder.innerHTML = 'Drop file here'
+          container.innerHTML += (
+            '<div class="group">' +
+            '<h3 class="request">' + file.name + ' [ Size: ' + formatBytes(file.size) + ']</h3>' +
+            '<div class="response">Result:<br/> <code>' + JSON.stringify(answer.content) + '</code></div>' +
+            '<h5 class="balance">remaining: ' + command.balanceRemaining + '€</h5>' +
+            '</div>'
+          );
+        });
+      }
+
+      reader.readAsBinaryString(file);
+    }
+
+    fileInput.onchange = function(event) {
+      event.preventDefault();
+      var file = event.target.files[0];
+      processFile(file)
+    }
+    holder.onclick = function () {
+      fileInput.click()
+    };
+    holder.ondragover = function() {
+      return false;
+    };
+    holder.ondragend = function() {
+      return false;
+    };
+    holder.ondrop = function(event) {
+      event.preventDefault();
+      var file = event.dataTransfer.files[0];
+      processFile(file)
+    };
+  </script>
+</body>
+</html>

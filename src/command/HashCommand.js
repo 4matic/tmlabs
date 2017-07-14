@@ -1,4 +1,5 @@
 import Hasha from 'hasha'
+import SHA256 from 'crypto-js/sha256'
 import FetchCommand from './FetchCommand'
 import { endpoint } from '../constant'
 
@@ -22,12 +23,14 @@ export default class HashCommand extends FetchCommand {
   async run (options = {}) {
     let fetchHash
     let runResponse
-    const { stream, file, hash, ...otherOptions } = options
+    const { stream, file, string, hash, ...otherOptions } = options
     try {
       if (stream) fetchHash = await this.getStreamHash(stream)
       else if (file) fetchHash = await this.getFileHash(file)
+      else if (string) fetchHash = await this.getStringHash(string)
       else if (hash) fetchHash = hash
       else throw new TypeError('None of the required parameters was found')
+      console.log('otherOptions', options, otherOptions)
       runResponse = this.fetch({
         hash: fetchHash,
         ...otherOptions
@@ -72,6 +75,16 @@ export default class HashCommand extends FetchCommand {
     const hash = await Hasha.fromFile(filepath, {
       algorithm: 'sha256'
     })
+    return hash
+  }
+
+  /**
+   * Get SHA256 from string. Useful in browser
+   * @param string
+   * @returns {string}
+   */
+  getStringHash (string) {
+    const hash = SHA256(string)
     return hash
   }
 }

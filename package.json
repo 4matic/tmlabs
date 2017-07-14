@@ -103,11 +103,15 @@
     "rollup-plugin-babili": "^3.1.0",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.1.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^1.1.1",
     "streamtest": "^1.2.2"
   },
   "dependencies": {
+    "crypto-browserify": "^3.11.1",
+    "crypto-js": "^3.1.9-1",
     "es6-promise": "^4.1.1",
     "fetch-ponyfill": "^4.0.0",
     "hasha": "^3.0.0",

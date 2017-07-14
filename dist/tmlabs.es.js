@@ -5,7 +5,7 @@ import https from 'https';
 import zlib from 'zlib';
 import require$$1 from 'stream';
 import require$$0 from 'buffer';
-import string_decoder from 'string_decoder';
+import 'string_decoder';
 import util from 'util';
 import fs from 'fs';
 import crypto from 'crypto';
@@ -5252,6 +5252,356 @@ var bomHandling = {
 	StripBOM: StripBOM
 };
 
+var index$10 = createCommonjsModule(function (module, exports) {
+/* eslint-disable node/no-deprecated-api */
+
+var Buffer = require$$0.Buffer;
+
+// alternative to using Object.keys for old browsers
+function copyProps (src, dst) {
+  for (var key in src) {
+    dst[key] = src[key];
+  }
+}
+if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
+  module.exports = require$$0;
+} else {
+  // Copy properties from require('buffer')
+  copyProps(require$$0, exports);
+  exports.Buffer = SafeBuffer;
+}
+
+function SafeBuffer (arg, encodingOrOffset, length) {
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+// Copy static methods from Buffer
+copyProps(Buffer, SafeBuffer);
+
+SafeBuffer.from = function (arg, encodingOrOffset, length) {
+  if (typeof arg === 'number') {
+    throw new TypeError('Argument must not be a number')
+  }
+  return Buffer(arg, encodingOrOffset, length)
+};
+
+SafeBuffer.alloc = function (size, fill, encoding) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  var buf = Buffer(size);
+  if (fill !== undefined) {
+    if (typeof encoding === 'string') {
+      buf.fill(fill, encoding);
+    } else {
+      buf.fill(fill);
+    }
+  } else {
+    buf.fill(0);
+  }
+  return buf
+};
+
+SafeBuffer.allocUnsafe = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return Buffer(size)
+};
+
+SafeBuffer.allocUnsafeSlow = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return require$$0.SlowBuffer(size)
+};
+});
+
+var Buffer$2 = index$10.Buffer;
+
+var isEncoding = Buffer$2.isEncoding || function (encoding) {
+  encoding = '' + encoding;
+  switch (encoding && encoding.toLowerCase()) {
+    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
+      return true;
+    default:
+      return false;
+  }
+};
+
+function _normalizeEncoding(enc) {
+  if (!enc) return 'utf8';
+  var retried;
+  while (true) {
+    switch (enc) {
+      case 'utf8':
+      case 'utf-8':
+        return 'utf8';
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return 'utf16le';
+      case 'latin1':
+      case 'binary':
+        return 'latin1';
+      case 'base64':
+      case 'ascii':
+      case 'hex':
+        return enc;
+      default:
+        if (retried) return; // undefined
+        enc = ('' + enc).toLowerCase();
+        retried = true;
+    }
+  }
+}
+
+// Do not cache `Buffer.isEncoding` when checking encoding names as some
+// modules monkey-patch it to support additional encodings
+function normalizeEncoding(enc) {
+  var nenc = _normalizeEncoding(enc);
+  if (typeof nenc !== 'string' && (Buffer$2.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
+  return nenc || enc;
+}
+
+// StringDecoder provides an interface for efficiently splitting a series of
+// buffers into a series of JS strings without breaking apart multi-byte
+// characters.
+var StringDecoder_1 = StringDecoder$1;
+function StringDecoder$1(encoding) {
+  this.encoding = normalizeEncoding(encoding);
+  var nb;
+  switch (this.encoding) {
+    case 'utf16le':
+      this.text = utf16Text;
+      this.end = utf16End;
+      nb = 4;
+      break;
+    case 'utf8':
+      this.fillLast = utf8FillLast;
+      nb = 4;
+      break;
+    case 'base64':
+      this.text = base64Text;
+      this.end = base64End;
+      nb = 3;
+      break;
+    default:
+      this.write = simpleWrite;
+      this.end = simpleEnd;
+      return;
+  }
+  this.lastNeed = 0;
+  this.lastTotal = 0;
+  this.lastChar = Buffer$2.allocUnsafe(nb);
+}
+
+StringDecoder$1.prototype.write = function (buf) {
+  if (buf.length === 0) return '';
+  var r;
+  var i;
+  if (this.lastNeed) {
+    r = this.fillLast(buf);
+    if (r === undefined) return '';
+    i = this.lastNeed;
+    this.lastNeed = 0;
+  } else {
+    i = 0;
+  }
+  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
+  return r || '';
+};
+
+StringDecoder$1.prototype.end = utf8End;
+
+// Returns only complete characters in a Buffer
+StringDecoder$1.prototype.text = utf8Text;
+
+// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
+StringDecoder$1.prototype.fillLast = function (buf) {
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
+  this.lastNeed -= buf.length;
+};
+
+// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
+// continuation byte.
+function utf8CheckByte(byte) {
+  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
+  return -1;
+}
+
+// Checks at most 3 bytes at the end of a Buffer in order to detect an
+// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
+// needed to complete the UTF-8 character (if applicable) are returned.
+function utf8CheckIncomplete(self, buf, i) {
+  var j = buf.length - 1;
+  if (j < i) return 0;
+  var nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 1;
+    return nb;
+  }
+  if (--j < i) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 2;
+    return nb;
+  }
+  if (--j < i) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) {
+      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
+    }
+    return nb;
+  }
+  return 0;
+}
+
+// Validates as many continuation bytes for a multi-byte UTF-8 character as
+// needed or are available. If we see a non-continuation byte where we expect
+// one, we "replace" the validated continuation bytes we've seen so far with
+// UTF-8 replacement characters ('\ufffd'), to match v8's UTF-8 decoding
+// behavior. The continuation byte check is included three times in the case
+// where all of the continuation bytes for a character exist in the same buffer.
+// It is also done this way as a slight performance increase instead of using a
+// loop.
+function utf8CheckExtraBytes(self, buf, p) {
+  if ((buf[0] & 0xC0) !== 0x80) {
+    self.lastNeed = 0;
+    return '\ufffd'.repeat(p);
+  }
+  if (self.lastNeed > 1 && buf.length > 1) {
+    if ((buf[1] & 0xC0) !== 0x80) {
+      self.lastNeed = 1;
+      return '\ufffd'.repeat(p + 1);
+    }
+    if (self.lastNeed > 2 && buf.length > 2) {
+      if ((buf[2] & 0xC0) !== 0x80) {
+        self.lastNeed = 2;
+        return '\ufffd'.repeat(p + 2);
+      }
+    }
+  }
+}
+
+// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
+function utf8FillLast(buf) {
+  var p = this.lastTotal - this.lastNeed;
+  var r = utf8CheckExtraBytes(this, buf, p);
+  if (r !== undefined) return r;
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, p, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, p, 0, buf.length);
+  this.lastNeed -= buf.length;
+}
+
+// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
+// partial character, the character's bytes are buffered until the required
+// number of bytes are available.
+function utf8Text(buf, i) {
+  var total = utf8CheckIncomplete(this, buf, i);
+  if (!this.lastNeed) return buf.toString('utf8', i);
+  this.lastTotal = total;
+  var end = buf.length - (total - this.lastNeed);
+  buf.copy(this.lastChar, 0, end);
+  return buf.toString('utf8', i, end);
+}
+
+// For UTF-8, a replacement character for each buffered byte of a (partial)
+// character needs to be added to the output.
+function utf8End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + '\ufffd'.repeat(this.lastTotal - this.lastNeed);
+  return r;
+}
+
+// UTF-16LE typically needs two bytes per character, but even if we have an even
+// number of bytes available, we need to check if we end on a leading/high
+// surrogate. In that case, we need to wait for the next two bytes in order to
+// decode the last character properly.
+function utf16Text(buf, i) {
+  if ((buf.length - i) % 2 === 0) {
+    var r = buf.toString('utf16le', i);
+    if (r) {
+      var c = r.charCodeAt(r.length - 1);
+      if (c >= 0xD800 && c <= 0xDBFF) {
+        this.lastNeed = 2;
+        this.lastTotal = 4;
+        this.lastChar[0] = buf[buf.length - 2];
+        this.lastChar[1] = buf[buf.length - 1];
+        return r.slice(0, -1);
+      }
+    }
+    return r;
+  }
+  this.lastNeed = 1;
+  this.lastTotal = 2;
+  this.lastChar[0] = buf[buf.length - 1];
+  return buf.toString('utf16le', i, buf.length - 1);
+}
+
+// For UTF-16LE we do not explicitly append special replacement characters if we
+// end on a partial character, we simply let v8 handle that.
+function utf16End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) {
+    var end = this.lastTotal - this.lastNeed;
+    return r + this.lastChar.toString('utf16le', 0, end);
+  }
+  return r;
+}
+
+function base64Text(buf, i) {
+  var n = (buf.length - i) % 3;
+  if (n === 0) return buf.toString('base64', i);
+  this.lastNeed = 3 - n;
+  this.lastTotal = 3;
+  if (n === 1) {
+    this.lastChar[0] = buf[buf.length - 1];
+  } else {
+    this.lastChar[0] = buf[buf.length - 2];
+    this.lastChar[1] = buf[buf.length - 1];
+  }
+  return buf.toString('base64', i, buf.length - n);
+}
+
+function base64End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
+  return r;
+}
+
+// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
+function simpleWrite(buf) {
+  return buf.toString(this.encoding);
+}
+
+function simpleEnd(buf) {
+  return buf && buf.length ? this.write(buf) : '';
+}
+
+var string_decoder$1 = {
+	StringDecoder: StringDecoder_1
+};
+
+
+
+var string_decoder$3 = Object.freeze({
+	default: string_decoder$1,
+	__moduleExports: string_decoder$1,
+	StringDecoder: StringDecoder_1
+});
+
+var require$$1$6 = ( string_decoder$3 && string_decoder$1 ) || string_decoder$3;
+
 var Buffer$1 = require$$0.Buffer;
 
 // Export Node.js internal encodings.
@@ -5301,7 +5651,7 @@ InternalCodec.prototype.decoder = InternalDecoder;
 //------------------------------------------------------------------------------
 
 // We use node.js internal decoder. Its signature is the same as ours.
-var StringDecoder = string_decoder.StringDecoder;
+var StringDecoder = require$$1$6.StringDecoder;
 
 if (!StringDecoder.prototype.end) // Node v0.8 doesn't have this method.
     StringDecoder.prototype.end = function() {};
@@ -5442,7 +5792,7 @@ InternalDecoderCesu8.prototype.end = function() {
     return res;
 };
 
-var Buffer$2 = require$$0.Buffer;
+var Buffer$3 = require$$0.Buffer;
 
 // Note: UTF16-LE (or UCS2) codec is Node.js native. See encodings/internal.js
 
@@ -5463,7 +5813,7 @@ function Utf16BEEncoder() {
 }
 
 Utf16BEEncoder.prototype.write = function(str) {
-    var buf = new Buffer$2(str, 'ucs2');
+    var buf = new Buffer$3(str, 'ucs2');
     for (var i = 0; i < buf.length; i += 2) {
         var tmp = buf[i]; buf[i] = buf[i+1]; buf[i+1] = tmp;
     }
@@ -5484,7 +5834,7 @@ Utf16BEDecoder.prototype.write = function(buf) {
     if (buf.length == 0)
         return '';
 
-    var buf2 = new Buffer$2(buf.length + 1),
+    var buf2 = new Buffer$3(buf.length + 1),
         i = 0, j = 0;
 
     if (this.overflowByte !== -1) {
@@ -5563,7 +5913,7 @@ Utf16Decoder.prototype.write = function(buf) {
             return '';
 
         // We have enough bytes -> detect endianness.
-        var buf = Buffer$2.concat(this.initialBytes),
+        var buf = Buffer$3.concat(this.initialBytes),
             encoding = detectEncoding(buf, this.options.defaultEncoding);
         this.decoder = this.iconv.getDecoder(encoding, this.options);
         this.initialBytes.length = this.initialBytesLen = 0;
@@ -5574,7 +5924,7 @@ Utf16Decoder.prototype.write = function(buf) {
 
 Utf16Decoder.prototype.end = function() {
     if (!this.decoder) {
-        var buf = Buffer$2.concat(this.initialBytes),
+        var buf = Buffer$3.concat(this.initialBytes),
             encoding = detectEncoding(buf, this.options.defaultEncoding);
         this.decoder = this.iconv.getDecoder(encoding, this.options);
 
@@ -5622,7 +5972,7 @@ var utf16 = {
 	utf16: utf16_1
 };
 
-var Buffer$3 = require$$0.Buffer;
+var Buffer$4 = require$$0.Buffer;
 
 // UTF-7 codec, according to https://tools.ietf.org/html/rfc2152
 // See also below a UTF-7-IMAP codec, according to http://tools.ietf.org/html/rfc3501#section-5.1.3
@@ -5649,7 +5999,7 @@ function Utf7Encoder(options, codec) {
 Utf7Encoder.prototype.write = function(str) {
     // Naive implementation.
     // Non-direct chars are encoded as "+<base64>-"; single "+" char is encoded as "+-".
-    return new Buffer$3(str.replace(nonDirectChars, function(chunk) {
+    return new Buffer$4(str.replace(nonDirectChars, function(chunk) {
         return "+" + (chunk === '+' ? '' : 
             this.iconv.encode(chunk, 'utf16-be').toString('base64').replace(/=+$/, '')) 
             + "-";
@@ -5698,7 +6048,7 @@ Utf7Decoder.prototype.write = function(buf) {
                     res += "+";
                 } else {
                     var b64str = base64Accum + buf.slice(lastI, i).toString();
-                    res += this.iconv.decode(new Buffer$3(b64str, 'base64'), "utf16-be");
+                    res += this.iconv.decode(new Buffer$4(b64str, 'base64'), "utf16-be");
                 }
 
                 if (buf[i] != minusChar) // Minus is absorbed after base64.
@@ -5720,7 +6070,7 @@ Utf7Decoder.prototype.write = function(buf) {
         base64Accum = b64str.slice(canBeDecoded); // The rest will be decoded in future.
         b64str = b64str.slice(0, canBeDecoded);
 
-        res += this.iconv.decode(new Buffer$3(b64str, 'base64'), "utf16-be");
+        res += this.iconv.decode(new Buffer$4(b64str, 'base64'), "utf16-be");
     }
 
     this.inBase64 = inBase64;
@@ -5732,7 +6082,7 @@ Utf7Decoder.prototype.write = function(buf) {
 Utf7Decoder.prototype.end = function() {
     var res = "";
     if (this.inBase64 && this.base64Accum.length > 0)
-        res = this.iconv.decode(new Buffer$3(this.base64Accum, 'base64'), "utf16-be");
+        res = this.iconv.decode(new Buffer$4(this.base64Accum, 'base64'), "utf16-be");
 
     this.inBase64 = false;
     this.base64Accum = '';
@@ -5767,7 +6117,7 @@ Utf7IMAPCodec.prototype.bomAware = true;
 function Utf7IMAPEncoder(options, codec) {
     this.iconv = codec.iconv;
     this.inBase64 = false;
-    this.base64Accum = new Buffer$3(6);
+    this.base64Accum = new Buffer$4(6);
     this.base64AccumIdx = 0;
 }
 
@@ -5775,7 +6125,7 @@ Utf7IMAPEncoder.prototype.write = function(str) {
     var inBase64 = this.inBase64,
         base64Accum = this.base64Accum,
         base64AccumIdx = this.base64AccumIdx,
-        buf = new Buffer$3(str.length*5 + 10), bufIdx = 0;
+        buf = new Buffer$4(str.length*5 + 10), bufIdx = 0;
 
     for (var i = 0; i < str.length; i++) {
         var uChar = str.charCodeAt(i);
@@ -5821,7 +6171,7 @@ Utf7IMAPEncoder.prototype.write = function(str) {
 };
 
 Utf7IMAPEncoder.prototype.end = function() {
-    var buf = new Buffer$3(10), bufIdx = 0;
+    var buf = new Buffer$4(10), bufIdx = 0;
     if (this.inBase64) {
         if (this.base64AccumIdx > 0) {
             bufIdx += buf.write(this.base64Accum.slice(0, this.base64AccumIdx).toString('base64').replace(/\//g, ',').replace(/=+$/, ''), bufIdx);
@@ -5869,7 +6219,7 @@ Utf7IMAPDecoder.prototype.write = function(buf) {
                     res += "&";
                 } else {
                     var b64str = base64Accum + buf.slice(lastI, i).toString().replace(/,/g, '/');
-                    res += this.iconv.decode(new Buffer$3(b64str, 'base64'), "utf16-be");
+                    res += this.iconv.decode(new Buffer$4(b64str, 'base64'), "utf16-be");
                 }
 
                 if (buf[i] != minusChar) // Minus may be absorbed after base64.
@@ -5891,7 +6241,7 @@ Utf7IMAPDecoder.prototype.write = function(buf) {
         base64Accum = b64str.slice(canBeDecoded); // The rest will be decoded in future.
         b64str = b64str.slice(0, canBeDecoded);
 
-        res += this.iconv.decode(new Buffer$3(b64str, 'base64'), "utf16-be");
+        res += this.iconv.decode(new Buffer$4(b64str, 'base64'), "utf16-be");
     }
 
     this.inBase64 = inBase64;
@@ -5903,7 +6253,7 @@ Utf7IMAPDecoder.prototype.write = function(buf) {
 Utf7IMAPDecoder.prototype.end = function() {
     var res = "";
     if (this.inBase64 && this.base64Accum.length > 0)
-        res = this.iconv.decode(new Buffer$3(this.base64Accum, 'base64'), "utf16-be");
+        res = this.iconv.decode(new Buffer$4(this.base64Accum, 'base64'), "utf16-be");
 
     this.inBase64 = false;
     this.base64Accum = '';
@@ -5916,7 +6266,7 @@ var utf7 = {
 	utf7imap: utf7imap
 };
 
-var Buffer$4 = require$$0.Buffer;
+var Buffer$5 = require$$0.Buffer;
 
 // Single-byte codec. Needs a 'chars' string parameter that contains 256 or 128 chars that
 // correspond to encoded bytes (if 128 - then lower half is ASCII). 
@@ -5937,10 +6287,10 @@ function SBCSCodec(codecOptions, iconv) {
         codecOptions.chars = asciiString + codecOptions.chars;
     }
 
-    this.decodeBuf = new Buffer$4(codecOptions.chars, 'ucs2');
+    this.decodeBuf = new Buffer$5(codecOptions.chars, 'ucs2');
     
     // Encoding buffer.
-    var encodeBuf = new Buffer$4(65536);
+    var encodeBuf = new Buffer$5(65536);
     encodeBuf.fill(iconv.defaultCharSingleByte.charCodeAt(0));
 
     for (var i = 0; i < codecOptions.chars.length; i++)
@@ -5958,7 +6308,7 @@ function SBCSEncoder(options, codec) {
 }
 
 SBCSEncoder.prototype.write = function(str) {
-    var buf = new Buffer$4(str.length);
+    var buf = new Buffer$5(str.length);
     for (var i = 0; i < str.length; i++)
         buf[i] = this.encodeBuf[str.charCodeAt(i)];
     
@@ -5976,7 +6326,7 @@ function SBCSDecoder(options, codec) {
 SBCSDecoder.prototype.write = function(buf) {
     // Strings are immutable in JS -> we use ucs2 buffer to speed up computations.
     var decodeBuf = this.decodeBuf;
-    var newBuf = new Buffer$4(buf.length*2);
+    var newBuf = new Buffer$5(buf.length*2);
     var idx1 = 0, idx2 = 0;
     for (var i = 0; i < buf.length; i++) {
         idx1 = buf[i]*2; idx2 = i*2;
@@ -6606,7 +6956,7 @@ var sbcsDataGenerated = {
   }
 };
 
-var Buffer$5 = require$$0.Buffer;
+var Buffer$6 = require$$0.Buffer;
 
 // Multibyte codec. In this scheme, a character is represented by 1 or more bytes.
 // Our codec supports UTF-16 surrogates, extensions for GB18030 and unicode sequences.
@@ -6888,7 +7238,7 @@ function DBCSEncoder(options, codec) {
 }
 
 DBCSEncoder.prototype.write = function(str) {
-    var newBuf = new Buffer$5(str.length * (this.gb18030 ? 4 : 3)), 
+    var newBuf = new Buffer$6(str.length * (this.gb18030 ? 4 : 3)), 
         leadSurrogate = this.leadSurrogate,
         seqObj = this.seqObj, nextChar = -1,
         i = 0, j = 0;
@@ -7011,7 +7361,7 @@ DBCSEncoder.prototype.end = function() {
     if (this.leadSurrogate === -1 && this.seqObj === undefined)
         return; // All clean. Most often case.
 
-    var newBuf = new Buffer$5(10), j = 0;
+    var newBuf = new Buffer$6(10), j = 0;
 
     if (this.seqObj) { // We're in the sequence.
         var dbcsCode = this.seqObj[DEF_CHAR];
@@ -7047,7 +7397,7 @@ DBCSEncoder.prototype.findIdx = findIdx;
 function DBCSDecoder(options, codec) {
     // Decoder state
     this.nodeIdx = 0;
-    this.prevBuf = new Buffer$5(0);
+    this.prevBuf = new Buffer$6(0);
 
     // Static data
     this.decodeTables = codec.decodeTables;
@@ -7057,14 +7407,14 @@ function DBCSDecoder(options, codec) {
 }
 
 DBCSDecoder.prototype.write = function(buf) {
-    var newBuf = new Buffer$5(buf.length*2),
+    var newBuf = new Buffer$6(buf.length*2),
         nodeIdx = this.nodeIdx, 
         prevBuf = this.prevBuf, prevBufOffset = this.prevBuf.length,
         seqStart = -this.prevBuf.length, // idx of the start of current parsed sequence.
         uCode;
 
     if (prevBufOffset > 0) // Make prev buf overlap a little to make it easier to slice later.
-        prevBuf = Buffer$5.concat([prevBuf, buf.slice(0, 10)]);
+        prevBuf = Buffer$6.concat([prevBuf, buf.slice(0, 10)]);
     
     for (var i = 0, j = 0; i < buf.length; i++) {
         var curByte = (i >= 0) ? buf[i] : prevBuf[i + prevBufOffset];
@@ -7134,7 +7484,7 @@ DBCSDecoder.prototype.end = function() {
         var buf = this.prevBuf.slice(1);
 
         // Parse remaining as usual.
-        this.prevBuf = new Buffer$5(0);
+        this.prevBuf = new Buffer$6(0);
         this.nodeIdx = 0;
         if (buf.length > 0)
             ret += this.write(buf);
@@ -8417,7 +8767,7 @@ var big5Added$1 = Object.freeze({
 	default: big5Added
 });
 
-var require$$0$34 = ( shiftjis$1 && shiftjis ) || shiftjis$1;
+var require$$0$35 = ( shiftjis$1 && shiftjis ) || shiftjis$1;
 
 var require$$1$7 = ( eucjp$1 && eucjp ) || eucjp$1;
 
@@ -8473,7 +8823,7 @@ var dbcsData = {
 
     'shiftjis': {
         type: '_dbcs',
-        table: function() { return require$$0$34 },
+        table: function() { return require$$0$35 },
         encodeAdd: {'\u00a5': 0x5C, '\u203E': 0x7E},
         encodeSkipVals: [{from: 0xED40, to: 0xF940}],
     },
@@ -8633,7 +8983,7 @@ for (var i = 0; i < modules.length; i++) {
 }
 });
 
-var Buffer$6 = require$$0.Buffer;
+var Buffer$7 = require$$0.Buffer;
 var Transform = require$$1.Transform;
 
 
@@ -8700,7 +9050,7 @@ IconvLiteEncoderStream.prototype.collect = function(cb) {
     this.on('error', cb);
     this.on('data', function(chunk) { chunks.push(chunk); });
     this.on('end', function() {
-        cb(null, Buffer$6.concat(chunks));
+        cb(null, Buffer$7.concat(chunks));
     });
     return this;
 };
@@ -8719,7 +9069,7 @@ IconvLiteDecoderStream.prototype = Object.create(Transform.prototype, {
 });
 
 IconvLiteDecoderStream.prototype._transform = function(chunk, encoding, done) {
-    if (!Buffer$6.isBuffer(chunk))
+    if (!Buffer$7.isBuffer(chunk))
         return done(new Error("Iconv decoding stream needs buffers as its input."));
     try {
         var res = this.conv.write(chunk);
@@ -8752,7 +9102,7 @@ IconvLiteDecoderStream.prototype.collect = function(cb) {
     return this;
 };
 
-var Buffer$7 = require$$0.Buffer;
+var Buffer$8 = require$$0.Buffer;
 
 // == Extend Node primitives to use iconv-lite =================================
 
@@ -8761,7 +9111,7 @@ var extendNode = function (iconv) {
 
     // Node authors rewrote Buffer internals to make it compatible with
     // Uint8Array and we cannot patch key functions since then.
-    iconv.supportsNodeEncodingsExtension = !(new Buffer$7(0) instanceof Uint8Array);
+    iconv.supportsNodeEncodingsExtension = !(new Buffer$8(0) instanceof Uint8Array);
 
     iconv.extendNodeEncodings = function extendNodeEncodings() {
         if (original) return;
@@ -8778,7 +9128,7 @@ var extendNode = function (iconv) {
             'base64': true, 'ucs2': true, 'ucs-2': true, 'utf16le': true, 'utf-16le': true,
         };
 
-        Buffer$7.isNativeEncoding = function(enc) {
+        Buffer$8.isNativeEncoding = function(enc) {
             return enc && nodeNativeEncodings[enc.toLowerCase()];
         };
 
@@ -8790,7 +9140,7 @@ var extendNode = function (iconv) {
             encoding = String(encoding || 'utf8').toLowerCase();
 
             // Use native conversion when possible
-            if (Buffer$7.isNativeEncoding(encoding))
+            if (Buffer$8.isNativeEncoding(encoding))
                 return original.SlowBufferToString.call(this, encoding, start, end);
 
             // Otherwise, use our decoding method.
@@ -8828,7 +9178,7 @@ var extendNode = function (iconv) {
             encoding = String(encoding || 'utf8').toLowerCase();
 
             // Use native conversion when possible
-            if (Buffer$7.isNativeEncoding(encoding))
+            if (Buffer$8.isNativeEncoding(encoding))
                 return original.SlowBufferWrite.call(this, string, offset, length, encoding);
 
             if (string.length > 0 && (length < 0 || offset < 0))
@@ -8843,29 +9193,29 @@ var extendNode = function (iconv) {
 
         // -- Buffer ---------------------------------------------------------------
 
-        original.BufferIsEncoding = Buffer$7.isEncoding;
-        Buffer$7.isEncoding = function(encoding) {
-            return Buffer$7.isNativeEncoding(encoding) || iconv.encodingExists(encoding);
+        original.BufferIsEncoding = Buffer$8.isEncoding;
+        Buffer$8.isEncoding = function(encoding) {
+            return Buffer$8.isNativeEncoding(encoding) || iconv.encodingExists(encoding);
         };
 
-        original.BufferByteLength = Buffer$7.byteLength;
-        Buffer$7.byteLength = SlowBuffer.byteLength = function(str, encoding) {
+        original.BufferByteLength = Buffer$8.byteLength;
+        Buffer$8.byteLength = SlowBuffer.byteLength = function(str, encoding) {
             encoding = String(encoding || 'utf8').toLowerCase();
 
             // Use native conversion when possible
-            if (Buffer$7.isNativeEncoding(encoding))
+            if (Buffer$8.isNativeEncoding(encoding))
                 return original.BufferByteLength.call(this, str, encoding);
 
             // Slow, I know, but we don't have a better way yet.
             return iconv.encode(str, encoding).length;
         };
 
-        original.BufferToString = Buffer$7.prototype.toString;
-        Buffer$7.prototype.toString = function(encoding, start, end) {
+        original.BufferToString = Buffer$8.prototype.toString;
+        Buffer$8.prototype.toString = function(encoding, start, end) {
             encoding = String(encoding || 'utf8').toLowerCase();
 
             // Use native conversion when possible
-            if (Buffer$7.isNativeEncoding(encoding))
+            if (Buffer$8.isNativeEncoding(encoding))
                 return original.BufferToString.call(this, encoding, start, end);
 
             // Otherwise, use our decoding method.
@@ -8874,8 +9224,8 @@ var extendNode = function (iconv) {
             return iconv.decode(this.slice(start, end), encoding);
         };
 
-        original.BufferWrite = Buffer$7.prototype.write;
-        Buffer$7.prototype.write = function(string, offset, length, encoding) {
+        original.BufferWrite = Buffer$8.prototype.write;
+        Buffer$8.prototype.write = function(string, offset, length, encoding) {
             var _offset = offset, _length = length, _encoding = encoding;
             // Support both (string, offset, length, encoding)
             // and the legacy (string, encoding, offset, length)
@@ -8894,7 +9244,7 @@ var extendNode = function (iconv) {
             encoding = String(encoding || 'utf8').toLowerCase();
 
             // Use native conversion when possible
-            if (Buffer$7.isNativeEncoding(encoding))
+            if (Buffer$8.isNativeEncoding(encoding))
                 return original.BufferWrite.call(this, string, _offset, _length, _encoding);
 
             offset = +offset || 0;
@@ -8944,17 +9294,17 @@ var extendNode = function (iconv) {
         if (!original)
             throw new Error("require('iconv-lite').undoExtendNodeEncodings(): Nothing to undo; extendNodeEncodings() is not called.")
 
-        delete Buffer$7.isNativeEncoding;
+        delete Buffer$8.isNativeEncoding;
 
         var SlowBuffer = require$$0.SlowBuffer;
 
         SlowBuffer.prototype.toString = original.SlowBufferToString;
         SlowBuffer.prototype.write = original.SlowBufferWrite;
 
-        Buffer$7.isEncoding = original.BufferIsEncoding;
-        Buffer$7.byteLength = original.BufferByteLength;
-        Buffer$7.prototype.toString = original.BufferToString;
-        Buffer$7.prototype.write = original.BufferWrite;
+        Buffer$8.isEncoding = original.BufferIsEncoding;
+        Buffer$8.byteLength = original.BufferByteLength;
+        Buffer$8.prototype.toString = original.BufferToString;
+        Buffer$8.prototype.write = original.BufferWrite;
 
         if (iconv.supportsStreams) {
             var Readable = require$$1.Readable;
@@ -9243,7 +9593,7 @@ var encoding = {
 	convert: convert_1
 };
 
-var index$10 = createCommonjsModule(function (module) {
+var index$12 = createCommonjsModule(function (module) {
 'use strict';
 
 var isStream = module.exports = function (stream) {
@@ -9544,7 +9894,7 @@ Body.prototype._clone = function(instance) {
 
 	// check that body is a stream and not form-data object
 	// note: we can't clone the form-data object without having it as a dependency
-	if (index$10(body) && typeof body.getBoundary !== 'function') {
+	if (index$12(body) && typeof body.getBoundary !== 'function') {
 		// tee instance body
 		p1 = new PassThrough();
 		p2 = new PassThrough();
@@ -12545,7 +12895,7 @@ hasha.stream = opts => {
 };
 
 hasha.fromStream = (stream, opts) => {
-	if (!index$10(stream)) {
+	if (!index$12(stream)) {
 		return Promise.reject(new TypeError('Expected a stream'));
 	}
 
@@ -12566,7 +12916,956 @@ hasha.fromFile = (fp, opts) => hasha.fromStream(fs.createReadStream(fp), opts);
 
 hasha.fromFileSync = (fp, opts) => hasha(fs.readFileSync(fp), opts);
 
-var index$12 = hasha;
+var index$14 = hasha;
+
+var core = createCommonjsModule(function (module, exports) {
+(function (root, factory) {
+	{
+		// CommonJS
+		module.exports = exports = factory();
+	}
+}(commonjsGlobal, function () {
+
+	/**
+	 * CryptoJS core components.
+	 */
+	var CryptoJS = CryptoJS || (function (Math, undefined) {
+	    /*
+	     * Local polyfil of Object.create
+	     */
+	    var create = Object.create || (function () {
+	        function F() {}
+
+	        return function (obj) {
+	            var subtype;
+
+	            F.prototype = obj;
+
+	            subtype = new F();
+
+	            F.prototype = null;
+
+	            return subtype;
+	        };
+	    }());
+
+	    /**
+	     * CryptoJS namespace.
+	     */
+	    var C = {};
+
+	    /**
+	     * Library namespace.
+	     */
+	    var C_lib = C.lib = {};
+
+	    /**
+	     * Base object for prototypal inheritance.
+	     */
+	    var Base = C_lib.Base = (function () {
+
+
+	        return {
+	            /**
+	             * Creates a new object that inherits from this object.
+	             *
+	             * @param {Object} overrides Properties to copy into the new object.
+	             *
+	             * @return {Object} The new object.
+	             *
+	             * @static
+	             *
+	             * @example
+	             *
+	             *     var MyType = CryptoJS.lib.Base.extend({
+	             *         field: 'value',
+	             *
+	             *         method: function () {
+	             *         }
+	             *     });
+	             */
+	            extend: function (overrides) {
+	                // Spawn
+	                var subtype = create(this);
+
+	                // Augment
+	                if (overrides) {
+	                    subtype.mixIn(overrides);
+	                }
+
+	                // Create default initializer
+	                if (!subtype.hasOwnProperty('init') || this.init === subtype.init) {
+	                    subtype.init = function () {
+	                        subtype.$super.init.apply(this, arguments);
+	                    };
+	                }
+
+	                // Initializer's prototype is the subtype object
+	                subtype.init.prototype = subtype;
+
+	                // Reference supertype
+	                subtype.$super = this;
+
+	                return subtype;
+	            },
+
+	            /**
+	             * Extends this object and runs the init method.
+	             * Arguments to create() will be passed to init().
+	             *
+	             * @return {Object} The new object.
+	             *
+	             * @static
+	             *
+	             * @example
+	             *
+	             *     var instance = MyType.create();
+	             */
+	            create: function () {
+	                var instance = this.extend();
+	                instance.init.apply(instance, arguments);
+
+	                return instance;
+	            },
+
+	            /**
+	             * Initializes a newly created object.
+	             * Override this method to add some logic when your objects are created.
+	             *
+	             * @example
+	             *
+	             *     var MyType = CryptoJS.lib.Base.extend({
+	             *         init: function () {
+	             *             // ...
+	             *         }
+	             *     });
+	             */
+	            init: function () {
+	            },
+
+	            /**
+	             * Copies properties into this object.
+	             *
+	             * @param {Object} properties The properties to mix in.
+	             *
+	             * @example
+	             *
+	             *     MyType.mixIn({
+	             *         field: 'value'
+	             *     });
+	             */
+	            mixIn: function (properties) {
+	                for (var propertyName in properties) {
+	                    if (properties.hasOwnProperty(propertyName)) {
+	                        this[propertyName] = properties[propertyName];
+	                    }
+	                }
+
+	                // IE won't copy toString using the loop above
+	                if (properties.hasOwnProperty('toString')) {
+	                    this.toString = properties.toString;
+	                }
+	            },
+
+	            /**
+	             * Creates a copy of this object.
+	             *
+	             * @return {Object} The clone.
+	             *
+	             * @example
+	             *
+	             *     var clone = instance.clone();
+	             */
+	            clone: function () {
+	                return this.init.prototype.extend(this);
+	            }
+	        };
+	    }());
+
+	    /**
+	     * An array of 32-bit words.
+	     *
+	     * @property {Array} words The array of 32-bit words.
+	     * @property {number} sigBytes The number of significant bytes in this word array.
+	     */
+	    var WordArray = C_lib.WordArray = Base.extend({
+	        /**
+	         * Initializes a newly created word array.
+	         *
+	         * @param {Array} words (Optional) An array of 32-bit words.
+	         * @param {number} sigBytes (Optional) The number of significant bytes in the words.
+	         *
+	         * @example
+	         *
+	         *     var wordArray = CryptoJS.lib.WordArray.create();
+	         *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607]);
+	         *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607], 6);
+	         */
+	        init: function (words, sigBytes) {
+	            words = this.words = words || [];
+
+	            if (sigBytes != undefined) {
+	                this.sigBytes = sigBytes;
+	            } else {
+	                this.sigBytes = words.length * 4;
+	            }
+	        },
+
+	        /**
+	         * Converts this word array to a string.
+	         *
+	         * @param {Encoder} encoder (Optional) The encoding strategy to use. Default: CryptoJS.enc.Hex
+	         *
+	         * @return {string} The stringified word array.
+	         *
+	         * @example
+	         *
+	         *     var string = wordArray + '';
+	         *     var string = wordArray.toString();
+	         *     var string = wordArray.toString(CryptoJS.enc.Utf8);
+	         */
+	        toString: function (encoder) {
+	            return (encoder || Hex).stringify(this);
+	        },
+
+	        /**
+	         * Concatenates a word array to this word array.
+	         *
+	         * @param {WordArray} wordArray The word array to append.
+	         *
+	         * @return {WordArray} This word array.
+	         *
+	         * @example
+	         *
+	         *     wordArray1.concat(wordArray2);
+	         */
+	        concat: function (wordArray) {
+	            // Shortcuts
+	            var thisWords = this.words;
+	            var thatWords = wordArray.words;
+	            var thisSigBytes = this.sigBytes;
+	            var thatSigBytes = wordArray.sigBytes;
+
+	            // Clamp excess bits
+	            this.clamp();
+
+	            // Concat
+	            if (thisSigBytes % 4) {
+	                // Copy one byte at a time
+	                for (var i = 0; i < thatSigBytes; i++) {
+	                    var thatByte = (thatWords[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+	                    thisWords[(thisSigBytes + i) >>> 2] |= thatByte << (24 - ((thisSigBytes + i) % 4) * 8);
+	                }
+	            } else {
+	                // Copy one word at a time
+	                for (var i = 0; i < thatSigBytes; i += 4) {
+	                    thisWords[(thisSigBytes + i) >>> 2] = thatWords[i >>> 2];
+	                }
+	            }
+	            this.sigBytes += thatSigBytes;
+
+	            // Chainable
+	            return this;
+	        },
+
+	        /**
+	         * Removes insignificant bits.
+	         *
+	         * @example
+	         *
+	         *     wordArray.clamp();
+	         */
+	        clamp: function () {
+	            // Shortcuts
+	            var words = this.words;
+	            var sigBytes = this.sigBytes;
+
+	            // Clamp
+	            words[sigBytes >>> 2] &= 0xffffffff << (32 - (sigBytes % 4) * 8);
+	            words.length = Math.ceil(sigBytes / 4);
+	        },
+
+	        /**
+	         * Creates a copy of this word array.
+	         *
+	         * @return {WordArray} The clone.
+	         *
+	         * @example
+	         *
+	         *     var clone = wordArray.clone();
+	         */
+	        clone: function () {
+	            var clone = Base.clone.call(this);
+	            clone.words = this.words.slice(0);
+
+	            return clone;
+	        },
+
+	        /**
+	         * Creates a word array filled with random bytes.
+	         *
+	         * @param {number} nBytes The number of random bytes to generate.
+	         *
+	         * @return {WordArray} The random word array.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var wordArray = CryptoJS.lib.WordArray.random(16);
+	         */
+	        random: function (nBytes) {
+	            var words = [];
+
+	            var r = (function (m_w) {
+	                var m_w = m_w;
+	                var m_z = 0x3ade68b1;
+	                var mask = 0xffffffff;
+
+	                return function () {
+	                    m_z = (0x9069 * (m_z & 0xFFFF) + (m_z >> 0x10)) & mask;
+	                    m_w = (0x4650 * (m_w & 0xFFFF) + (m_w >> 0x10)) & mask;
+	                    var result = ((m_z << 0x10) + m_w) & mask;
+	                    result /= 0x100000000;
+	                    result += 0.5;
+	                    return result * (Math.random() > .5 ? 1 : -1);
+	                }
+	            });
+
+	            for (var i = 0, rcache; i < nBytes; i += 4) {
+	                var _r = r((rcache || Math.random()) * 0x100000000);
+
+	                rcache = _r() * 0x3ade67b7;
+	                words.push((_r() * 0x100000000) | 0);
+	            }
+
+	            return new WordArray.init(words, nBytes);
+	        }
+	    });
+
+	    /**
+	     * Encoder namespace.
+	     */
+	    var C_enc = C.enc = {};
+
+	    /**
+	     * Hex encoding strategy.
+	     */
+	    var Hex = C_enc.Hex = {
+	        /**
+	         * Converts a word array to a hex string.
+	         *
+	         * @param {WordArray} wordArray The word array.
+	         *
+	         * @return {string} The hex string.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var hexString = CryptoJS.enc.Hex.stringify(wordArray);
+	         */
+	        stringify: function (wordArray) {
+	            // Shortcuts
+	            var words = wordArray.words;
+	            var sigBytes = wordArray.sigBytes;
+
+	            // Convert
+	            var hexChars = [];
+	            for (var i = 0; i < sigBytes; i++) {
+	                var bite = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+	                hexChars.push((bite >>> 4).toString(16));
+	                hexChars.push((bite & 0x0f).toString(16));
+	            }
+
+	            return hexChars.join('');
+	        },
+
+	        /**
+	         * Converts a hex string to a word array.
+	         *
+	         * @param {string} hexStr The hex string.
+	         *
+	         * @return {WordArray} The word array.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var wordArray = CryptoJS.enc.Hex.parse(hexString);
+	         */
+	        parse: function (hexStr) {
+	            // Shortcut
+	            var hexStrLength = hexStr.length;
+
+	            // Convert
+	            var words = [];
+	            for (var i = 0; i < hexStrLength; i += 2) {
+	                words[i >>> 3] |= parseInt(hexStr.substr(i, 2), 16) << (24 - (i % 8) * 4);
+	            }
+
+	            return new WordArray.init(words, hexStrLength / 2);
+	        }
+	    };
+
+	    /**
+	     * Latin1 encoding strategy.
+	     */
+	    var Latin1 = C_enc.Latin1 = {
+	        /**
+	         * Converts a word array to a Latin1 string.
+	         *
+	         * @param {WordArray} wordArray The word array.
+	         *
+	         * @return {string} The Latin1 string.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var latin1String = CryptoJS.enc.Latin1.stringify(wordArray);
+	         */
+	        stringify: function (wordArray) {
+	            // Shortcuts
+	            var words = wordArray.words;
+	            var sigBytes = wordArray.sigBytes;
+
+	            // Convert
+	            var latin1Chars = [];
+	            for (var i = 0; i < sigBytes; i++) {
+	                var bite = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+	                latin1Chars.push(String.fromCharCode(bite));
+	            }
+
+	            return latin1Chars.join('');
+	        },
+
+	        /**
+	         * Converts a Latin1 string to a word array.
+	         *
+	         * @param {string} latin1Str The Latin1 string.
+	         *
+	         * @return {WordArray} The word array.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var wordArray = CryptoJS.enc.Latin1.parse(latin1String);
+	         */
+	        parse: function (latin1Str) {
+	            // Shortcut
+	            var latin1StrLength = latin1Str.length;
+
+	            // Convert
+	            var words = [];
+	            for (var i = 0; i < latin1StrLength; i++) {
+	                words[i >>> 2] |= (latin1Str.charCodeAt(i) & 0xff) << (24 - (i % 4) * 8);
+	            }
+
+	            return new WordArray.init(words, latin1StrLength);
+	        }
+	    };
+
+	    /**
+	     * UTF-8 encoding strategy.
+	     */
+	    var Utf8 = C_enc.Utf8 = {
+	        /**
+	         * Converts a word array to a UTF-8 string.
+	         *
+	         * @param {WordArray} wordArray The word array.
+	         *
+	         * @return {string} The UTF-8 string.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var utf8String = CryptoJS.enc.Utf8.stringify(wordArray);
+	         */
+	        stringify: function (wordArray) {
+	            try {
+	                return decodeURIComponent(escape(Latin1.stringify(wordArray)));
+	            } catch (e) {
+	                throw new Error('Malformed UTF-8 data');
+	            }
+	        },
+
+	        /**
+	         * Converts a UTF-8 string to a word array.
+	         *
+	         * @param {string} utf8Str The UTF-8 string.
+	         *
+	         * @return {WordArray} The word array.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var wordArray = CryptoJS.enc.Utf8.parse(utf8String);
+	         */
+	        parse: function (utf8Str) {
+	            return Latin1.parse(unescape(encodeURIComponent(utf8Str)));
+	        }
+	    };
+
+	    /**
+	     * Abstract buffered block algorithm template.
+	     *
+	     * The property blockSize must be implemented in a concrete subtype.
+	     *
+	     * @property {number} _minBufferSize The number of blocks that should be kept unprocessed in the buffer. Default: 0
+	     */
+	    var BufferedBlockAlgorithm = C_lib.BufferedBlockAlgorithm = Base.extend({
+	        /**
+	         * Resets this block algorithm's data buffer to its initial state.
+	         *
+	         * @example
+	         *
+	         *     bufferedBlockAlgorithm.reset();
+	         */
+	        reset: function () {
+	            // Initial values
+	            this._data = new WordArray.init();
+	            this._nDataBytes = 0;
+	        },
+
+	        /**
+	         * Adds new data to this block algorithm's buffer.
+	         *
+	         * @param {WordArray|string} data The data to append. Strings are converted to a WordArray using UTF-8.
+	         *
+	         * @example
+	         *
+	         *     bufferedBlockAlgorithm._append('data');
+	         *     bufferedBlockAlgorithm._append(wordArray);
+	         */
+	        _append: function (data) {
+	            // Convert string to WordArray, else assume WordArray already
+	            if (typeof data == 'string') {
+	                data = Utf8.parse(data);
+	            }
+
+	            // Append
+	            this._data.concat(data);
+	            this._nDataBytes += data.sigBytes;
+	        },
+
+	        /**
+	         * Processes available data blocks.
+	         *
+	         * This method invokes _doProcessBlock(offset), which must be implemented by a concrete subtype.
+	         *
+	         * @param {boolean} doFlush Whether all blocks and partial blocks should be processed.
+	         *
+	         * @return {WordArray} The processed data.
+	         *
+	         * @example
+	         *
+	         *     var processedData = bufferedBlockAlgorithm._process();
+	         *     var processedData = bufferedBlockAlgorithm._process(!!'flush');
+	         */
+	        _process: function (doFlush) {
+	            // Shortcuts
+	            var data = this._data;
+	            var dataWords = data.words;
+	            var dataSigBytes = data.sigBytes;
+	            var blockSize = this.blockSize;
+	            var blockSizeBytes = blockSize * 4;
+
+	            // Count blocks ready
+	            var nBlocksReady = dataSigBytes / blockSizeBytes;
+	            if (doFlush) {
+	                // Round up to include partial blocks
+	                nBlocksReady = Math.ceil(nBlocksReady);
+	            } else {
+	                // Round down to include only full blocks,
+	                // less the number of blocks that must remain in the buffer
+	                nBlocksReady = Math.max((nBlocksReady | 0) - this._minBufferSize, 0);
+	            }
+
+	            // Count words ready
+	            var nWordsReady = nBlocksReady * blockSize;
+
+	            // Count bytes ready
+	            var nBytesReady = Math.min(nWordsReady * 4, dataSigBytes);
+
+	            // Process blocks
+	            if (nWordsReady) {
+	                for (var offset = 0; offset < nWordsReady; offset += blockSize) {
+	                    // Perform concrete-algorithm logic
+	                    this._doProcessBlock(dataWords, offset);
+	                }
+
+	                // Remove processed words
+	                var processedWords = dataWords.splice(0, nWordsReady);
+	                data.sigBytes -= nBytesReady;
+	            }
+
+	            // Return processed words
+	            return new WordArray.init(processedWords, nBytesReady);
+	        },
+
+	        /**
+	         * Creates a copy of this object.
+	         *
+	         * @return {Object} The clone.
+	         *
+	         * @example
+	         *
+	         *     var clone = bufferedBlockAlgorithm.clone();
+	         */
+	        clone: function () {
+	            var clone = Base.clone.call(this);
+	            clone._data = this._data.clone();
+
+	            return clone;
+	        },
+
+	        _minBufferSize: 0
+	    });
+
+	    /**
+	     * Abstract hasher template.
+	     *
+	     * @property {number} blockSize The number of 32-bit words this hasher operates on. Default: 16 (512 bits)
+	     */
+	    var Hasher = C_lib.Hasher = BufferedBlockAlgorithm.extend({
+	        /**
+	         * Configuration options.
+	         */
+	        cfg: Base.extend(),
+
+	        /**
+	         * Initializes a newly created hasher.
+	         *
+	         * @param {Object} cfg (Optional) The configuration options to use for this hash computation.
+	         *
+	         * @example
+	         *
+	         *     var hasher = CryptoJS.algo.SHA256.create();
+	         */
+	        init: function (cfg) {
+	            // Apply config defaults
+	            this.cfg = this.cfg.extend(cfg);
+
+	            // Set initial values
+	            this.reset();
+	        },
+
+	        /**
+	         * Resets this hasher to its initial state.
+	         *
+	         * @example
+	         *
+	         *     hasher.reset();
+	         */
+	        reset: function () {
+	            // Reset data buffer
+	            BufferedBlockAlgorithm.reset.call(this);
+
+	            // Perform concrete-hasher logic
+	            this._doReset();
+	        },
+
+	        /**
+	         * Updates this hasher with a message.
+	         *
+	         * @param {WordArray|string} messageUpdate The message to append.
+	         *
+	         * @return {Hasher} This hasher.
+	         *
+	         * @example
+	         *
+	         *     hasher.update('message');
+	         *     hasher.update(wordArray);
+	         */
+	        update: function (messageUpdate) {
+	            // Append
+	            this._append(messageUpdate);
+
+	            // Update the hash
+	            this._process();
+
+	            // Chainable
+	            return this;
+	        },
+
+	        /**
+	         * Finalizes the hash computation.
+	         * Note that the finalize operation is effectively a destructive, read-once operation.
+	         *
+	         * @param {WordArray|string} messageUpdate (Optional) A final message update.
+	         *
+	         * @return {WordArray} The hash.
+	         *
+	         * @example
+	         *
+	         *     var hash = hasher.finalize();
+	         *     var hash = hasher.finalize('message');
+	         *     var hash = hasher.finalize(wordArray);
+	         */
+	        finalize: function (messageUpdate) {
+	            // Final message update
+	            if (messageUpdate) {
+	                this._append(messageUpdate);
+	            }
+
+	            // Perform concrete-hasher logic
+	            var hash = this._doFinalize();
+
+	            return hash;
+	        },
+
+	        blockSize: 512/32,
+
+	        /**
+	         * Creates a shortcut function to a hasher's object interface.
+	         *
+	         * @param {Hasher} hasher The hasher to create a helper for.
+	         *
+	         * @return {Function} The shortcut function.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var SHA256 = CryptoJS.lib.Hasher._createHelper(CryptoJS.algo.SHA256);
+	         */
+	        _createHelper: function (hasher) {
+	            return function (message, cfg) {
+	                return new hasher.init(cfg).finalize(message);
+	            };
+	        },
+
+	        /**
+	         * Creates a shortcut function to the HMAC's object interface.
+	         *
+	         * @param {Hasher} hasher The hasher to use in this HMAC helper.
+	         *
+	         * @return {Function} The shortcut function.
+	         *
+	         * @static
+	         *
+	         * @example
+	         *
+	         *     var HmacSHA256 = CryptoJS.lib.Hasher._createHmacHelper(CryptoJS.algo.SHA256);
+	         */
+	        _createHmacHelper: function (hasher) {
+	            return function (message, key) {
+	                return new C_algo.HMAC.init(hasher, key).finalize(message);
+	            };
+	        }
+	    });
+
+	    /**
+	     * Algorithm namespace.
+	     */
+	    var C_algo = C.algo = {};
+
+	    return C;
+	}(Math));
+
+
+	return CryptoJS;
+
+}));
+});
+
+var sha256 = createCommonjsModule(function (module, exports) {
+(function (root, factory) {
+	{
+		// CommonJS
+		module.exports = exports = factory(core);
+	}
+}(commonjsGlobal, function (CryptoJS) {
+
+	(function (Math) {
+	    // Shortcuts
+	    var C = CryptoJS;
+	    var C_lib = C.lib;
+	    var WordArray = C_lib.WordArray;
+	    var Hasher = C_lib.Hasher;
+	    var C_algo = C.algo;
+
+	    // Initialization and round constants tables
+	    var H = [];
+	    var K = [];
+
+	    // Compute constants
+	    (function () {
+	        function isPrime(n) {
+	            var sqrtN = Math.sqrt(n);
+	            for (var factor = 2; factor <= sqrtN; factor++) {
+	                if (!(n % factor)) {
+	                    return false;
+	                }
+	            }
+
+	            return true;
+	        }
+
+	        function getFractionalBits(n) {
+	            return ((n - (n | 0)) * 0x100000000) | 0;
+	        }
+
+	        var n = 2;
+	        var nPrime = 0;
+	        while (nPrime < 64) {
+	            if (isPrime(n)) {
+	                if (nPrime < 8) {
+	                    H[nPrime] = getFractionalBits(Math.pow(n, 1 / 2));
+	                }
+	                K[nPrime] = getFractionalBits(Math.pow(n, 1 / 3));
+
+	                nPrime++;
+	            }
+
+	            n++;
+	        }
+	    }());
+
+	    // Reusable object
+	    var W = [];
+
+	    /**
+	     * SHA-256 hash algorithm.
+	     */
+	    var SHA256 = C_algo.SHA256 = Hasher.extend({
+	        _doReset: function () {
+	            this._hash = new WordArray.init(H.slice(0));
+	        },
+
+	        _doProcessBlock: function (M, offset) {
+	            // Shortcut
+	            var H = this._hash.words;
+
+	            // Working variables
+	            var a = H[0];
+	            var b = H[1];
+	            var c = H[2];
+	            var d = H[3];
+	            var e = H[4];
+	            var f = H[5];
+	            var g = H[6];
+	            var h = H[7];
+
+	            // Computation
+	            for (var i = 0; i < 64; i++) {
+	                if (i < 16) {
+	                    W[i] = M[offset + i] | 0;
+	                } else {
+	                    var gamma0x = W[i - 15];
+	                    var gamma0  = ((gamma0x << 25) | (gamma0x >>> 7))  ^
+	                                  ((gamma0x << 14) | (gamma0x >>> 18)) ^
+	                                   (gamma0x >>> 3);
+
+	                    var gamma1x = W[i - 2];
+	                    var gamma1  = ((gamma1x << 15) | (gamma1x >>> 17)) ^
+	                                  ((gamma1x << 13) | (gamma1x >>> 19)) ^
+	                                   (gamma1x >>> 10);
+
+	                    W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
+	                }
+
+	                var ch  = (e & f) ^ (~e & g);
+	                var maj = (a & b) ^ (a & c) ^ (b & c);
+
+	                var sigma0 = ((a << 30) | (a >>> 2)) ^ ((a << 19) | (a >>> 13)) ^ ((a << 10) | (a >>> 22));
+	                var sigma1 = ((e << 26) | (e >>> 6)) ^ ((e << 21) | (e >>> 11)) ^ ((e << 7)  | (e >>> 25));
+
+	                var t1 = h + sigma1 + ch + K[i] + W[i];
+	                var t2 = sigma0 + maj;
+
+	                h = g;
+	                g = f;
+	                f = e;
+	                e = (d + t1) | 0;
+	                d = c;
+	                c = b;
+	                b = a;
+	                a = (t1 + t2) | 0;
+	            }
+
+	            // Intermediate hash value
+	            H[0] = (H[0] + a) | 0;
+	            H[1] = (H[1] + b) | 0;
+	            H[2] = (H[2] + c) | 0;
+	            H[3] = (H[3] + d) | 0;
+	            H[4] = (H[4] + e) | 0;
+	            H[5] = (H[5] + f) | 0;
+	            H[6] = (H[6] + g) | 0;
+	            H[7] = (H[7] + h) | 0;
+	        },
+
+	        _doFinalize: function () {
+	            // Shortcuts
+	            var data = this._data;
+	            var dataWords = data.words;
+
+	            var nBitsTotal = this._nDataBytes * 8;
+	            var nBitsLeft = data.sigBytes * 8;
+
+	            // Add padding
+	            dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
+	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
+	            data.sigBytes = dataWords.length * 4;
+
+	            // Hash final blocks
+	            this._process();
+
+	            // Return final computed hash
+	            return this._hash;
+	        },
+
+	        clone: function () {
+	            var clone = Hasher.clone.call(this);
+	            clone._hash = this._hash.clone();
+
+	            return clone;
+	        }
+	    });
+
+	    /**
+	     * Shortcut function to the hasher's object interface.
+	     *
+	     * @param {WordArray|string} message The message to hash.
+	     *
+	     * @return {WordArray} The hash.
+	     *
+	     * @static
+	     *
+	     * @example
+	     *
+	     *     var hash = CryptoJS.SHA256('message');
+	     *     var hash = CryptoJS.SHA256(wordArray);
+	     */
+	    C.SHA256 = Hasher._createHelper(SHA256);
+
+	    /**
+	     * Shortcut function to the HMAC's object interface.
+	     *
+	     * @param {WordArray|string} message The message to hash.
+	     * @param {WordArray|string} key The secret key.
+	     *
+	     * @return {WordArray} The HMAC.
+	     *
+	     * @static
+	     *
+	     * @example
+	     *
+	     *     var hmac = CryptoJS.HmacSHA256(message, key);
+	     */
+	    C.HmacSHA256 = Hasher._createHmacHelper(SHA256);
+	}(Math));
+
+
+	return CryptoJS.SHA256;
+
+}));
+});
 
 /**
  * HashCommand class for file & stream hashing.
@@ -12596,14 +13895,14 @@ var HashCommand = function (_FetchCommand) {
     value: function () {
       var _ref = _asyncToGenerator(index.mark(function _callee() {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var fetchHash, runResponse, stream, file, hash, otherOptions;
+        var fetchHash, runResponse, stream, file, string, hash, otherOptions;
         return index.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 fetchHash = void 0;
                 runResponse = void 0;
-                stream = options.stream, file = options.file, hash = options.hash, otherOptions = _objectWithoutProperties(options, ['stream', 'file', 'hash']);
+                stream = options.stream, file = options.file, string = options.string, hash = options.hash, otherOptions = _objectWithoutProperties(options, ['stream', 'file', 'string', 'hash']);
                 _context.prev = 3;
 
                 if (!stream) {
@@ -12616,7 +13915,7 @@ var HashCommand = function (_FetchCommand) {
 
               case 7:
                 fetchHash = _context.sent;
-                _context.next = 21;
+                _context.next = 27;
                 break;
 
               case 10:
@@ -12630,31 +13929,46 @@ var HashCommand = function (_FetchCommand) {
 
               case 13:
                 fetchHash = _context.sent;
-                _context.next = 21;
+                _context.next = 27;
                 break;
 
               case 16:
+                if (!string) {
+                  _context.next = 22;
+                  break;
+                }
+
+                _context.next = 19;
+                return this.getStringHash(string);
+
+              case 19:
+                fetchHash = _context.sent;
+                _context.next = 27;
+                break;
+
+              case 22:
                 if (!hash) {
-                  _context.next = 20;
+                  _context.next = 26;
                   break;
                 }
 
                 fetchHash = hash;
-                _context.next = 21;
+                _context.next = 27;
                 break;
 
-              case 20:
+              case 26:
                 throw new TypeError('None of the required parameters was found');
 
-              case 21:
+              case 27:
+                console.log('otherOptions', options, otherOptions);
                 runResponse = this.fetch(_extends$1({
                   hash: fetchHash
                 }, otherOptions));
-                _context.next = 30;
+                _context.next = 37;
                 break;
 
-              case 24:
-                _context.prev = 24;
+              case 31:
+                _context.prev = 31;
                 _context.t0 = _context['catch'](3);
 
                 this._map.get(this).error = true;
@@ -12662,15 +13976,15 @@ var HashCommand = function (_FetchCommand) {
                 this.emit('error', _context.t0, this);
                 throw _context.t0;
 
-              case 30:
+              case 37:
                 return _context.abrupt('return', runResponse);
 
-              case 31:
+              case 38:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[3, 24]]);
+        }, _callee, this, [[3, 31]]);
       }));
 
       function run() {
@@ -12702,7 +14016,7 @@ var HashCommand = function (_FetchCommand) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return index$12.fromStream(stream, {
+                return index$14.fromStream(stream, {
                   algorithm: 'sha256'
                 });
 
@@ -12741,7 +14055,7 @@ var HashCommand = function (_FetchCommand) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return index$12.fromFile(filepath, {
+                return index$14.fromFile(filepath, {
                   algorithm: 'sha256'
                 });
 
@@ -12763,10 +14077,23 @@ var HashCommand = function (_FetchCommand) {
 
       return getFileHash;
     }()
+
+    /**
+     * Get SHA256 from string. Useful in browser
+     * @param string
+     * @returns {string}
+     */
+
+  }, {
+    key: 'getStringHash',
+    value: function getStringHash(string) {
+      var hash = sha256(string);
+      return hash;
+    }
   }, {
     key: 'hashStream',
     get: function get() {
-      return index$12.stream({
+      return index$14.stream({
         algorithm: 'sha256'
       });
     }
@@ -13113,9 +14440,9 @@ var fetch = function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            command = new Command('fetch', params);
+            command = new FetchCommand(params);
             _context.next = 3;
-            return command.do(params);
+            return command.run(params);
 
           case 3:
             answer = _context.sent;
@@ -13134,5 +14461,34 @@ var fetch = function () {
   };
 }();
 
-export { TmLabs$1 as TmLabs, Command, fetch, FetchCommand };export default TmLabs$1;
+var hash = function () {
+  var _ref2 = _asyncToGenerator(index.mark(function _callee2(params) {
+    var command, answer;
+    return index.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            console.log('hash', params);
+            command = new HashCommand();
+            _context2.next = 4;
+            return command.run(params);
+
+          case 4:
+            answer = _context2.sent;
+            return _context2.abrupt('return', answer);
+
+          case 6:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, _this);
+  }));
+
+  return function hash(_x2) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+export { TmLabs$1 as TmLabs, Command, fetch, hash, FetchCommand, HashCommand };export default TmLabs$1;
 //# sourceMappingURL=tmlabs.es.js.map

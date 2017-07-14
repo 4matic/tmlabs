@@ -1,6 +1,6 @@
 import EventEmitter from 'smelly-event-emitter'
+import Q from 'q'
 import PQueue from 'p-queue'
-import PAll from 'p-all'
 import Command from './Command'
 import FetchCommand from './command/FetchCommand'
 // import * as Constants from './constant';
@@ -19,45 +19,29 @@ export default class TmLabs extends EventEmitter {
       queue,
       history
     })
+    this.on('resolved', (command) => {
+      this._map.get(this).history.push(command)
+    })
   }
 
   /**
    *
    * @param {{command: string, params: object}} commands Array of command objects which contain command key and it params key for command run options
    * @param options
-   * @returns {Promise.<Array>}
+   * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
    */
   async runBatch (commands = [], options = {}) {
     let batchResponse = []
-    if (!options.throw) { // get array of results including errors
-      for (let i = 0; i < commands.length; i++) {
-        const commandObj = commands[i]
-        try {
-          if (!commandObj) throw new TypeError('Empty command')
-          if (typeof commandObj !== 'object') throw new ReferenceError('Invalid command type')
-          if (!commandObj.command) throw new TypeError("Empty required param 'method'")
-          const command = commandObj.command
-          // if (!Object.values(methods).includes(command.method)) throw new TypeError('Only command instance could be')
-          const response = await this.runCommand(command, commandObj.params)
-          batchResponse.push(response)
-        } catch (e) {
-          batchResponse.push({
-            error: true,
-            errorText: e.message
-          })
-        }
-      }
-    } else {
-      let promises = []
-      commands.forEach((commandObj) => {
-        if (!commandObj) throw new TypeError('Empty command')
-        if (typeof commandObj !== 'object') throw new ReferenceError('Invalid command type')
-        if (!commandObj.command) throw new TypeError("Empty required param 'method'")
-        const command = commandObj.command
-        promises.push(() => this.runCommand(command, commandObj.params))
-      })
-      batchResponse = await PAll(promises, {concurrency: this.limit})
-    }
+    let promises = []
+    commands.forEach((commandObj) => {
+      if (!commandObj) throw new TypeError('Empty command')
+      if (typeof commandObj !== 'object') throw new ReferenceError('Invalid command type')
+      if (!commandObj.command) throw new TypeError("Empty required param 'method'")
+      const command = commandObj.command
+      promises.push(this.runCommand(command, commandObj.params))
+    })
+    if (!options.throw) batchResponse = await Q.allSettled(promises)
+    else batchResponse = await Q.all(promises)
     return batchResponse
   }
 
@@ -66,32 +50,19 @@ export default class TmLabs extends EventEmitter {
    * @param {string} method API method dns|ip, etc
    * @param {[object]} objects array of request parameters
    * @param options additional options
-   * @returns {Promise.<Array>}
+   * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
    */
   async fetchBatch (method, objects = [], options = {}) {
     let batchResponse = []
     const methods = FetchCommand.getMethods()
     if (!method) throw new TypeError("Empty required param 'method'")
     if (!Object.values(methods).includes(method)) throw new TypeError('Invalid method param')
-    if (!options.throw) { // get array of results including errors
-      for (let i = 0; i < objects.length; i++) {
-        try {
-          const response = await this.fetch(method, objects[i])
-          batchResponse.push(response)
-        } catch (e) {
-          batchResponse.push({
-            error: true,
-            errorText: e.message
-          })
-        }
-      }
-    } else {
-      let promises = []
-      objects.forEach((params) => {
-        promises.push(this.fetch(method, params))
-      })
-      batchResponse = await PAll(promises, {concurrency: this.limit})
-    }
+    let promises = []
+    objects.forEach((params) => {
+      promises.push(this.fetch(method, params))
+    })
+    if (!options.throw) batchResponse = await Q.allSettled(promises)
+    else batchResponse = await Q.all(promises)
     return batchResponse
   }
 
@@ -115,23 +86,27 @@ export default class TmLabs extends EventEmitter {
    * @param params command params
    * @returns {Promise}
    */
-  async runCommand (command, params) {
-    this._map.get(this).history.push(command)
-    this.emit('command', command, params)
-    command.on('error', (error, cmd) => {
-      this.emit('error', error, cmd)
+  runCommand (command, params) {
+    return new Promise((resolve, reject) => {
+      this.emit('command', command, params)
+      command.on('error', (error, cmd) => {
+        this.emit('error', error, cmd)
+        reject(error)
+      })
+      command.on('fetch', (options, cmd) => {
+        this.emit('fetch', cmd, options)
+      })
+      command.on('response', (response, cmd) => {
+        this.emit('response', cmd, response)
+      })
+      command.on('raw_response', (response, cmd) => {
+        this.emit('raw_response', cmd, response)
+      })
+      this._map.get(this).queue.add(() => command.run(params).then((response) => {
+        this.emit('resolved', command, response)
+        resolve(response)
+      }))
     })
-    command.on('fetch', (options, cmd) => {
-      this.emit('fetch', cmd, options)
-    })
-    command.on('response', (response, cmd) => {
-      this.emit('response', cmd, response)
-    })
-    command.on('raw_response', (response, cmd) => {
-      this.emit('raw_response', cmd, response)
-    })
-    const answer = command.run(params)
-    return answer
   }
 
   get history () {

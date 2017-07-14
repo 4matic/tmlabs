@@ -14,20 +14,20 @@ describe('Class Tests', () => {
   it('Multiple requests. domain requests. throw error for invalid domains', async () => {
     const tmLabs = new TmLabs()
     const domains = ['google.com', 'facebook.com', 'ibm.com', 'example.com', 'assadasf', '127.0.0.1']
+    let results
     try {
-      await tmLabs.fetchBatch('dns', domains.map(domain => ({
+      results = await tmLabs.fetchBatch('dns', domains.map(domain => ({
         domain: domain
       })), {throw: true})
     } catch (e) {
-      assert.instanceOf(e, TypeError)
+      assert.isUndefined(results)
       assert.equal(e.message, 'Method required param \'domain\' validation error', 'exception message')
     }
   })
   it('Multiple requests. domain requests. invalid domains error in result array', async () => {
     const tmLabs = new TmLabs()
     const domains = ['google.com', 'facebook.com', 'ibm.com', 'example.com', 'assadasf', '127.0.0.1']
-    let results
-    results = await tmLabs.fetchBatch('dns', domains.map(domain => ({
+    const results = await tmLabs.fetchBatch('dns', domains.map(domain => ({
       domain: domain
     })))
     assert.lengthOf(results, 6)
@@ -52,6 +52,33 @@ describe('Class Tests', () => {
       params: command[1]
     })))
     assert.lengthOf(results, 3)
-    assert.equal(results[0].error, true)
+    assert.equal(results[0].state, 'rejected')
+    assert.instanceOf(results[0].reason, Error)
+  })
+  it('Multiple commands. fetch commands. error in results array', async () => {
+    const tmLabs = new TmLabs()
+    let results
+    const commands = [[new FetchCommand({
+      method: 'ip'
+    }), {
+      ip: '127.0.0.1'
+    }], [new FetchCommand({
+      method: 'ip'
+    }), {
+      ip: '173.194.122.233'
+    }], [new Command('fetch', {
+      method: 'ip'
+    }), {
+      ip: '173.194.122.234'
+    }]]
+    try {
+      results = await tmLabs.runBatch(commands.map(command => ({
+        command: command[0],
+        params: command[1]
+      })), { throw: true })
+    } catch (e) {
+      assert.isUndefined(results)
+      assert.equal(e.message, 'Incorrect IPv4 address', 'exception message')
+    }
   })
 })

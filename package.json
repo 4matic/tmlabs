@@ -113,7 +113,9 @@
     "isomorphic-fetch": "^2.2.1",
     "p-all": "^1.0.0",
     "p-cancelable": "^0.3.0",
+    "p-finally": "^1.0.0",
     "p-queue": "^1.1.0",
+    "q": "^1.5.0",
     "smelly-event-emitter": "^0.1.1",
     "validator": "^8.0.0"
   }

@@ -42,10 +42,34 @@ export default class FetchCommand extends AbstractCommand {
     this._map.get(this).method = method
     this._map.get(this).headers = {}
     this._map.get(this).args = []
+    this._map.get(this).rawArgs = []
 
     this._map.get(this).balance_remaining = undefined
     this._map.get(this).balance_lastbill = undefined
     this._map.get(this).balance_reset = undefined
+  }
+  static getMethods () {
+    return endpoint
+  }
+  static getMethodSpecifications (method = false) {
+    const methods = FetchCommand.getMethods()
+    const newMethods = {}
+    const getOneMethodData = (method) => {
+      const args = argument[method]
+      const spec = specification[method]
+      const methodData = {}
+      if (spec) methodData.spec = spec
+      if (args) methodData.args = args
+      else methodData.args = []
+      return methodData
+    }
+    if (!method) {
+      Object.values(methods).forEach((method) => {
+        const data = getOneMethodData(method)
+        newMethods[method] = data
+      })
+    } else return getOneMethodData(method)
+    return newMethods
   }
   _checkArguments (data) {
     if (typeof data !== 'object') throw new TypeError(`Method params should be an object`)
@@ -139,7 +163,9 @@ export default class FetchCommand extends AbstractCommand {
       options.method = method
       // console.log(options)
       this.emit('fetch', options, this)
+      this._map.get(this).pending = true
       const response = await fetchFunc(url, options)
+      this._map.get(this).pending = false
       this.emit('raw_response', response, this)
       return response
     } catch (err) {
@@ -148,29 +174,6 @@ export default class FetchCommand extends AbstractCommand {
       this.emit('error', err, this)
       throw err
     }
-  }
-  static getMethodSpecifications (method = false) {
-    const methods = FetchCommand.getMethods()
-    const newMethods = {}
-    const getOneMethodData = (method) => {
-      const args = argument[method]
-      const spec = specification[method]
-      const methodData = {}
-      if (spec) methodData.spec = spec
-      if (args) methodData.args = args
-      else methodData.args = []
-      return methodData
-    }
-    if (!method) {
-      Object.values(methods).forEach((method) => {
-        const data = getOneMethodData(method)
-        newMethods[method] = data
-      })
-    } else return getOneMethodData(method)
-    return newMethods
-  }
-  static getMethods () {
-    return endpoint
   }
   set method (method) {
     if (!method) {
@@ -190,6 +193,7 @@ export default class FetchCommand extends AbstractCommand {
     let fetchResponse
     try {
       // console.log('FETCH', options);
+      this._map.get(this).rawArgs = options
       const args = this._checkArguments(options)
       params = {
         method
@@ -258,8 +262,21 @@ export default class FetchCommand extends AbstractCommand {
   get headers () {
     return this._map.get(this).headers
   }
+
+  /**
+   * Get checked command arguments.
+   * @returns {[{arg: string, val: *}]}
+   */
   get args () {
     return this._map.get(this).args
+  }
+
+  /**
+   * Get raw args. Fetch command args
+   * @returns {Array}
+   */
+  get rawArgs () {
+    return this._map.get(this).rawArgs
   }
   get content () {
     return this._map.get(this).content
@@ -284,6 +301,9 @@ export default class FetchCommand extends AbstractCommand {
   }
   get balanceReset () {
     return this._map.get(this).balance_reset
+  }
+  get pending () {
+    return this._map.get(this).pending
   }
   get url () {
     const parts = [this.api_url, 'api', this.version, this.method]

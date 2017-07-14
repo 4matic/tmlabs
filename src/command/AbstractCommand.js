@@ -16,6 +16,7 @@ export default class AbstractCommand extends EventEmitter {
     this._map = new WeakMap()
     this._map.set(this, {
       action,
+      pending: false,
       params
     })
   }

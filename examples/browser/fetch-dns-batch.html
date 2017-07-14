@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fetch DNS Batch Example - TempicoLabs SDK</title>
+    <style>
+      .error,
+      .request,
+      .balance,
+      .response {
+        padding: 5px 15px;
+        display: block;
+      }
+      .response {
+        background: #ccc;
+      }
+      .error {
+        background: #ba2535;
+        margin-bottom: 10px;
+      }
+      .request {
+        color: #e8e8e8;
+        background: #26aa57;
+        margin: 5px 0 0;
+      }
+      .group {
+        border: 1px solid #ccc;
+        padding: 10px 15px 15px;
+        margin: 15px 0;
+      }
+      .balance {
+        color: #e8e8e8;
+        background: #287da8;
+      }
+    </style>
+</head>
+<body>
+  <div id="response"></div>
+  <script src="../../dist/tmlabs.min.js"></script>
+  <script>
+    var $response = document.getElementById('response')
+    var timer = 0
+    var tmLabs = new TmLabs['default']({
+      limit: 2 // only 2 requests can do at the same time
+    })
+    var pendingTimerId = setInterval(function () {
+      timer+=(0.1)
+      console.log('[ PENDING REQUESTS: ]', tmLabs.pending)
+    }, 100)
+
+    tmLabs.on('error', function (error, command) {
+      $response.innerHTML += (
+        '<div class="error"><strong>Arguments:</strong> ' + JSON.stringify(command.rawArgs) + '<br/> <strong>Error:</strong> <code>' + JSON.stringify(error.message) + '</code></div>'
+      )
+      console.error("[ ERROR '" + command.method + "' ]", command)
+    })
+    tmLabs.on('response', function (command, response) {
+      console.info("[ RESPONSE '" + command.method + "' ]", response.content)
+      console.log('[ BALANCE ]', command.balanceRemaining) // return Remaining Balance
+    })
+    tmLabs.on('command', function (command, args) {
+      console.log("[ COMMAND '" + command.method + "' ] history size: ", tmLabs.history.length, ', pending: ', tmLabs.pending) // get array of one completed commands
+    })
+    tmLabs.on('resolved', function (command, args) {
+      $response.innerHTML += (
+        '<div class="group"><h3 class="request">Resolved request: [ <span>' + timer.toPrecision(1) + 's</span> ]</h3>' +
+        '<h5 class="balance">remaining: ' + command.balanceRemaining + '€</h5>' +
+        '<div class="response"><strong>Arguments:</strong> ' + JSON.stringify(command.rawArgs) + '<br/> <strong>Response:</strong> <code>' + JSON.stringify(command.content) + '</code></div></div>'
+      )
+      console.log("[ RESOLVED '" + command.method + "' ] history size: ", tmLabs.history.length, ', pending: ', tmLabs.pending) // get array of one completed commands
+    })
+    var domains = ['google.com', 'facebook.com', 'ibm.com', 'example.com', 'assadasf', '127.0.0.1', 'www.www']
+    tmLabs.fetchBatch('dns', domains.map(function (domain) {
+      return {
+        domain: domain
+      }
+    })).then(function (responses) {
+      console.log('[ RESPONSES ]', responses)
+      console.log('History after DNS command batch. history size: ', tmLabs.history.length) // get array of one completed command
+      clearInterval(pendingTimerId)
+    })
+    $response.innerHTML += ('<h3>Requests start. Pending request number: ' + tmLabs.pending + '</h3>')
+    console.log('History with one pending request. history size: ', tmLabs.history.length, ', pending: ', tmLabs.pending) // get array of one pending command in history
+  </script>
+</body>
+</html>

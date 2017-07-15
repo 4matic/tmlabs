@@ -6,8 +6,15 @@ import { endpoint } from '../constant'
 /**
  * HashCommand class for file & stream hashing.
  * Run method sends hash to API
+ * @class HashCommand
+ * @extends FetchCommand
  */
-export default class HashCommand extends FetchCommand {
+class HashCommand extends FetchCommand {
+  /**
+   * @constructor
+   * @param params
+   * @param {string} params.key - API key.
+   */
   constructor (params) {
     super({
       method: endpoint.HASH,
@@ -17,7 +24,11 @@ export default class HashCommand extends FetchCommand {
 
   /**
    * Get file or stream hash and check it by sending request to API
+   * @member HashCommand#run
    * @param {{stream: Stream}|{file: string}|{hash: string}} options
+   * @fulfil {Object}
+   * @reject {Error}
+   * @throws {InsufficientFundsError}
    * @returns {Promise}
    */
   async run (options = {}) {
@@ -46,6 +57,8 @@ export default class HashCommand extends FetchCommand {
   /**
    * Get Hash transform object
    * @see {@link https://nodejs.org/api/crypto.html#crypto_class_hash}
+   * @member HashCommand#hashStream
+   * @returns {string}
    */
   get hashStream () {
     return Hasha.stream({
@@ -56,6 +69,7 @@ export default class HashCommand extends FetchCommand {
   /**
    * Get hash passing stream as parameter
    * @param {Stream} stream Stream object
+   * @member HashCommand#getStreamHash
    * @returns {Promise}
    */
   async getStreamHash (stream) {
@@ -68,6 +82,7 @@ export default class HashCommand extends FetchCommand {
   /**
    * Get hash passing only file path
    * @param {string} filepath
+   * @member HashCommand#getFileHash
    * @returns {Promise}
    */
   async getFileHash (filepath) {
@@ -79,7 +94,8 @@ export default class HashCommand extends FetchCommand {
 
   /**
    * Get SHA256 from string. Useful in browser
-   * @param string
+   * @param {string} string
+   * @member HashCommand#getStringHash
    * @returns {string}
    */
   getStringHash (string) {
@@ -87,3 +103,5 @@ export default class HashCommand extends FetchCommand {
     return hash
   }
 }
+
+export default HashCommand

@@ -18,10 +18,64 @@
 //
 // @app.route('/api/status', methods=['GET'])
 
+/**
+ * @module endpoint
+ * @desc Endpoint constants
+ * @memberOf module:constants
+ */
+
+/**
+ * IP
+ * @type {string}
+ * @constant
+ * @default ip
+ */
 export const IP = 'ip'
+
+/**
+ * Hash
+ * @type {string}
+ * @constant
+ * @default hash
+ */
 export const HASH = 'hash'
+
+/**
+ * Scan
+ * @type {string}
+ * @constant
+ * @default scan
+ */
 export const SCAN = 'scan'
+
+/**
+ * Status
+ * @type {string}
+ * @constant
+ * @default status
+ */
 export const STATUS = 'status'
+
+/**
+ * DNS
+ * @type {string}
+ * @constant
+ * @default dns
+ */
 export const DNS = 'dns'
+
+/**
+ * Me. Data about myself
+ * @type {string}
+ * @constant
+ * @default me
+ */
 export const ME = 'me'
+
+/**
+ * Email Leaks
+ * @type {string}
+ * @constant
+ * @default email/leaks
+ */
 export const EMAIL_LEAKS = 'email/leaks'

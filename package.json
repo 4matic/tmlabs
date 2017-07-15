@@ -17,6 +17,7 @@
     "build:umd": "rollup -c -f umd -o dist/tmlabs.umd.js",
     "build:browser": "rollup -c --environment production -f umd -o dist/tmlabs.min.js",
     "build:es": "rollup -c -f es -o dist/tmlabs.es.js",
+    "docs:api": "jsdoc2md --configure docs/jsdoc.json --files src/*.js src/**/*.js > docs/api.md",
     "test": "mocha",
     "test:watch": "npm run test -- --reporter min --watch",
     "precommit": "lint-staged"
@@ -93,6 +94,8 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "husky": "^0.14.3",
+    "jsdoc-babel": "^0.3.0",
+    "jsdoc-to-markdown": "^3.0.0",
     "lint-staged": "^4.0.0",
     "minimist": "^1.2.0",
     "mocha": "^3.4.2",

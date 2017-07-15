@@ -3,9 +3,18 @@ import Q from 'q'
 import PQueue from 'p-queue'
 import Command from './Command'
 import FetchCommand from './command/FetchCommand'
-// import * as Constants from './constant';
 
+/**
+ * Main TmLabs class.
+ * @module TmLabs
+ * @class
+ * @extends EventEmitter
+ */
 export default class TmLabs extends EventEmitter {
+  /**
+   * @param {Object} [options] - The options object
+   * @constructor
+   */
   constructor (options) {
     super()
     const key = options && options.key ? options.key : false
@@ -28,10 +37,12 @@ export default class TmLabs extends EventEmitter {
   }
 
   /**
-   *
-   * @param {{command: string, params: object}} commands Array of command objects which contain command key and it params key for command run options
-   * @param options
-   * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
+   * Run commands
+   * @param {Array.<Object>} commands Array of command objects which contain command key and it params key for command run options
+   * @param {Object} [options] Batch command options
+   * @param {Boolean} [options.throw=false] If true command will throw exceptions
+   * @member TmLabs#runBatch
+   * @returns {Promise}
    */
   async runBatch (commands = [], options = {}) {
     let batchResponse = []
@@ -51,9 +62,10 @@ export default class TmLabs extends EventEmitter {
   /**
    * Fetch specific method multiple times with different params
    * @param {string} method API method dns|ip, etc
-   * @param {[object]} objects array of request parameters
+   * @param {Object[]} objects array of request parameters
    * @param options additional options
-   * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
+   * @member TmLabs#fetchBatch
+   * @returns {Promise}
    */
   async fetchBatch (method, objects = [], options = {}) {
     let batchResponse = []
@@ -73,6 +85,7 @@ export default class TmLabs extends EventEmitter {
    * Fetch specific method
    * @param {string} method API method dns|ip, etc
    * @param {object} params method parameters
+   * @member TmLabs#fetch
    * @returns {Promise}
    */
   fetch (method, params = {}) {
@@ -87,7 +100,9 @@ export default class TmLabs extends EventEmitter {
    * Run command with params
    * @param {Command} command
    * @param params command params
-   * @returns {Promise}
+   * @member TmLabs#runCommand
+   * @resolves {Array.<Object>} result
+   * @returns {Promise} result
    */
   runCommand (command, params) {
     let newParams = params
@@ -119,14 +134,17 @@ export default class TmLabs extends EventEmitter {
 
   /**
    * History array return
-   * @returns {Array}
+   * @member TmLabs#history
+   * @returns {AbstractCommand[]}
    */
   get history () {
     return this._map.get(this).history
   }
 
   /**
-   * Active key for TmLabs Object
+   * Active token for TmLabs Object.
+   * Overrides if passed into params of [FetchCommand Class]{@link FetchCommand} <code>key</code> or
+   * @member TmLabs#key
    * @returns {string}
    */
   get key () {
@@ -135,6 +153,7 @@ export default class TmLabs extends EventEmitter {
 
   /**
    * Get number of simultaneously requests
+   * @member TmLabs#limit
    * @returns {number}
    */
   get limit () {
@@ -143,18 +162,39 @@ export default class TmLabs extends EventEmitter {
 
   /**
    * Get number of pending requests
+   * @member TmLabs#pending
    * @returns {number}
    */
   get pending () {
     return this._map.get(this).queue.pending
   }
 
+  /**
+   * Remaining balance
+   * @member TmLabs#balanceRemaining
+   * @see {@link FetchCommand#balanceRemaining}
+   * @returns {double|undefined}
+   */
   get balanceRemaining () {
     return this._map.get(this).balance_remaining
   }
+
+  /**
+   * Last billing cost
+   * @member TmLabs#balanceLastbill
+   * @see {@link FetchCommand#balanceLastbill}
+   * @returns {double|undefined}
+   */
   get balanceLastbill () {
     return this._map.get(this).balance_lastbill
   }
+
+  /**
+   * Returns number of seconds before free key credits renew
+   * @member TmLabs#balanceReset
+   * @see {@link FetchCommand#balanceReset}
+   * @returns {undefined|double}
+   */
   get balanceReset () {
     return this._map.get(this).balance_reset
   }

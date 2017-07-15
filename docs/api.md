@@ -1,0 +1,1084 @@
+## Modules
+
+<dl>
+<dt><a href="#module_TmLabs">TmLabs</a></dt>
+<dd><p>SDK Available Globals.
+Default export is Main TmLabs object class.</p>
+</dd>
+<dt><a href="#module_command">command</a></dt>
+<dd><p>Commands module</p>
+</dd>
+<dt><a href="#module_constants.module_argument">argument</a></dt>
+<dd><p>Endpoint specifications object</p>
+</dd>
+<dt><a href="#module_constants.module_endpoint">endpoint</a></dt>
+<dd><p>Endpoint constants</p>
+</dd>
+<dt><a href="#module_error">error</a></dt>
+<dd><p>SDK errors</p>
+</dd>
+<dt><a href="#module_constants">constants</a></dt>
+<dd><p>SDK constants</p>
+</dd>
+<dt><a href="#module_specification">specification</a></dt>
+<dd><p>Endpoint specifications object</p>
+</dd>
+</dl>
+
+## Classes
+
+<dl>
+<dt><a href="#Command">Command</a> ⇐ <code><a href="#AbstractCommand">AbstractCommand</a></code></dt>
+<dd></dd>
+<dt><a href="#TmLabs">TmLabs</a> ⇐ <code>EventEmitter</code></dt>
+<dd></dd>
+<dt><a href="#AbstractCommand">AbstractCommand</a> ⇐ <code>EventEmitter</code></dt>
+<dd></dd>
+<dt><a href="#FetchCommand">FetchCommand</a> ⇐ <code><a href="#AbstractCommand">AbstractCommand</a></code></dt>
+<dd></dd>
+<dt><a href="#HashCommand">HashCommand</a> ⇐ <code><a href="#FetchCommand">FetchCommand</a></code></dt>
+<dd></dd>
+<dt><a href="#StatusCommand">StatusCommand</a> ⇐ <code><a href="#FetchCommand">FetchCommand</a></code></dt>
+<dd></dd>
+</dl>
+
+## Members
+
+<dl>
+<dt><a href="#AbstractCommand">AbstractCommand</a></dt>
+<dd></dd>
+</dl>
+
+<a name="module_TmLabs"></a>
+
+## TmLabs
+SDK Available Globals.
+Default export is Main TmLabs object class.
+
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| TmLabs | [<code>TmLabs</code>](#TmLabs) | Main object TmLabs class |
+| Command | [<code>Command</code>](#Command) | Main Command object class |
+| FetchCommand | [<code>FetchCommand</code>](#FetchCommand) | FetchCommand object class |
+| HashCommand | [<code>HashCommand</code>](#HashCommand) | HashCommand object class |
+| StatusCommand | [<code>StatusCommand</code>](#StatusCommand) | StatusCommand object class |
+
+**Example**  
+```js
+// returns specific classes from package module
+import { HashCommand as HashClass } '@tempicolabs/tmlabs'
+```
+**Example**  
+```js
+// returns default TmLabs main object class
+import TmLabs '@tempicolabs/tmlabs'
+```
+
+* [TmLabs](#module_TmLabs)
+    * [.fetch](#module_TmLabs.fetch) ⇒ <code>Promise</code>
+    * [.hash](#module_TmLabs.hash) ⇒ <code>Promise</code>
+
+<a name="module_TmLabs.fetch"></a>
+
+### TmLabs.fetch ⇒ <code>Promise</code>
+Simple fetch function
+
+**Kind**: static property of [<code>TmLabs</code>](#module_TmLabs)  
+
+| Param |
+| --- |
+| params | 
+
+<a name="module_TmLabs.hash"></a>
+
+### TmLabs.hash ⇒ <code>Promise</code>
+Simple hash function
+
+**Kind**: static property of [<code>TmLabs</code>](#module_TmLabs)  
+
+| Param |
+| --- |
+| params | 
+
+<a name="module_command"></a>
+
+## command
+Commands module
+
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| Fetch | [<code>FetchCommand</code>](#FetchCommand) | FetchCommand class |
+| Hash | [<code>HashCommand</code>](#HashCommand) | HashCommand class |
+| Status | [<code>StatusCommand</code>](#StatusCommand) | StatusCommand class |
+
+<a name="module_constants.module_argument"></a>
+
+## argument
+Endpoint specifications object
+
+**Read only**: true  
+<a name="module_constants.module_endpoint"></a>
+
+## endpoint
+Endpoint constants
+
+
+* [endpoint](#module_constants.module_endpoint)
+    * [~IP](#module_constants.module_endpoint..IP) : <code>string</code>
+    * [~HASH](#module_constants.module_endpoint..HASH) : <code>string</code>
+    * [~SCAN](#module_constants.module_endpoint..SCAN) : <code>string</code>
+    * [~STATUS](#module_constants.module_endpoint..STATUS) : <code>string</code>
+    * [~DNS](#module_constants.module_endpoint..DNS) : <code>string</code>
+    * [~ME](#module_constants.module_endpoint..ME) : <code>string</code>
+    * [~EMAIL_LEAKS](#module_constants.module_endpoint..EMAIL_LEAKS) : <code>string</code>
+
+<a name="module_constants.module_endpoint..IP"></a>
+
+### endpoint~IP : <code>string</code>
+IP
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;ip&quot;</code>  
+<a name="module_constants.module_endpoint..HASH"></a>
+
+### endpoint~HASH : <code>string</code>
+Hash
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;hash&quot;</code>  
+<a name="module_constants.module_endpoint..SCAN"></a>
+
+### endpoint~SCAN : <code>string</code>
+Scan
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;scan&quot;</code>  
+<a name="module_constants.module_endpoint..STATUS"></a>
+
+### endpoint~STATUS : <code>string</code>
+Status
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;status&quot;</code>  
+<a name="module_constants.module_endpoint..DNS"></a>
+
+### endpoint~DNS : <code>string</code>
+DNS
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;dns&quot;</code>  
+<a name="module_constants.module_endpoint..ME"></a>
+
+### endpoint~ME : <code>string</code>
+Me. Data about myself
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;me&quot;</code>  
+<a name="module_constants.module_endpoint..EMAIL_LEAKS"></a>
+
+### endpoint~EMAIL_LEAKS : <code>string</code>
+Email Leaks
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;email/leaks&quot;</code>  
+<a name="module_error"></a>
+
+## error
+SDK errors
+
+
+* [error](#module_error)
+    * [~InsufficientFundsError](#module_error..InsufficientFundsError)
+        * [new InsufficientFundsError()](#new_module_error..InsufficientFundsError_new)
+
+<a name="module_error..InsufficientFundsError"></a>
+
+### error~InsufficientFundsError
+**Kind**: inner class of [<code>error</code>](#module_error)  
+<a name="new_module_error..InsufficientFundsError_new"></a>
+
+#### new InsufficientFundsError()
+Error for insufficient funds
+
+<a name="module_constants"></a>
+
+## constants
+SDK constants
+
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| endpoint | <code>Object</code> | Endpoint constants |
+| argument | <code>Object</code> | Endpoint arguments |
+| specification | <code>Object</code> | Endpoint specifications |
+| error | <code>Object</code> | SDK Errors |
+
+<a name="module_specification"></a>
+
+## specification
+Endpoint specifications object
+
+**Read only**: true  
+<a name="Command"></a>
+
+## Command ⇐ [<code>AbstractCommand</code>](#AbstractCommand)
+**Kind**: global class  
+**Extends**: [<code>AbstractCommand</code>](#AbstractCommand)  
+
+* [Command](#Command) ⇐ [<code>AbstractCommand</code>](#AbstractCommand)
+    * [new Command()](#new_Command_new)
+    * [.getClass](#Command+getClass) ⇒ [<code>FetchCommand</code>](#FetchCommand) \| [<code>StatusCommand</code>](#StatusCommand) \| [<code>HashCommand</code>](#HashCommand)
+    * [.run](#Command+run)
+    * [.class](#Command+class)
+    * [.action](#AbstractCommand+action) : <code>String</code>
+    * [.pending](#AbstractCommand+pending) : <code>Boolean</code>
+    * [.params](#AbstractCommand+params) : <code>Array</code>
+
+<a name="new_Command_new"></a>
+
+### new Command()
+Main Universal Command
+
+<a name="Command+getClass"></a>
+
+### command.getClass ⇒ [<code>FetchCommand</code>](#FetchCommand) \| [<code>StatusCommand</code>](#StatusCommand) \| [<code>HashCommand</code>](#HashCommand)
+**Kind**: instance property of [<code>Command</code>](#Command)  
+**Throws**:
+
+- ReferenceError
+
+
+| Param | Type |
+| --- | --- |
+| [action] | <code>Boolean</code> \| <code>String</code> | 
+
+<a name="Command+run"></a>
+
+### command.run
+Run command
+
+**Kind**: instance property of [<code>Command</code>](#Command)  
+
+| Param |
+| --- |
+| params | 
+
+<a name="Command+class"></a>
+
+### command.class
+Get class of this command
+
+**Kind**: instance property of [<code>Command</code>](#Command)  
+**See**: [getClass](#Command+getClass)  
+<a name="AbstractCommand+action"></a>
+
+### command.action : <code>String</code>
+Command action
+
+**Kind**: instance property of [<code>Command</code>](#Command)  
+<a name="AbstractCommand+pending"></a>
+
+### command.pending : <code>Boolean</code>
+Pending status
+
+**Kind**: instance property of [<code>Command</code>](#Command)  
+<a name="AbstractCommand+params"></a>
+
+### command.params : <code>Array</code>
+Params
+
+**Kind**: instance property of [<code>Command</code>](#Command)  
+<a name="TmLabs"></a>
+
+## TmLabs ⇐ <code>EventEmitter</code>
+**Kind**: global class  
+**Extends**: <code>EventEmitter</code>  
+
+* [TmLabs](#TmLabs) ⇐ <code>EventEmitter</code>
+    * [new TmLabs()](#new_TmLabs_new)
+    * [.runBatch](#TmLabs+runBatch) ⇒ <code>Promise</code>
+    * [.fetchBatch](#TmLabs+fetchBatch) ⇒ <code>Promise</code>
+    * [.fetch](#TmLabs+fetch) ⇒ <code>Promise</code>
+    * [.runCommand](#TmLabs+runCommand) ⇒ <code>Promise</code>
+    * [.history](#TmLabs+history) ⇒ [<code>Array.&lt;AbstractCommand&gt;</code>](#AbstractCommand)
+    * [.key](#TmLabs+key) ⇒ <code>string</code>
+    * [.limit](#TmLabs+limit) ⇒ <code>number</code>
+    * [.pending](#TmLabs+pending) ⇒ <code>number</code>
+    * [.balanceRemaining](#TmLabs+balanceRemaining) ⇒ <code>double</code> \| <code>undefined</code>
+    * [.balanceLastbill](#TmLabs+balanceLastbill) ⇒ <code>double</code> \| <code>undefined</code>
+    * [.balanceReset](#TmLabs+balanceReset) ⇒ <code>undefined</code> \| <code>double</code>
+
+<a name="new_TmLabs_new"></a>
+
+### new TmLabs()
+Main TmLabs class.
+
+<a name="TmLabs+runBatch"></a>
+
+### tmLabs.runBatch ⇒ <code>Promise</code>
+Run commands
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| commands | <code>Array.&lt;Object&gt;</code> |  | Array of command objects which contain command key and it params key for command run options |
+| [options] | <code>Object</code> |  | Batch command options |
+| [options.throw] | <code>Boolean</code> | <code>false</code> | If true command will throw exceptions |
+
+<a name="TmLabs+fetchBatch"></a>
+
+### tmLabs.fetchBatch ⇒ <code>Promise</code>
+Fetch specific method multiple times with different params
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| method | <code>string</code> | API method dns|ip, etc |
+| objects | <code>Array.&lt;Object&gt;</code> | array of request parameters |
+| options |  | additional options |
+
+<a name="TmLabs+fetch"></a>
+
+### tmLabs.fetch ⇒ <code>Promise</code>
+Fetch specific method
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| method | <code>string</code> | API method dns|ip, etc |
+| params | <code>object</code> | method parameters |
+
+<a name="TmLabs+runCommand"></a>
+
+### tmLabs.runCommand ⇒ <code>Promise</code>
+Run command with params
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**Returns**: <code>Promise</code> - result  
+**Resolves**: <code>Array.&lt;Object&gt;</code> result  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| command | [<code>Command</code>](#Command) |  |
+| params |  | command params |
+
+<a name="TmLabs+history"></a>
+
+### tmLabs.history ⇒ [<code>Array.&lt;AbstractCommand&gt;</code>](#AbstractCommand)
+History array return
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+<a name="TmLabs+key"></a>
+
+### tmLabs.key ⇒ <code>string</code>
+Active token for TmLabs Object.
+Overrides if passed into params of [FetchCommand Class](#FetchCommand) <code>key</code> or
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+<a name="TmLabs+limit"></a>
+
+### tmLabs.limit ⇒ <code>number</code>
+Get number of simultaneously requests
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+<a name="TmLabs+pending"></a>
+
+### tmLabs.pending ⇒ <code>number</code>
+Get number of pending requests
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+<a name="TmLabs+balanceRemaining"></a>
+
+### tmLabs.balanceRemaining ⇒ <code>double</code> \| <code>undefined</code>
+Remaining balance
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**See**: [balanceRemaining](#FetchCommand+balanceRemaining)  
+<a name="TmLabs+balanceLastbill"></a>
+
+### tmLabs.balanceLastbill ⇒ <code>double</code> \| <code>undefined</code>
+Last billing cost
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**See**: [balanceLastbill](#FetchCommand+balanceLastbill)  
+<a name="TmLabs+balanceReset"></a>
+
+### tmLabs.balanceReset ⇒ <code>undefined</code> \| <code>double</code>
+Returns number of seconds before free key credits renew
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**See**: [balanceReset](#FetchCommand+balanceReset)  
+<a name="AbstractCommand"></a>
+
+## *AbstractCommand ⇐ <code>EventEmitter</code>*
+**Kind**: global abstract class  
+**Extends**: <code>EventEmitter</code>  
+
+* *[AbstractCommand](#AbstractCommand) ⇐ <code>EventEmitter</code>*
+    * *[new AbstractCommand()](#new_AbstractCommand_new)*
+    * *[.action](#AbstractCommand+action) : <code>String</code>*
+    * *[.pending](#AbstractCommand+pending) : <code>Boolean</code>*
+    * *[.params](#AbstractCommand+params) : <code>Array</code>*
+
+<a name="new_AbstractCommand_new"></a>
+
+### *new AbstractCommand()*
+AbstractCommand main class which is parent for all commands
+
+<a name="AbstractCommand+action"></a>
+
+### *abstractCommand.action : <code>String</code>*
+Command action
+
+**Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  
+<a name="AbstractCommand+pending"></a>
+
+### *abstractCommand.pending : <code>Boolean</code>*
+Pending status
+
+**Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  
+<a name="AbstractCommand+params"></a>
+
+### *abstractCommand.params : <code>Array</code>*
+Params
+
+**Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  
+<a name="FetchCommand"></a>
+
+## FetchCommand ⇐ [<code>AbstractCommand</code>](#AbstractCommand)
+**Kind**: global class  
+**Extends**: [<code>AbstractCommand</code>](#AbstractCommand)  
+
+* [FetchCommand](#FetchCommand) ⇐ [<code>AbstractCommand</code>](#AbstractCommand)
+    * [new FetchCommand()](#new_FetchCommand_new)
+    * [.method](#FetchCommand+method) : <code>string</code>
+    * [.run](#FetchCommand+run) ⇒ <code>Promise</code>
+    * [.fetch](#FetchCommand+fetch) ⇒ <code>Promise</code>
+    * [.headers](#FetchCommand+headers) : <code>Object</code> \| <code>undefined</code>
+    * [.args](#FetchCommand+args) : <code>Array.&lt;Object&gt;</code>
+    * [.rawArgs](#FetchCommand+rawArgs) : <code>Object</code>
+    * [.content](#FetchCommand+content) : <code>Object</code>
+    * [.error](#FetchCommand+error) : <code>Boolean</code>
+    * [.status](#FetchCommand+status) ⇒ <code>number</code> \| <code>undefined</code>
+    * [.statusText](#FetchCommand+statusText) ⇒ <code>String</code> \| <code>undefined</code>
+    * [.errorText](#FetchCommand+errorText) ⇒ <code>String</code> \| <code>undefined</code>
+    * [.balanceRemaining](#FetchCommand+balanceRemaining) : <code>double</code> \| <code>undefined</code>
+    * [.balanceLastbill](#FetchCommand+balanceLastbill) : <code>double</code> \| <code>undefined</code>
+    * [.balanceReset](#FetchCommand+balanceReset) : <code>double</code> \| <code>undefined</code>
+    * [.pending](#FetchCommand+pending) : <code>Boolean</code>
+    * [.url](#FetchCommand+url) : <code>String</code>
+    * [.key](#FetchCommand+key) : <code>String</code>
+    * [.action](#AbstractCommand+action) : <code>String</code>
+    * [.params](#AbstractCommand+params) : <code>Array</code>
+
+<a name="new_FetchCommand_new"></a>
+
+### new FetchCommand()
+FetchCommand for API requests
+
+<a name="FetchCommand+method"></a>
+
+### fetchCommand.method : <code>string</code>
+Command method
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+**Throws**:
+
+- ReferenceError
+
+<a name="FetchCommand+run"></a>
+
+### fetchCommand.run ⇒ <code>Promise</code>
+Run FetchCommand.
+Options params can be found in [fetch method](#FetchCommand+fetch)
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> | <code>{}</code> | The options object |
+
+<a name="FetchCommand+fetch"></a>
+
+### fetchCommand.fetch ⇒ <code>Promise</code>
+Fetch method
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+**Throws**:
+
+- InsufficientFundsError
+- Error
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> | <code>{}</code> | The options object |
+| [options.key] | <code>String</code> |  | Token key |
+| [options.headers] | <code>Object</code> | <code>false</code> | Custom headers for request |
+| [options.method] | <code>String</code> | <code>&#x27;GET&#x27;</code> | Custom method. e.g 'POST', 'GET' |
+
+<a name="FetchCommand+headers"></a>
+
+### fetchCommand.headers : <code>Object</code> \| <code>undefined</code>
+Request headers
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+args"></a>
+
+### fetchCommand.args : <code>Array.&lt;Object&gt;</code>
+Filtered command arguments
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+rawArgs"></a>
+
+### fetchCommand.rawArgs : <code>Object</code>
+Filtered command arguments
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+content"></a>
+
+### fetchCommand.content : <code>Object</code>
+Request json encoded object
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+error"></a>
+
+### fetchCommand.error : <code>Boolean</code>
+Error occurred?
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+status"></a>
+
+### fetchCommand.status ⇒ <code>number</code> \| <code>undefined</code>
+Get status code.
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+**Example**  
+```js
+return 200
+```
+<a name="FetchCommand+statusText"></a>
+
+### fetchCommand.statusText ⇒ <code>String</code> \| <code>undefined</code>
+Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+**Example**  
+```js
+return 'OK'
+```
+<a name="FetchCommand+errorText"></a>
+
+### fetchCommand.errorText ⇒ <code>String</code> \| <code>undefined</code>
+Get command error text if error occurred
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+balanceRemaining"></a>
+
+### fetchCommand.balanceRemaining : <code>double</code> \| <code>undefined</code>
+Remaining balance
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+balanceLastbill"></a>
+
+### fetchCommand.balanceLastbill : <code>double</code> \| <code>undefined</code>
+Get last request cost
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+balanceReset"></a>
+
+### fetchCommand.balanceReset : <code>double</code> \| <code>undefined</code>
+Returns number of seconds before free key credits renew
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+pending"></a>
+
+### fetchCommand.pending : <code>Boolean</code>
+Is pending request or not
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+**Overrides**: [<code>pending</code>](#AbstractCommand+pending)  
+<a name="FetchCommand+url"></a>
+
+### fetchCommand.url : <code>String</code>
+Request url
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="FetchCommand+key"></a>
+
+### fetchCommand.key : <code>String</code>
+Token key
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="AbstractCommand+action"></a>
+
+### fetchCommand.action : <code>String</code>
+Command action
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="AbstractCommand+params"></a>
+
+### fetchCommand.params : <code>Array</code>
+Params
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+<a name="HashCommand"></a>
+
+## HashCommand ⇐ [<code>FetchCommand</code>](#FetchCommand)
+**Kind**: global class  
+**Extends**: [<code>FetchCommand</code>](#FetchCommand)  
+
+* [HashCommand](#HashCommand) ⇐ [<code>FetchCommand</code>](#FetchCommand)
+    * [new HashCommand()](#new_HashCommand_new)
+    * [.run](#HashCommand+run) ⇒ <code>Promise</code>
+    * [.getStreamHash](#HashCommand+getStreamHash) ⇒ <code>Promise</code>
+    * [.hashStream](#HashCommand+hashStream) ⇒ <code>string</code>
+    * [.getFileHash](#HashCommand+getFileHash) ⇒ <code>Promise</code>
+    * [.getStringHash](#HashCommand+getStringHash) ⇒ <code>string</code>
+    * [.method](#FetchCommand+method) : <code>string</code>
+    * [.fetch](#FetchCommand+fetch) ⇒ <code>Promise</code>
+    * [.headers](#FetchCommand+headers) : <code>Object</code> \| <code>undefined</code>
+    * [.args](#FetchCommand+args) : <code>Array.&lt;Object&gt;</code>
+    * [.rawArgs](#FetchCommand+rawArgs) : <code>Object</code>
+    * [.content](#FetchCommand+content) : <code>Object</code>
+    * [.error](#FetchCommand+error) : <code>Boolean</code>
+    * [.status](#FetchCommand+status) ⇒ <code>number</code> \| <code>undefined</code>
+    * [.statusText](#FetchCommand+statusText) ⇒ <code>String</code> \| <code>undefined</code>
+    * [.errorText](#FetchCommand+errorText) ⇒ <code>String</code> \| <code>undefined</code>
+    * [.balanceRemaining](#FetchCommand+balanceRemaining) : <code>double</code> \| <code>undefined</code>
+    * [.balanceLastbill](#FetchCommand+balanceLastbill) : <code>double</code> \| <code>undefined</code>
+    * [.balanceReset](#FetchCommand+balanceReset) : <code>double</code> \| <code>undefined</code>
+    * [.pending](#FetchCommand+pending) : <code>Boolean</code>
+    * [.url](#FetchCommand+url) : <code>String</code>
+    * [.key](#FetchCommand+key) : <code>String</code>
+    * [.action](#AbstractCommand+action) : <code>String</code>
+    * [.params](#AbstractCommand+params) : <code>Array</code>
+
+<a name="new_HashCommand_new"></a>
+
+### new HashCommand()
+HashCommand class for file & stream hashing.
+Run method sends hash to API
+
+<a name="HashCommand+run"></a>
+
+### hashCommand.run ⇒ <code>Promise</code>
+Get file or stream hash and check it by sending request to API
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**Overrides**: [<code>run</code>](#FetchCommand+run)  
+**Throws**:
+
+- <code>InsufficientFundsError</code> 
+
+**Fulfil**: <code>Object</code>  
+**Reject**: <code>Error</code>  
+
+| Param | Type |
+| --- | --- |
+| options | <code>Object</code> \| <code>Object</code> \| <code>Object</code> | 
+
+<a name="HashCommand+getStreamHash"></a>
+
+### hashCommand.getStreamHash ⇒ <code>Promise</code>
+Get hash passing stream as parameter
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| stream | <code>Stream</code> | Stream object |
+
+<a name="HashCommand+hashStream"></a>
+
+### hashCommand.hashStream ⇒ <code>string</code>
+Get Hash transform object
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**See**: [https://nodejs.org/api/crypto.html#crypto_class_hash](https://nodejs.org/api/crypto.html#crypto_class_hash)  
+<a name="HashCommand+getFileHash"></a>
+
+### hashCommand.getFileHash ⇒ <code>Promise</code>
+Get hash passing only file path
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+
+| Param | Type |
+| --- | --- |
+| filepath | <code>string</code> | 
+
+<a name="HashCommand+getStringHash"></a>
+
+### hashCommand.getStringHash ⇒ <code>string</code>
+Get SHA256 from string. Useful in browser
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+
+| Param | Type |
+| --- | --- |
+| string | <code>string</code> | 
+
+<a name="FetchCommand+method"></a>
+
+### hashCommand.method : <code>string</code>
+Command method
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**Throws**:
+
+- ReferenceError
+
+<a name="FetchCommand+fetch"></a>
+
+### hashCommand.fetch ⇒ <code>Promise</code>
+Fetch method
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**Throws**:
+
+- InsufficientFundsError
+- Error
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> | <code>{}</code> | The options object |
+| [options.key] | <code>String</code> |  | Token key |
+| [options.headers] | <code>Object</code> | <code>false</code> | Custom headers for request |
+| [options.method] | <code>String</code> | <code>&#x27;GET&#x27;</code> | Custom method. e.g 'POST', 'GET' |
+
+<a name="FetchCommand+headers"></a>
+
+### hashCommand.headers : <code>Object</code> \| <code>undefined</code>
+Request headers
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+args"></a>
+
+### hashCommand.args : <code>Array.&lt;Object&gt;</code>
+Filtered command arguments
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+rawArgs"></a>
+
+### hashCommand.rawArgs : <code>Object</code>
+Filtered command arguments
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+content"></a>
+
+### hashCommand.content : <code>Object</code>
+Request json encoded object
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+error"></a>
+
+### hashCommand.error : <code>Boolean</code>
+Error occurred?
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+status"></a>
+
+### hashCommand.status ⇒ <code>number</code> \| <code>undefined</code>
+Get status code.
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**Example**  
+```js
+return 200
+```
+<a name="FetchCommand+statusText"></a>
+
+### hashCommand.statusText ⇒ <code>String</code> \| <code>undefined</code>
+Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**Example**  
+```js
+return 'OK'
+```
+<a name="FetchCommand+errorText"></a>
+
+### hashCommand.errorText ⇒ <code>String</code> \| <code>undefined</code>
+Get command error text if error occurred
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+balanceRemaining"></a>
+
+### hashCommand.balanceRemaining : <code>double</code> \| <code>undefined</code>
+Remaining balance
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+balanceLastbill"></a>
+
+### hashCommand.balanceLastbill : <code>double</code> \| <code>undefined</code>
+Get last request cost
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+balanceReset"></a>
+
+### hashCommand.balanceReset : <code>double</code> \| <code>undefined</code>
+Returns number of seconds before free key credits renew
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+pending"></a>
+
+### hashCommand.pending : <code>Boolean</code>
+Is pending request or not
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+url"></a>
+
+### hashCommand.url : <code>String</code>
+Request url
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="FetchCommand+key"></a>
+
+### hashCommand.key : <code>String</code>
+Token key
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="AbstractCommand+action"></a>
+
+### hashCommand.action : <code>String</code>
+Command action
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="AbstractCommand+params"></a>
+
+### hashCommand.params : <code>Array</code>
+Params
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+<a name="StatusCommand"></a>
+
+## StatusCommand ⇐ [<code>FetchCommand</code>](#FetchCommand)
+**Kind**: global class  
+**Extends**: [<code>FetchCommand</code>](#FetchCommand)  
+
+* [StatusCommand](#StatusCommand) ⇐ [<code>FetchCommand</code>](#FetchCommand)
+    * [new StatusCommand()](#new_StatusCommand_new)
+    * [.run](#StatusCommand+run) ⇒ <code>Promise</code>
+    * [.method](#FetchCommand+method) : <code>string</code>
+    * [.fetch](#FetchCommand+fetch) ⇒ <code>Promise</code>
+    * [.headers](#FetchCommand+headers) : <code>Object</code> \| <code>undefined</code>
+    * [.args](#FetchCommand+args) : <code>Array.&lt;Object&gt;</code>
+    * [.rawArgs](#FetchCommand+rawArgs) : <code>Object</code>
+    * [.content](#FetchCommand+content) : <code>Object</code>
+    * [.error](#FetchCommand+error) : <code>Boolean</code>
+    * [.status](#FetchCommand+status) ⇒ <code>number</code> \| <code>undefined</code>
+    * [.statusText](#FetchCommand+statusText) ⇒ <code>String</code> \| <code>undefined</code>
+    * [.errorText](#FetchCommand+errorText) ⇒ <code>String</code> \| <code>undefined</code>
+    * [.balanceRemaining](#FetchCommand+balanceRemaining) : <code>double</code> \| <code>undefined</code>
+    * [.balanceLastbill](#FetchCommand+balanceLastbill) : <code>double</code> \| <code>undefined</code>
+    * [.balanceReset](#FetchCommand+balanceReset) : <code>double</code> \| <code>undefined</code>
+    * [.pending](#FetchCommand+pending) : <code>Boolean</code>
+    * [.url](#FetchCommand+url) : <code>String</code>
+    * [.key](#FetchCommand+key) : <code>String</code>
+    * [.action](#AbstractCommand+action) : <code>String</code>
+    * [.params](#AbstractCommand+params) : <code>Array</code>
+
+<a name="new_StatusCommand_new"></a>
+
+### new StatusCommand()
+StatusCommand for getting status about yourself
+
+<a name="StatusCommand+run"></a>
+
+### statusCommand.run ⇒ <code>Promise</code>
+Return API status promise
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+**Overrides**: [<code>run</code>](#FetchCommand+run)  
+
+| Param |
+| --- |
+| options | 
+
+<a name="FetchCommand+method"></a>
+
+### statusCommand.method : <code>string</code>
+Command method
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+**Throws**:
+
+- ReferenceError
+
+<a name="FetchCommand+fetch"></a>
+
+### statusCommand.fetch ⇒ <code>Promise</code>
+Fetch method
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+**Throws**:
+
+- InsufficientFundsError
+- Error
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>Object</code> | <code>{}</code> | The options object |
+| [options.key] | <code>String</code> |  | Token key |
+| [options.headers] | <code>Object</code> | <code>false</code> | Custom headers for request |
+| [options.method] | <code>String</code> | <code>&#x27;GET&#x27;</code> | Custom method. e.g 'POST', 'GET' |
+
+<a name="FetchCommand+headers"></a>
+
+### statusCommand.headers : <code>Object</code> \| <code>undefined</code>
+Request headers
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+args"></a>
+
+### statusCommand.args : <code>Array.&lt;Object&gt;</code>
+Filtered command arguments
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+rawArgs"></a>
+
+### statusCommand.rawArgs : <code>Object</code>
+Filtered command arguments
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+content"></a>
+
+### statusCommand.content : <code>Object</code>
+Request json encoded object
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+error"></a>
+
+### statusCommand.error : <code>Boolean</code>
+Error occurred?
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+status"></a>
+
+### statusCommand.status ⇒ <code>number</code> \| <code>undefined</code>
+Get status code.
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+**Example**  
+```js
+return 200
+```
+<a name="FetchCommand+statusText"></a>
+
+### statusCommand.statusText ⇒ <code>String</code> \| <code>undefined</code>
+Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+**Example**  
+```js
+return 'OK'
+```
+<a name="FetchCommand+errorText"></a>
+
+### statusCommand.errorText ⇒ <code>String</code> \| <code>undefined</code>
+Get command error text if error occurred
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+balanceRemaining"></a>
+
+### statusCommand.balanceRemaining : <code>double</code> \| <code>undefined</code>
+Remaining balance
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+balanceLastbill"></a>
+
+### statusCommand.balanceLastbill : <code>double</code> \| <code>undefined</code>
+Get last request cost
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+balanceReset"></a>
+
+### statusCommand.balanceReset : <code>double</code> \| <code>undefined</code>
+Returns number of seconds before free key credits renew
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+pending"></a>
+
+### statusCommand.pending : <code>Boolean</code>
+Is pending request or not
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+url"></a>
+
+### statusCommand.url : <code>String</code>
+Request url
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="FetchCommand+key"></a>
+
+### statusCommand.key : <code>String</code>
+Token key
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="AbstractCommand+action"></a>
+
+### statusCommand.action : <code>String</code>
+Command action
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="AbstractCommand+params"></a>
+
+### statusCommand.params : <code>Array</code>
+Params
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+<a name="AbstractCommand"></a>
+
+## AbstractCommand
+**Kind**: global variable  
+**Throws**:
+
+- TypeError
+- ReferenceError
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| action | <code>String</code> | Action to be performed |
+| params | <code>Object</code> | command params |
+
+
+* [AbstractCommand](#AbstractCommand)
+    * *[new AbstractCommand()](#new_AbstractCommand_new)*
+    * *[.action](#AbstractCommand+action) : <code>String</code>*
+    * *[.pending](#AbstractCommand+pending) : <code>Boolean</code>*
+    * *[.params](#AbstractCommand+params) : <code>Array</code>*
+
+<a name="new_AbstractCommand_new"></a>
+
+### *new AbstractCommand()*
+AbstractCommand main class which is parent for all commands
+
+<a name="AbstractCommand+action"></a>
+
+### *abstractCommand.action : <code>String</code>*
+Command action
+
+**Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  
+<a name="AbstractCommand+pending"></a>
+
+### *abstractCommand.pending : <code>Boolean</code>*
+Pending status
+
+**Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  
+<a name="AbstractCommand+params"></a>
+
+### *abstractCommand.params : <code>Array</code>*
+Params
+
+**Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  

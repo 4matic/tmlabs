@@ -22,7 +22,20 @@ const validator = {
   matches
 }
 
-export default class FetchCommand extends AbstractCommand {
+/**
+ * FetchCommand for API requests
+ * @module FetchCommand
+ * @class
+ * @extends AbstractCommand
+ */
+class FetchCommand extends AbstractCommand {
+  /**
+   * @constructor
+   * @param {Object} params - The params object
+   * @param {String} params.method - Fetch method
+   * @throws TypeError
+   * @throws ReferenceError
+   */
   constructor (params) {
     super('fetch', params)
     const { method, version, data, key, fetchFunc } = params // todo: do data parsing
@@ -39,6 +52,13 @@ export default class FetchCommand extends AbstractCommand {
 
     if (key !== undefined && typeof key === 'string') this._map.get(this).key = key
     else if (process.env.TMLABS_KEY) this._map.get(this).key = process.env.TMLABS_KEY
+
+    /**
+     * Command method
+     * @type {string}
+     * @throws ReferenceError
+     * @member FetchCommand#method
+     */
     this._map.get(this).method = method
     this._map.get(this).headers = {}
     this._map.get(this).args = []
@@ -48,9 +68,21 @@ export default class FetchCommand extends AbstractCommand {
     this._map.get(this).balance_lastbill = undefined
     this._map.get(this).balance_reset = undefined
   }
+  /**
+   * Available methods
+   * @static
+   * @property {array} method list
+   */
   static getMethods () {
     return endpoint
   }
+
+  /**
+   * Get method specifications
+   * @static
+   * @param {String|false} [method=false] if method defined get specifications for this method, else get all
+   * @returns {Object[]}
+   */
   static getMethodSpecifications (method = false) {
     const methods = FetchCommand.getMethods()
     const newMethods = {}
@@ -71,6 +103,15 @@ export default class FetchCommand extends AbstractCommand {
     } else return getOneMethodData(method)
     return newMethods
   }
+
+  /**
+   * Checking arguments
+   * @param {Object|false} data - checking data
+   * @returns {Array}
+   * @throws TypeError
+   * @member FetchCommand#_checkArguments
+   * @private
+   */
   _checkArguments (data) {
     if (typeof data !== 'object' && data !== false) throw new TypeError(`Method params should be an object`)
     else {
@@ -138,6 +179,18 @@ export default class FetchCommand extends AbstractCommand {
       return returnArgs
     }
   }
+
+  /**
+   * Main fetch function
+   * @param {String} url fetching url
+   * @param {Object} [params={}] request parameters
+   * @param {function|false} [fetchFunc=false] fetch function
+   * @throws Error
+   * @throws ReferenceError
+   * @member FetchCommand#_makeRequest
+   * @returns {Promise}
+   * @private
+   */
   async _makeRequest (url, params = {}, fetchFunc = false) {
     if (!url) throw new ReferenceError('Empty url')
     if (!fetchFunc) fetchFunc = fetch
@@ -175,15 +228,40 @@ export default class FetchCommand extends AbstractCommand {
       throw err
     }
   }
+
+  get method () {
+    return this._map.get(this).method
+  }
+
   set method (method) {
     if (!method) {
       throw new ReferenceError('Empty method')
     }
     this._map.get(this).method = method
   }
+
+  /**
+   * Run FetchCommand.
+   * Options params can be found in [fetch method]{@link FetchCommand#fetch}
+   * @param {Object} [options={}] - The options object
+   * @member FetchCommand#run
+   * @returns {Promise}
+   */
   run (options = {}) {
     return this.fetch(options)
   }
+
+  /**
+   * Fetch method
+   * @param {Object} [options={}] - The options object
+   * @param {String} [options.key] - Token key
+   * @param {Object} [options.headers=false] - Custom headers for request
+   * @param {String} [options.method='GET'] - Custom method. e.g 'POST', 'GET'
+   * @member FetchCommand#fetch
+   * @throws InsufficientFundsError
+   * @throws Error
+   * @returns {Promise}
+   */
   async fetch (options = {}) {
     let params = {}
     const method = options.method || 'GET'
@@ -256,55 +334,124 @@ export default class FetchCommand extends AbstractCommand {
       throw err
     }
   }
-  get method () {
-    return this._map.get(this).method
-  }
+
+  /**
+   * Request headers
+   * @type {Object|undefined}
+   * @member FetchCommand#headers
+   */
   get headers () {
     return this._map.get(this).headers
   }
 
   /**
-   * Get checked command arguments.
-   * @returns {[{arg: string, val: *}]}
+   * Filtered command arguments
+   * @type {Object[]}
+   * @member FetchCommand#args
    */
   get args () {
     return this._map.get(this).args
   }
 
   /**
-   * Get raw args. Fetch command args
-   * @returns {Array}
+   * Filtered command arguments
+   * @type {Object}
+   * @member FetchCommand#rawArgs
    */
   get rawArgs () {
     return this._map.get(this).rawArgs
   }
+
+  /**
+   * Request json encoded object
+   * @type {Object}
+   * @member FetchCommand#content
+   */
   get content () {
     return this._map.get(this).content
   }
+
+  /**
+   * Error occurred?
+   * @type {Boolean}
+   * @member FetchCommand#error
+   */
   get error () {
     return this._map.get(this).error
   }
+
+  /**
+   * Get status code.
+   * @example
+   * return 200
+   * @member FetchCommand#status
+   * @returns {number|undefined}
+   */
   get status () {
     return this._map.get(this).status
   }
+
+  /**
+   * Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
+   * @example
+   * return 'OK'
+   * @member FetchCommand#statusText
+   * @returns {String|undefined}
+   */
   get statusText () {
     return this._map.get(this).statusText
   }
+
+  /**
+   * Get command error text if error occurred
+   * @member FetchCommand#errorText
+   * @returns {String|undefined}
+   */
   get errorText () {
     return this._map.get(this).errorText
   }
+
+  /**
+   * Remaining balance
+   * @type {double|undefined}
+   * @member FetchCommand#balanceRemaining
+   */
   get balanceRemaining () {
     return this._map.get(this).balance_remaining
   }
+
+  /**
+   * Get last request cost
+   * @type {double|undefined}
+   * @member FetchCommand#balanceLastbill
+   */
   get balanceLastbill () {
     return this._map.get(this).balance_lastbill
   }
+
+  /**
+   * Returns number of seconds before free key credits renew
+   * @type {double|undefined}
+   * @member FetchCommand#balanceReset
+   */
   get balanceReset () {
     return this._map.get(this).balance_reset
   }
+
+  /**
+   * Is pending request or not
+   * @type {Boolean}
+   * @member FetchCommand#pending
+   */
   get pending () {
     return this._map.get(this).pending
   }
+
+  /**
+   * Request url
+   * @type {String}
+   * @member FetchCommand#url
+   */
   get url () {
     const parts = [this.api_url, 'api', this.version, this.method]
     const args = this.args
@@ -320,7 +467,15 @@ export default class FetchCommand extends AbstractCommand {
     if (this.key) url += `?key=${this.key}`
     return url
   }
+
+  /**
+   * Token key
+   * @type {String}
+   * @member FetchCommand#key
+   */
   get key () {
     return this._map.get(this).key
   }
 }
+
+export default FetchCommand

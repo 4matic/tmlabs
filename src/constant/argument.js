@@ -9,7 +9,13 @@ import {
 
 const mode = ['detailed', 'simple', 'blacklist', 'geoip']
 
-const argument = {
+/**
+ * @module argument
+ * @readonly
+ * @desc Endpoint specifications object
+ * @memberOf module:constants
+ */
+export default {
   [EMAIL_LEAKS]: [
     {
       arg: 'email',
@@ -105,5 +111,3 @@ const argument = {
     }
   ]
 }
-
-export default argument

@@ -3,6 +3,11 @@ import {
   EMAIL_LEAKS
 } from './endpoint'
 
+/**
+ * Endpoint specifications object
+ * @module specification
+ * @readonly
+ */
 const specification = {
   [STATUS]: {
     version: false

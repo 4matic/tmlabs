@@ -9,9 +9,11 @@ import globals from 'rollup-plugin-node-globals'
 
 let external = !process.env.production && !process.env.browser ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : []
 
+const pkg = require('./package.json')
+
 const replaceOptions = {
   exclude: 'node_modules/**',
-  'VERSION': 'v2.0.0'
+  'VERSION': `v${pkg.version}`
 }
 
 if (process.env.production || process.env.browser) replaceOptions['process.env.TMLABS_KEY'] = false
@@ -53,7 +55,7 @@ export default {
     replace(replaceOptions),
     process.env.production ? babili({
       comments: false,
-      banner: '/**\r* Tempico Labs SDK v2.0.0 \r*/'
+      banner: `/**\r* Tempico Labs SDK v${pkg.version} \r*/`
     }) : false
   ],
   external: external,

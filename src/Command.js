@@ -3,7 +3,21 @@ import FetchCommand from './command/FetchCommand'
 import StatusCommand from './command/StatusCommand'
 import HashCommand from './command/HashCommand'
 
-export default class Command extends AbstractCommand {
+/**
+ * Main Universal Command
+ * @module Command
+ * @class
+ * @extends AbstractCommand
+ */
+class Command extends AbstractCommand {
+  /**
+   * Constructor for Command class
+   * @param {String} action - Action for the command
+   * @param {Object} params - Command parameters
+   * @constructor
+   * @constructors Command
+   * @returns {Proxy}
+   */
   constructor (action, params) {
     super(action, params)
     const CommandClass = this.class
@@ -19,6 +33,15 @@ export default class Command extends AbstractCommand {
       }
     })
   }
+
+  /**
+   *
+   * @param {Boolean|String} [action]
+   * @static
+   * @member Command#getClass
+   * @throws ReferenceError
+   * @returns {FetchCommand|StatusCommand|HashCommand}
+   */
   static getClass (action = false) {
     if (!action) throw new ReferenceError('Action param empty')
     switch (action) {
@@ -32,11 +55,25 @@ export default class Command extends AbstractCommand {
         throw new ReferenceError('Action not found')
     }
   }
+
+  /**
+   * Get class of this command
+   * @see {@link Command#getClass}
+   * @member Command#class
+   */
   get class () {
     const action = this._map.get(this).action
     return Command.getClass(action)
   }
+
+  /**
+   * Run command
+   * @param params
+   * @member Command#run
+   */
   run (params) {
     if (this.instance) return this.instance.run(params)
   }
 }
+
+export default Command

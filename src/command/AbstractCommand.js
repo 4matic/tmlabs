@@ -1,6 +1,20 @@
 import EventEmitter from 'smelly-event-emitter'
 
-export default class AbstractCommand extends EventEmitter {
+/**
+ * AbstractCommand main class which is parent for all commands
+ * @extends EventEmitter
+ * @abstract
+ * @class AbstractCommand
+ */
+class AbstractCommand extends EventEmitter {
+  /**
+   *
+   * @param {String} action - Action to be performed
+   * @param {Object} params - command params
+   * @member AbstractCommand
+   * @throws TypeError
+   * @throws ReferenceError
+   */
   constructor (action, params) {
     super()
     if (new.target === AbstractCommand) {
@@ -15,8 +29,23 @@ export default class AbstractCommand extends EventEmitter {
     }
     this._map = new WeakMap()
     this._map.set(this, {
+      /**
+       * Command action
+       * @type {String}
+       * @member AbstractCommand#action
+       */
       action,
+      /**
+       * Pending status
+       * @type {Boolean}
+       * @member AbstractCommand#pending
+       */
       pending: false,
+      /**
+       * Params
+       * @type {Array}
+       * @member AbstractCommand#params
+       */
       params
     })
   }
@@ -39,3 +68,5 @@ export default class AbstractCommand extends EventEmitter {
     this._map.get(this).params = params
   }
 }
+
+export default AbstractCommand

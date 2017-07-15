@@ -7727,7 +7727,6 @@ var FetchCommand = function (_AbstractCommand) {
                   }
                 }
                 options.method = method;
-                // console.log(options)
                 this.emit('fetch', options, this);
                 this._map.get(this).pending = true;
                 _context.next = 13;
@@ -7814,7 +7813,6 @@ var FetchCommand = function (_AbstractCommand) {
                 fetchResponse = void 0;
                 _context2.prev = 5;
 
-                // console.log('FETCH', options);
                 this._map.get(this).rawArgs = options;
                 args = this._checkArguments(options);
 
@@ -7823,8 +7821,6 @@ var FetchCommand = function (_AbstractCommand) {
                 };
                 if (headers !== false) params.headers = headers;
                 this._map.get(this).args = params.body = args;
-                // console.log(this.url);
-                // console.log(params);
                 _context2.next = 13;
                 return this._makeRequest(this.url, params);
 
@@ -9532,7 +9528,8 @@ var HashCommand = function (_FetchCommand) {
     }()
 
     /**
-     * Get Hash transform object
+     * Get Hash transform object.
+     * *** NOTE: Can't use in browser
      * @see {@link https://nodejs.org/api/crypto.html#crypto_class_hash}
      * @member HashCommand#hashStream
      * @returns {string}
@@ -9543,7 +9540,8 @@ var HashCommand = function (_FetchCommand) {
 
 
     /**
-     * Get hash passing stream as parameter
+     * Get hash passing stream as parameter.
+     * *** NOTE: Can't use in browser
      * @param {Stream} stream Stream object
      * @member HashCommand#getStreamHash
      * @returns {Promise}
@@ -9580,7 +9578,8 @@ var HashCommand = function (_FetchCommand) {
     }()
 
     /**
-     * Get hash passing only file path
+     * Get hash passing only file path.
+     * *** NOTE: Can't use in browser
      * @param {string} filepath
      * @member HashCommand#getFileHash
      * @returns {Promise}
@@ -9620,7 +9619,8 @@ var HashCommand = function (_FetchCommand) {
     }()
 
     /**
-     * Get SHA256 from string. Useful in browser
+     * Get SHA256 from string.
+     * Can be used in browser
      * @param {string} string
      * @member HashCommand#getStringHash
      * @returns {string}

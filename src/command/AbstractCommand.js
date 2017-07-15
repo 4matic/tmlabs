@@ -1,14 +1,11 @@
 import EventEmitter from 'smelly-event-emitter'
 
-/**
- * AbstractCommand main class which is parent for all commands
- * @extends EventEmitter
- * @abstract
- * @class AbstractCommand
- */
 class AbstractCommand extends EventEmitter {
   /**
-   *
+   * AbstractCommand main class which is parent for all commands
+   * @constructs AbstractCommand
+   * @augments EventEmitter
+   * @abstract
    * @param {String} action - Action to be performed
    * @param {Object} params - command params
    * @member AbstractCommand

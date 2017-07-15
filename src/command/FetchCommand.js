@@ -22,17 +22,14 @@ const validator = {
   matches
 }
 
-/**
- * FetchCommand for API requests
- * @module FetchCommand
- * @class
- * @extends AbstractCommand
- */
 class FetchCommand extends AbstractCommand {
   /**
-   * @constructor
+   * FetchCommand for API requests
+   * @constructs FetchCommand
    * @param {Object} params - The params object
+   * @param {String} [params.key - Token key
    * @param {String} params.method - Fetch method
+   * @augments AbstractCommand
    * @throws TypeError
    * @throws ReferenceError
    */
@@ -214,7 +211,6 @@ class FetchCommand extends AbstractCommand {
         }
       }
       options.method = method
-      // console.log(options)
       this.emit('fetch', options, this)
       this._map.get(this).pending = true
       const response = await fetchFunc(url, options)
@@ -270,7 +266,6 @@ class FetchCommand extends AbstractCommand {
     else if (process.env.TMLABS_KEY) this._map.get(this).key = process.env.TMLABS_KEY
     let fetchResponse
     try {
-      // console.log('FETCH', options);
       this._map.get(this).rawArgs = options
       const args = this._checkArguments(options)
       params = {
@@ -278,8 +273,6 @@ class FetchCommand extends AbstractCommand {
       }
       if (headers !== false) params.headers = headers
       this._map.get(this).args = params.body = args
-      // console.log(this.url);
-      // console.log(params);
       const response = await this._makeRequest(this.url, params)
       if (response) {
         const {headers, status, statusText} = response
@@ -338,6 +331,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Request headers
    * @type {Object|undefined}
+   * @readonly
    * @member FetchCommand#headers
    */
   get headers () {
@@ -347,6 +341,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Filtered command arguments
    * @type {Object[]}
+   * @readonly
    * @member FetchCommand#args
    */
   get args () {
@@ -356,6 +351,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Filtered command arguments
    * @type {Object}
+   * @readonly
    * @member FetchCommand#rawArgs
    */
   get rawArgs () {
@@ -365,6 +361,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Request json encoded object
    * @type {Object}
+   * @readonly
    * @member FetchCommand#content
    */
   get content () {
@@ -374,6 +371,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Error occurred?
    * @type {Boolean}
+   * @readonly
    * @member FetchCommand#error
    */
   get error () {
@@ -385,6 +383,7 @@ class FetchCommand extends AbstractCommand {
    * @example
    * return 200
    * @member FetchCommand#status
+   * @readonly
    * @returns {number|undefined}
    */
   get status () {
@@ -396,6 +395,7 @@ class FetchCommand extends AbstractCommand {
    * @example
    * return 'OK'
    * @member FetchCommand#statusText
+   * @readonly
    * @returns {String|undefined}
    */
   get statusText () {
@@ -405,6 +405,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Get command error text if error occurred
    * @member FetchCommand#errorText
+   * @readonly
    * @returns {String|undefined}
    */
   get errorText () {
@@ -414,6 +415,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Remaining balance
    * @type {double|undefined}
+   * @readonly
    * @member FetchCommand#balanceRemaining
    */
   get balanceRemaining () {
@@ -423,6 +425,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Get last request cost
    * @type {double|undefined}
+   * @readonly
    * @member FetchCommand#balanceLastbill
    */
   get balanceLastbill () {
@@ -432,6 +435,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Returns number of seconds before free key credits renew
    * @type {double|undefined}
+   * @readonly
    * @member FetchCommand#balanceReset
    */
   get balanceReset () {
@@ -441,6 +445,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Is pending request or not
    * @type {Boolean}
+   * @readonly
    * @member FetchCommand#pending
    */
   get pending () {
@@ -450,6 +455,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Request url
    * @type {String}
+   * @readonly
    * @member FetchCommand#url
    */
   get url () {
@@ -471,6 +477,7 @@ class FetchCommand extends AbstractCommand {
   /**
    * Token key
    * @type {String}
+   * @readonly
    * @member FetchCommand#key
    */
   get key () {

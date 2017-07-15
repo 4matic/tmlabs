@@ -1,16 +1,12 @@
 import FetchCommand from './FetchCommand'
 import { endpoint } from '../constant'
 
-/**
- * StatusCommand for getting status about yourself
- * @module StatusCommand
- * @class
- * @extends FetchCommand
- */
 class StatusCommand extends FetchCommand {
   /**
-   *
-   * @param {Object|false|undefined} params - command params
+   * StatusCommand for getting status about yourself
+   * @augments FetchCommand
+   * @constructs StatusCommand
+   * @param {Object|false|undefined} [params] - command params
    */
   constructor (params) {
     super(Object.assign({}, params, {

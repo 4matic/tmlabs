@@ -37,11 +37,38 @@ export default TmLabs
  * SDK Available Globals.
  * Default export is Main TmLabs object class.
  * @example
+ * // es6
  * // returns specific classes from package module
  * import { HashCommand as HashClass } '@tempicolabs/tmlabs'
+ *
+ * // or
+ *
+ * var tmLabs = require('@tempicolabs/tmlabs');
+ * var HashCommand = tmLabs.HashCommand;
  * @example
+ * // in browser
+ * <script src="dist/tmlabs.min.js"></script>
+ * <script>
+ *   var tmLabs = TmLabs.HashCommand();
+ * </script>
+ * @example
+ * // es6
  * // returns default TmLabs main object class
  * import TmLabs '@tempicolabs/tmlabs'
+ *
+ * // or
+ * var TmLabs = require('@tempicolabs/tmlabs');
+ * var tmLabs = TmLabs.TmLabs();
+ * //or
+ * var tmLabs = TmLabs.default();
+ * @example
+ * // in browser
+ * <script src="dist/tmlabs.min.js"></script>
+ * <script>
+ *   var tmLabs = TmLabs.default();
+ *   //or
+ *   var tmLabs2 = TmLabs.TmLabs();
+ * </script>
  * @module TmLabs
  * @property {TmLabs} TmLabs - Main object TmLabs class
  * @property {Command} Command - Main Command object class

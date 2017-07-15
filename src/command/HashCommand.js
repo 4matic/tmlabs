@@ -3,17 +3,14 @@ import SHA256 from 'crypto-js/sha256'
 import FetchCommand from './FetchCommand'
 import { endpoint } from '../constant'
 
-/**
- * HashCommand class for file & stream hashing.
- * Run method sends hash to API
- * @class HashCommand
- * @extends FetchCommand
- */
 class HashCommand extends FetchCommand {
   /**
-   * @constructor
-   * @param params
-   * @param {string} params.key - API key.
+   * HashCommand class for file & stream hashing.
+   * Run method sends hash to API
+   * @constructors HashCommand
+   * @augments FetchCommand
+   * @param [params]
+   * @param {string} [params.key] - API key.
    */
   constructor (params) {
     super({
@@ -55,7 +52,8 @@ class HashCommand extends FetchCommand {
   }
 
   /**
-   * Get Hash transform object
+   * Get Hash transform object.
+   * *** NOTE: Can't use in browser
    * @see {@link https://nodejs.org/api/crypto.html#crypto_class_hash}
    * @member HashCommand#hashStream
    * @returns {string}
@@ -67,7 +65,8 @@ class HashCommand extends FetchCommand {
   }
 
   /**
-   * Get hash passing stream as parameter
+   * Get hash passing stream as parameter.
+   * *** NOTE: Can't use in browser
    * @param {Stream} stream Stream object
    * @member HashCommand#getStreamHash
    * @returns {Promise}
@@ -80,7 +79,8 @@ class HashCommand extends FetchCommand {
   }
 
   /**
-   * Get hash passing only file path
+   * Get hash passing only file path.
+   * *** NOTE: Can't use in browser
    * @param {string} filepath
    * @member HashCommand#getFileHash
    * @returns {Promise}
@@ -93,7 +93,8 @@ class HashCommand extends FetchCommand {
   }
 
   /**
-   * Get SHA256 from string. Useful in browser
+   * Get SHA256 from string.
+   * Can be used in browser
    * @param {string} string
    * @member HashCommand#getStringHash
    * @returns {string}

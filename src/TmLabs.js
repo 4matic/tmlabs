@@ -4,16 +4,14 @@ import PQueue from 'p-queue'
 import Command from './Command'
 import FetchCommand from './command/FetchCommand'
 
-/**
- * Main TmLabs class.
- * @module TmLabs
- * @class
- * @extends EventEmitter
- */
 export default class TmLabs extends EventEmitter {
   /**
+   * Main TmLabs class.
+   * @constructs TmLabs
+   * @augments EventEmitter
    * @param {Object} [options] - The options object
-   * @constructor
+   * @param {Object} [options.key] - API token
+   * @param {Object} [options.limit] - Queue limit
    */
   constructor (options) {
     super()

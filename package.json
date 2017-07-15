@@ -1,9 +1,9 @@
 {
   "name": "@tempicolabs/tmlabs",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "NodeJS SDK for TempicoLabs API",
   "main": "dist/tmlabs.umd.js",
-  "browser": "dist/tmlabs.min.js",
+  "browser": "dist/tmlabs.js",
   "module": "dist/tmlabs.es.js",
   "files": [
     "src",
@@ -13,9 +13,10 @@
   "scripts": {
     "lint:js": "eslint src tools",
     "lint:staged": "lint-staged",
-    "build": "npm run build:umd && npm run build:es && npm run build:browser",
+    "build": "npm run build:umd && npm run build:es && npm run build:browser && npm run build:browser:minified",
     "build:umd": "rollup -c -f umd -o dist/tmlabs.umd.js",
-    "build:browser": "rollup -c --environment production -f umd -o dist/tmlabs.min.js",
+    "build:browser": "rollup -c --environment browser -f umd -o dist/tmlabs.js",
+    "build:browser:minified": "rollup -c --environment production -f umd -o dist/tmlabs.min.js",
     "build:es": "rollup -c -f es -o dist/tmlabs.es.js",
     "docs:api": "jsdoc2md --configure docs/jsdoc.json --files src/*.js src/**/*.js > docs/api.md",
     "test": "mocha",

@@ -10,9 +10,10 @@
 <h4 align="center">Tempico Labs SDK for API. For node.js and the web.</h4>
 
 <p align="center">
-  <a href="https://standardjs.com"><img src="https://img.shields.io/npm/v/@tempicolabs/tmlabs.svg" alt="Npm version"></a>
+  <img src="https://img.shields.io/bower/v/tmlabs.svg" alt="Bower version">
+  <a href="https://www.npmjs.com/package/@tempicolabs/tmlabs"><img src="https://img.shields.io/npm/v/@tempicolabs/tmlabs.svg" alt="Npm version"></a>
   <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code/style-standard-brightgreen.svg" alt="Javascipt Standart Style"></a>
-  <a href="https://standardjs.com"><img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence"></a>
+  <a href="https://github.com/TempicoLabs/tmlabs/blob/master/LICENSE"><img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence"></a>
 </p>
 <br>
 
@@ -33,11 +34,15 @@ Or alternatively using Bower, run:
 bower install tmlabs --save
 ```
 
-To install a `tmlabs` [command line program](https://github.com/TempicoLabs/tmlabs-cli), run:
+#### SDK contain:
 
-```bash
-npm install @tempicolabs/tmlabs-cli -g
-```
+`dist/tmlabs.umd.js` - Standart package for node.js
+
+`dist/tmlabs.es.js` - ES6 Package for node.js using import
+
+`dist/tmlabs.js` - Unminified browser version
+
+`dist/tmlabs.min.js` - Minified browser version
 
 ### TmLabs API Documentation
 
@@ -86,18 +91,20 @@ TmLabs is the wrapper for API. It uses [fetch-ponyfill](https://github.com/qubyt
 TmLabs also works in node.js, using the *same npm package!*
 
 ```javascript
-  import TmLabs from '@tempicolabs/tmlabs'
+  var TmLabs = require('@tempicolabs/tmlabs').default
   
-  TmLabs.on('error', (error, command) => {
+  TmLabs.on('error', function (error, command) {
     console.error(error);
   });
-  TmLabs.on('response', (response, command) => {
+  TmLabs.on('response', function (response, command) {
     console.log('response', response);
     console.log('balanceRemaining', command.balanceRemaining); // return Remaining Balance
   });
   TmLabs.fetch('dns', {
     domain: 'google.com'
-  });
+  }).then(function (response) {
+    console.log('after then response', response)
+  })
 ```
 ** You can use bundled version in `dist/tmlabs.umd.js`
 
@@ -125,15 +132,6 @@ For example in ES6:
 ** You can use bundled version in `dist/tmlabs.es.js` for ES6
 
 ##### More examples you can find in [examples directory](examples)
-
-#### As a command line app
-
-TmLabs is also available as a [command line app](https://github.com/TempicoLabs/tmlabs-cli). Here's how to use it:
-
-```bash
-$ npm install @tempicolabs/tmlabs-cli -g
-$ tmlabs --help
-```
 
 ### License
 

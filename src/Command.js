@@ -3,19 +3,13 @@ import FetchCommand from './command/FetchCommand'
 import StatusCommand from './command/StatusCommand'
 import HashCommand from './command/HashCommand'
 
-/**
- * Main Universal Command
- * @module Command
- * @class
- * @extends AbstractCommand
- */
 class Command extends AbstractCommand {
   /**
-   * Constructor for Command class
+   * Main Universal Command
    * @param {String} action - Action for the command
    * @param {Object} params - Command parameters
-   * @constructor
-   * @constructors Command
+   * @augments AbstractCommand
+   * @constructs Command
    * @returns {Proxy}
    */
   constructor (action, params) {
@@ -59,6 +53,7 @@ class Command extends AbstractCommand {
   /**
    * Get class of this command
    * @see {@link Command#getClass}
+   * @readonly
    * @member Command#class
    */
   get class () {

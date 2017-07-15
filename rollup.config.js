@@ -7,16 +7,14 @@ import replace from 'rollup-plugin-replace'
 import builtins from 'rollup-plugin-node-builtins'
 import globals from 'rollup-plugin-node-globals'
 
-let external = !process.env.production ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : []
+let external = !process.env.production && !process.env.browser ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : []
 
 const replaceOptions = {
   exclude: 'node_modules/**',
-  'VERSION': 'v1.0.0'
+  'VERSION': 'v2.0.0'
 }
 
-if (process.env.production) replaceOptions['process.env.TMLABS_KEY'] = false
-
-console.log('replaceOptions', replaceOptions)
+if (process.env.production || process.env.browser) replaceOptions['process.env.TMLABS_KEY'] = false
 
 export default {
   entry: 'src/index.js',
@@ -26,7 +24,7 @@ export default {
     resolve({
       jsnext: true,
       main: true,
-      browser: process.env.production,
+      browser: process.env.production || process.env.browser,
       preferBuiltins: false
     }),
     commonjs(),
@@ -55,7 +53,7 @@ export default {
     replace(replaceOptions),
     process.env.production ? babili({
       comments: false,
-      banner: '/**\r* Tempico Labs SDK v1.0.0 \r*/'
+      banner: '/**\r* Tempico Labs SDK v2.0.0 \r*/'
     }) : false
   ],
   external: external,

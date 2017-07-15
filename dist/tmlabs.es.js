@@ -5056,6 +5056,17 @@ var _Object$keys = unwrapExports(keys);
 var AbstractCommand = function (_EventEmitter) {
   _inherits(AbstractCommand, _EventEmitter);
 
+  /**
+   * AbstractCommand main class which is parent for all commands
+   * @constructs AbstractCommand
+   * @augments EventEmitter
+   * @abstract
+   * @param {String} action - Action to be performed
+   * @param {Object} params - command params
+   * @member AbstractCommand
+   * @throws TypeError
+   * @throws ReferenceError
+   */
   function AbstractCommand(action, params) {
     _classCallCheck(this, AbstractCommand);
 
@@ -5073,8 +5084,23 @@ var AbstractCommand = function (_EventEmitter) {
     }
     _this._map = new _WeakMap();
     _this._map.set(_this, {
+      /**
+       * Command action
+       * @type {String}
+       * @member AbstractCommand#action
+       */
       action: action,
+      /**
+       * Pending status
+       * @type {Boolean}
+       * @member AbstractCommand#pending
+       */
       pending: false,
+      /**
+       * Params
+       * @type {Array}
+       * @member AbstractCommand#params
+       */
       params: params
     });
     return _this;
@@ -12044,12 +12070,66 @@ var matches = unwrapExports(matches_1);
 //
 // @app.route('/api/status', methods=['GET'])
 
+/**
+ * @module endpoint
+ * @desc Endpoint constants
+ * @memberOf module:constants
+ */
+
+/**
+ * IP
+ * @type {string}
+ * @constant
+ * @default ip
+ */
 var IP = 'ip';
+
+/**
+ * Hash
+ * @type {string}
+ * @constant
+ * @default hash
+ */
 var HASH = 'hash';
+
+/**
+ * Scan
+ * @type {string}
+ * @constant
+ * @default scan
+ */
 var SCAN = 'scan';
+
+/**
+ * Status
+ * @type {string}
+ * @constant
+ * @default status
+ */
 var STATUS = 'status';
+
+/**
+ * DNS
+ * @type {string}
+ * @constant
+ * @default dns
+ */
 var DNS = 'dns';
+
+/**
+ * Me. Data about myself
+ * @type {string}
+ * @constant
+ * @default me
+ */
 var ME = 'me';
+
+/**
+ * Email Leaks
+ * @type {string}
+ * @constant
+ * @default email/leaks
+ */
 var EMAIL_LEAKS = 'email/leaks';
 
 var endpoint = Object.freeze({
@@ -12091,11 +12171,17 @@ exports.default = function (obj, key, value) {
 
 var _defineProperty$1 = unwrapExports(defineProperty$5);
 
-var _argument;
+var _EMAIL_LEAKS$SCAN$HAS;
 
 var mode = ['detailed', 'simple', 'blacklist', 'geoip'];
 
-var argument = (_argument = {}, _defineProperty$1(_argument, EMAIL_LEAKS, [{
+/**
+ * @module argument
+ * @readonly
+ * @desc Endpoint specifications object
+ * @memberOf module:constants
+ */
+var argument = (_EMAIL_LEAKS$SCAN$HAS = {}, _defineProperty$1(_EMAIL_LEAKS$SCAN$HAS, EMAIL_LEAKS, [{
   arg: 'email',
   required: true,
   check: {
@@ -12106,7 +12192,7 @@ var argument = (_argument = {}, _defineProperty$1(_argument, EMAIL_LEAKS, [{
       allow_utf8_local_part: true
     }]
   }
-}]), _defineProperty$1(_argument, SCAN, [{
+}]), _defineProperty$1(_EMAIL_LEAKS$SCAN$HAS, SCAN, [{
   arg: 'ip',
   alias: 'ipaddr',
   required: true,
@@ -12134,14 +12220,14 @@ var argument = (_argument = {}, _defineProperty$1(_argument, EMAIL_LEAKS, [{
       lt: 65535
     }]
   }
-}]), _defineProperty$1(_argument, HASH, [{
+}]), _defineProperty$1(_EMAIL_LEAKS$SCAN$HAS, HASH, [{
   arg: 'hash',
   required: true,
   check: {
     func: 'matches',
     args: [/[0-9a-f]{5,40}/i]
   }
-}]), _defineProperty$1(_argument, IP, [{
+}]), _defineProperty$1(_EMAIL_LEAKS$SCAN$HAS, IP, [{
   arg: 'ip',
   alias: 'ipaddr',
   required: true,
@@ -12153,7 +12239,7 @@ var argument = (_argument = {}, _defineProperty$1(_argument, EMAIL_LEAKS, [{
   arg: 'mode',
   required: false,
   check: mode
-}]), _defineProperty$1(_argument, DNS, [{
+}]), _defineProperty$1(_EMAIL_LEAKS$SCAN$HAS, DNS, [{
   arg: 'domain',
   required: true,
   check: {
@@ -12164,15 +12250,28 @@ var argument = (_argument = {}, _defineProperty$1(_argument, EMAIL_LEAKS, [{
       allow_trailing_dot: false
     }]
   }
-}]), _defineProperty$1(_argument, ME, [{
+}]), _defineProperty$1(_EMAIL_LEAKS$SCAN$HAS, ME, [{
   arg: 'mode',
   required: false,
   check: mode
-}]), _argument);
+}]), _EMAIL_LEAKS$SCAN$HAS);
 
+/**
+ * @module error
+ * @desc SDK errors
+ */
+
+/**
+ * Error for insufficient funds
+ * @class
+ */
 var InsufficientFundsError = function (_Error) {
   _inherits(InsufficientFundsError, _Error);
 
+  /**
+   * @constructor
+   * @param {string} [message] - Error message
+   */
   function InsufficientFundsError() {
     var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Insufficient funds for request';
 
@@ -12186,6 +12285,11 @@ var InsufficientFundsError = function (_Error) {
 
 var _specification;
 
+/**
+ * Endpoint specifications object
+ * @module specification
+ * @readonly
+ */
 var specification = (_specification = {}, _defineProperty$1(_specification, STATUS, {
   version: false
 }), _defineProperty$1(_specification, EMAIL_LEAKS, {
@@ -12211,6 +12315,16 @@ var validator = {
 var FetchCommand = function (_AbstractCommand) {
   _inherits(FetchCommand, _AbstractCommand);
 
+  /**
+   * FetchCommand for API requests
+   * @constructs FetchCommand
+   * @param {Object} params - The params object
+   * @param {String} [params.key - Token key
+   * @param {String} params.method - Fetch method
+   * @augments AbstractCommand
+   * @throws TypeError
+   * @throws ReferenceError
+   */
   function FetchCommand(params) {
     _classCallCheck(this, FetchCommand);
 
@@ -12232,6 +12346,13 @@ var FetchCommand = function (_AbstractCommand) {
     if (version !== undefined) _this.version = version;else _this.version = 'v2';
 
     if (key !== undefined && typeof key === 'string') _this._map.get(_this).key = key;else if (process.env.TMLABS_KEY) _this._map.get(_this).key = process.env.TMLABS_KEY;
+
+    /**
+     * Command method
+     * @type {string}
+     * @throws ReferenceError
+     * @member FetchCommand#method
+     */
     _this._map.get(_this).method = method;
     _this._map.get(_this).headers = {};
     _this._map.get(_this).args = [];
@@ -12242,9 +12363,25 @@ var FetchCommand = function (_AbstractCommand) {
     _this._map.get(_this).balance_reset = undefined;
     return _this;
   }
+  /**
+   * Available methods
+   * @static
+   * @property {array} method list
+   */
+
 
   _createClass(FetchCommand, [{
     key: '_checkArguments',
+
+
+    /**
+     * Checking arguments
+     * @param {Object|false} data - checking data
+     * @returns {Array}
+     * @throws TypeError
+     * @member FetchCommand#_checkArguments
+     * @private
+     */
     value: function _checkArguments(data) {
       var _this2 = this;
 
@@ -12327,6 +12464,19 @@ var FetchCommand = function (_AbstractCommand) {
         return returnArgs;
       }
     }
+
+    /**
+     * Main fetch function
+     * @param {String} url fetching url
+     * @param {Object} [params={}] request parameters
+     * @param {function|false} [fetchFunc=false] fetch function
+     * @throws Error
+     * @throws ReferenceError
+     * @member FetchCommand#_makeRequest
+     * @returns {Promise}
+     * @private
+     */
+
   }, {
     key: '_makeRequest',
     value: function () {
@@ -12406,11 +12556,33 @@ var FetchCommand = function (_AbstractCommand) {
     }()
   }, {
     key: 'run',
+
+
+    /**
+     * Run FetchCommand.
+     * Options params can be found in [fetch method]{@link FetchCommand#fetch}
+     * @param {Object} [options={}] - The options object
+     * @member FetchCommand#run
+     * @returns {Promise}
+     */
     value: function run() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       return this.fetch(options);
     }
+
+    /**
+     * Fetch method
+     * @param {Object} [options={}] - The options object
+     * @param {String} [options.key] - Token key
+     * @param {Object} [options.headers=false] - Custom headers for request
+     * @param {String} [options.method='GET'] - Custom method. e.g 'POST', 'GET'
+     * @member FetchCommand#fetch
+     * @throws InsufficientFundsError
+     * @throws Error
+     * @returns {Promise}
+     */
+
   }, {
     key: 'fetch',
     value: function () {
@@ -12614,16 +12786,24 @@ var FetchCommand = function (_AbstractCommand) {
 
       return fetch;
     }()
+
+    /**
+     * Request headers
+     * @type {Object|undefined}
+     * @readonly
+     * @member FetchCommand#headers
+     */
+
   }, {
     key: 'method',
+    get: function get() {
+      return this._map.get(this).method;
+    },
     set: function set(method) {
       if (!method) {
         throw new ReferenceError('Empty method');
       }
       this._map.get(this).method = method;
-    },
-    get: function get() {
-      return this._map.get(this).method;
     }
   }, {
     key: 'headers',
@@ -12632,8 +12812,10 @@ var FetchCommand = function (_AbstractCommand) {
     }
 
     /**
-     * Get checked command arguments.
-     * @returns {[{arg: string, val: *}]}
+     * Filtered command arguments
+     * @type {Object[]}
+     * @readonly
+     * @member FetchCommand#args
      */
 
   }, {
@@ -12643,8 +12825,10 @@ var FetchCommand = function (_AbstractCommand) {
     }
 
     /**
-     * Get raw args. Fetch command args
-     * @returns {Array}
+     * Filtered command arguments
+     * @type {Object}
+     * @readonly
+     * @member FetchCommand#rawArgs
      */
 
   }, {
@@ -12652,51 +12836,135 @@ var FetchCommand = function (_AbstractCommand) {
     get: function get() {
       return this._map.get(this).rawArgs;
     }
+
+    /**
+     * Request json encoded object
+     * @type {Object}
+     * @readonly
+     * @member FetchCommand#content
+     */
+
   }, {
     key: 'content',
     get: function get() {
       return this._map.get(this).content;
     }
+
+    /**
+     * Error occurred?
+     * @type {Boolean}
+     * @readonly
+     * @member FetchCommand#error
+     */
+
   }, {
     key: 'error',
     get: function get() {
       return this._map.get(this).error;
     }
+
+    /**
+     * Get status code.
+     * @example
+     * return 200
+     * @member FetchCommand#status
+     * @readonly
+     * @returns {number|undefined}
+     */
+
   }, {
     key: 'status',
     get: function get() {
       return this._map.get(this).status;
     }
+
+    /**
+     * Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
+     * @example
+     * return 'OK'
+     * @member FetchCommand#statusText
+     * @readonly
+     * @returns {String|undefined}
+     */
+
   }, {
     key: 'statusText',
     get: function get() {
       return this._map.get(this).statusText;
     }
+
+    /**
+     * Get command error text if error occurred
+     * @member FetchCommand#errorText
+     * @readonly
+     * @returns {String|undefined}
+     */
+
   }, {
     key: 'errorText',
     get: function get() {
       return this._map.get(this).errorText;
     }
+
+    /**
+     * Remaining balance
+     * @type {double|undefined}
+     * @readonly
+     * @member FetchCommand#balanceRemaining
+     */
+
   }, {
     key: 'balanceRemaining',
     get: function get() {
       return this._map.get(this).balance_remaining;
     }
+
+    /**
+     * Get last request cost
+     * @type {double|undefined}
+     * @readonly
+     * @member FetchCommand#balanceLastbill
+     */
+
   }, {
     key: 'balanceLastbill',
     get: function get() {
       return this._map.get(this).balance_lastbill;
     }
+
+    /**
+     * Returns number of seconds before free key credits renew
+     * @type {double|undefined}
+     * @readonly
+     * @member FetchCommand#balanceReset
+     */
+
   }, {
     key: 'balanceReset',
     get: function get() {
       return this._map.get(this).balance_reset;
     }
+
+    /**
+     * Is pending request or not
+     * @type {Boolean}
+     * @readonly
+     * @member FetchCommand#pending
+     */
+
   }, {
     key: 'pending',
     get: function get() {
       return this._map.get(this).pending;
     }
+
+    /**
+     * Request url
+     * @type {String}
+     * @readonly
+     * @member FetchCommand#url
+     */
+
   }, {
     key: 'url',
     get: function get() {
@@ -12714,6 +12982,14 @@ var FetchCommand = function (_AbstractCommand) {
       if (this.key) url$$1 += '?key=' + this.key;
       return url$$1;
     }
+
+    /**
+     * Token key
+     * @type {String}
+     * @readonly
+     * @member FetchCommand#key
+     */
+
   }, {
     key: 'key',
     get: function get() {
@@ -12724,6 +13000,14 @@ var FetchCommand = function (_AbstractCommand) {
     value: function getMethods() {
       return endpoint;
     }
+
+    /**
+     * Get method specifications
+     * @static
+     * @param {String|false} [method=false] if method defined get specifications for this method, else get all
+     * @returns {Object[]}
+     */
+
   }, {
     key: 'getMethodSpecifications',
     value: function getMethodSpecifications() {
@@ -12768,6 +13052,12 @@ var _Object$assign = unwrapExports(assign);
 var StatusCommand = function (_FetchCommand) {
   _inherits(StatusCommand, _FetchCommand);
 
+  /**
+   * StatusCommand for getting status about yourself
+   * @augments FetchCommand
+   * @constructs StatusCommand
+   * @param {Object|false|undefined} [params] - command params
+   */
   function StatusCommand(params) {
     _classCallCheck(this, StatusCommand);
 
@@ -12776,6 +13066,14 @@ var StatusCommand = function (_FetchCommand) {
       version: false
     })));
   }
+
+  /**
+   * Return API status promise
+   * @param options
+   * @member StatusCommand#run
+   * @returns {Promise}
+   */
+
 
   _createClass(StatusCommand, [{
     key: 'run',
@@ -13867,14 +14165,17 @@ var sha256 = createCommonjsModule(function (module, exports) {
 }));
 });
 
-/**
- * HashCommand class for file & stream hashing.
- * Run method sends hash to API
- */
-
 var HashCommand = function (_FetchCommand) {
   _inherits(HashCommand, _FetchCommand);
 
+  /**
+   * HashCommand class for file & stream hashing.
+   * Run method sends hash to API
+   * @constructors HashCommand
+   * @augments FetchCommand
+   * @param [params]
+   * @param {string} [params.key] - API key.
+   */
   function HashCommand(params) {
     _classCallCheck(this, HashCommand);
 
@@ -13885,7 +14186,11 @@ var HashCommand = function (_FetchCommand) {
 
   /**
    * Get file or stream hash and check it by sending request to API
+   * @member HashCommand#run
    * @param {{stream: Stream}|{file: string}|{hash: string}} options
+   * @fulfil {Object}
+   * @reject {Error}
+   * @throws {InsufficientFundsError}
    * @returns {Promise}
    */
 
@@ -13996,6 +14301,8 @@ var HashCommand = function (_FetchCommand) {
     /**
      * Get Hash transform object
      * @see {@link https://nodejs.org/api/crypto.html#crypto_class_hash}
+     * @member HashCommand#hashStream
+     * @returns {string}
      */
 
   }, {
@@ -14005,6 +14312,7 @@ var HashCommand = function (_FetchCommand) {
     /**
      * Get hash passing stream as parameter
      * @param {Stream} stream Stream object
+     * @member HashCommand#getStreamHash
      * @returns {Promise}
      */
     value: function () {
@@ -14041,6 +14349,7 @@ var HashCommand = function (_FetchCommand) {
     /**
      * Get hash passing only file path
      * @param {string} filepath
+     * @member HashCommand#getFileHash
      * @returns {Promise}
      */
 
@@ -14079,7 +14388,8 @@ var HashCommand = function (_FetchCommand) {
 
     /**
      * Get SHA256 from string. Useful in browser
-     * @param string
+     * @param {string} string
+     * @member HashCommand#getStringHash
      * @returns {string}
      */
 
@@ -14104,6 +14414,14 @@ var HashCommand = function (_FetchCommand) {
 var Command = function (_AbstractCommand) {
   _inherits(Command, _AbstractCommand);
 
+  /**
+   * Main Universal Command
+   * @param {String} action - Action for the command
+   * @param {Object} params - Command parameters
+   * @augments AbstractCommand
+   * @constructs Command
+   * @returns {Proxy}
+   */
   function Command(action, params) {
     var _ret;
 
@@ -14131,13 +14449,38 @@ var Command = function (_AbstractCommand) {
     }), _possibleConstructorReturn(_this, _ret);
   }
 
+  /**
+   *
+   * @param {Boolean|String} [action]
+   * @static
+   * @member Command#getClass
+   * @throws ReferenceError
+   * @returns {FetchCommand|StatusCommand|HashCommand}
+   */
+
+
   _createClass(Command, [{
     key: 'run',
+
+
+    /**
+     * Run command
+     * @param params
+     * @member Command#run
+     */
     value: function run(params) {
       if (this.instance) return this.instance.run(params);
     }
   }, {
     key: 'class',
+
+
+    /**
+     * Get class of this command
+     * @see {@link Command#getClass}
+     * @readonly
+     * @member Command#class
+     */
     get: function get() {
       var action = this._map.get(this).action;
       return Command.getClass(action);
@@ -14164,11 +14507,17 @@ var Command = function (_AbstractCommand) {
   return Command;
 }(AbstractCommand);
 
-// import * as Constants from './constant';
-
 var TmLabs$1 = function (_EventEmitter) {
   _inherits(TmLabs, _EventEmitter);
 
+  /**
+   * Main TmLabs class.
+   * @constructs TmLabs
+   * @augments EventEmitter
+   * @param {Object} [options] - The options object
+   * @param {Object} [options.key] - API token
+   * @param {Object} [options.limit] - Queue limit
+   */
   function TmLabs(options) {
     _classCallCheck(this, TmLabs);
 
@@ -14195,10 +14544,12 @@ var TmLabs$1 = function (_EventEmitter) {
   }
 
   /**
-   *
-   * @param {{command: string, params: object}} commands Array of command objects which contain command key and it params key for command run options
-   * @param options
-   * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
+   * Run commands
+   * @param {Array.<Object>} commands Array of command objects which contain command key and it params key for command run options
+   * @param {Object} [options] Batch command options
+   * @param {Boolean} [options.throw=false] If true command will throw exceptions
+   * @member TmLabs#runBatch
+   * @returns {Promise}
    */
 
 
@@ -14267,9 +14618,10 @@ var TmLabs$1 = function (_EventEmitter) {
     /**
      * Fetch specific method multiple times with different params
      * @param {string} method API method dns|ip, etc
-     * @param {[object]} objects array of request parameters
+     * @param {Object[]} objects array of request parameters
      * @param options additional options
-     * @returns {[{state: 'fulfilled', value: {}}|{state: 'rejected', reason: Error}]}
+     * @member TmLabs#fetchBatch
+     * @returns {Promise}
      */
 
   }, {
@@ -14352,6 +14704,7 @@ var TmLabs$1 = function (_EventEmitter) {
      * Fetch specific method
      * @param {string} method API method dns|ip, etc
      * @param {object} params method parameters
+     * @member TmLabs#fetch
      * @returns {Promise}
      */
 
@@ -14371,7 +14724,9 @@ var TmLabs$1 = function (_EventEmitter) {
      * Run command with params
      * @param {Command} command
      * @param params command params
-     * @returns {Promise}
+     * @member TmLabs#runCommand
+     * @resolves {Array.<Object>} result
+     * @returns {Promise} result
      */
 
   }, {
@@ -14410,7 +14765,8 @@ var TmLabs$1 = function (_EventEmitter) {
 
     /**
      * History array return
-     * @returns {Array}
+     * @member TmLabs#history
+     * @returns {AbstractCommand[]}
      */
 
   }, {
@@ -14420,7 +14776,9 @@ var TmLabs$1 = function (_EventEmitter) {
     }
 
     /**
-     * Active key for TmLabs Object
+     * Active token for TmLabs Object.
+     * Overrides if passed into params of [FetchCommand Class]{@link FetchCommand} <code>key</code> or
+     * @member TmLabs#key
      * @returns {string}
      */
 
@@ -14432,6 +14790,7 @@ var TmLabs$1 = function (_EventEmitter) {
 
     /**
      * Get number of simultaneously requests
+     * @member TmLabs#limit
      * @returns {number}
      */
 
@@ -14443,6 +14802,7 @@ var TmLabs$1 = function (_EventEmitter) {
 
     /**
      * Get number of pending requests
+     * @member TmLabs#pending
      * @returns {number}
      */
 
@@ -14451,16 +14811,40 @@ var TmLabs$1 = function (_EventEmitter) {
     get: function get() {
       return this._map.get(this).queue.pending;
     }
+
+    /**
+     * Remaining balance
+     * @member TmLabs#balanceRemaining
+     * @see {@link FetchCommand#balanceRemaining}
+     * @returns {double|undefined}
+     */
+
   }, {
     key: 'balanceRemaining',
     get: function get() {
       return this._map.get(this).balance_remaining;
     }
+
+    /**
+     * Last billing cost
+     * @member TmLabs#balanceLastbill
+     * @see {@link FetchCommand#balanceLastbill}
+     * @returns {double|undefined}
+     */
+
   }, {
     key: 'balanceLastbill',
     get: function get() {
       return this._map.get(this).balance_lastbill;
     }
+
+    /**
+     * Returns number of seconds before free key credits renew
+     * @member TmLabs#balanceReset
+     * @see {@link FetchCommand#balanceReset}
+     * @returns {undefined|double}
+     */
+
   }, {
     key: 'balanceReset',
     get: function get() {
@@ -14473,6 +14857,13 @@ var TmLabs$1 = function (_EventEmitter) {
 
 var _this = undefined;
 
+/**
+ * Simple fetch function
+ * @function fetch
+ * @param params
+ * @member module:TmLabs.fetch
+ * @returns {Promise}
+ */
 var fetch = function () {
   var _ref = _asyncToGenerator(index.mark(function _callee(params) {
     var command, answer;
@@ -14501,6 +14892,13 @@ var fetch = function () {
   };
 }();
 
+/**
+ * Simple hash function
+ * @function hash
+ * @param params
+ * @member module:TmLabs.hash
+ * @returns {Promise}
+ */
 var hash = function () {
   var _ref2 = _asyncToGenerator(index.mark(function _callee2(params) {
     var command, answer;
@@ -14530,5 +14928,5 @@ var hash = function () {
   };
 }();
 
-export { TmLabs$1 as TmLabs, Command, fetch, hash, FetchCommand, HashCommand };export default TmLabs$1;
+export { TmLabs$1 as TmLabs, Command, fetch, hash, FetchCommand, StatusCommand, HashCommand };export default TmLabs$1;
 //# sourceMappingURL=tmlabs.es.js.map

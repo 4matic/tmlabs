@@ -1,7 +1,7 @@
 {
   "name": "tmlabs",
   "description": "NodeJS SDK for TempicoLabs API",
-  "main": "dist/tmlabs.min.js",
+  "main": "dist/tmlabs.js",
   "authors": [
     "Maxim Maximov <root@4matikku.com>"
   ],

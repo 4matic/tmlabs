@@ -2,6 +2,7 @@ import EventEmitter from 'smelly-event-emitter'
 import Q from 'q'
 import PQueue from 'p-queue'
 import Command from './Command'
+import { event } from './constant'
 import FetchCommand from './command/FetchCommand'
 
 export default class TmLabs extends EventEmitter {
@@ -29,7 +30,7 @@ export default class TmLabs extends EventEmitter {
       balance_lastbill: undefined,
       balance_reset: undefined
     })
-    this.on('resolved', (command) => {
+    this.on(event.RESOLVED, (command) => {
       this._map.get(this).history.push(command)
     })
   }
@@ -112,25 +113,25 @@ export default class TmLabs extends EventEmitter {
     let newParams = params
     if (this.key) newParams.key = this.key
     return new Promise((resolve, reject) => {
-      this.emit('command', command, newParams)
-      command.on('error', (error, cmd) => {
-        this.emit('error', error, cmd)
+      this.emit(event.COMMAND, command, newParams)
+      command.on(event.ERROR, (error, cmd) => {
+        this.emit(event.ERROR, error, cmd)
         reject(error)
       })
-      command.on('fetch', (options, cmd) => {
-        this.emit('fetch', cmd, options)
+      command.on(event.FETCH, (options, cmd) => {
+        this.emit(event.FETCH, cmd, options)
       })
-      command.on('response', (response, cmd) => {
-        this.emit('response', cmd, response)
+      command.on(event.RESPONSE, (response, cmd) => {
+        this.emit(event.RESPONSE, cmd, response)
         this._map.get(this).balance_remaining = cmd.balanceRemaining
         this._map.get(this).balance_lastbill = cmd.balanceLastbill
         this._map.get(this).balance_reset = cmd.balanceReset
       })
-      command.on('raw_response', (response, cmd) => {
-        this.emit('raw_response', cmd, response)
+      command.on(event.RAW_RESPONSE, (response, cmd) => {
+        this.emit(event.RAW_RESPONSE, cmd, response)
       })
       this._map.get(this).queue.add(() => command.run(newParams).then((response) => {
-        this.emit('resolved', command, response)
+        this.emit(event.RESOLVED, command, response)
         resolve(response)
       }))
     })

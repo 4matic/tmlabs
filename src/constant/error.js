@@ -1,6 +1,19 @@
 /**
  * @module error
  * @desc SDK errors
+ * @example
+ * // Good way for handling errors created using TmLabs Object
+ * var tmLabs = new TmLabs['default']();
+ * tmLabs.on('error', function (error, command) {
+ *   console.error('[ SDK ERROR ]', error)
+ * });
+ * tmLabs.fetch('ip', {
+ *    ip: '127.0.0.1'
+ * }).then(function(ipAnswer){
+ *     console.log('ipAnswer', ipAnswer);
+ * }).catch(function(err){
+ *     console.log('error', err);
+ * });
  */
 
 /**

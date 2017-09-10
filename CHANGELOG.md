@@ -1,7 +1,9 @@
-3.0.1
+3.1.0
 * fixing fetch function in main package
 * some static methods added
+* RunKit support added
 * Updated Examples & Docs
+* Added event constants module
 
 3.0.0
 * UMD Module fix

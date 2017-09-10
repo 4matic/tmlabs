@@ -1,7 +1,7 @@
 import Hasha from 'hasha'
 import SHA256 from 'crypto-js/sha256'
 import FetchCommand from './FetchCommand'
-import { endpoint } from '../constant'
+import { endpoint, event } from '../constant'
 
 class HashCommand extends FetchCommand {
   /**
@@ -45,7 +45,7 @@ class HashCommand extends FetchCommand {
     } catch (err) {
       this._map.get(this).error = true
       this._map.get(this).errorText = err.message
-      this.emit('error', err, this)
+      this.emit(event.ERROR, err, this)
       throw err
     }
     return runResponse

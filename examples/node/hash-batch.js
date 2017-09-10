@@ -22,7 +22,7 @@ tmLabs.on('resolved', function (command, args) {
   console.log("[ RESOLVED '" + command.method + "' ] history size: ", tmLabs.history.length, ', pending: ', tmLabs.pending)
 })
 
-const commands = [[new TmLabs.HashCommand(), {
+var commands = [[new TmLabs.HashCommand(), {
   hash: 'testing hash'
 }], [new TmLabs.HashCommand(), {
   hash: 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051' // just check hash

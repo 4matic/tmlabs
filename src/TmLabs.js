@@ -65,14 +65,20 @@ export default class TmLabs extends EventEmitter {
    * @member TmLabs#fetchBatch
    * @returns {Promise}
    */
-  async fetchBatch (method, objects = [], options = {}) {
+  async fetchBatch (method, objects = [], options = { throw: false }) {
     let batchResponse = []
-    const methods = FetchCommand.getMethods()
+    const methods = FetchCommand.methods
     if (!method) throw new TypeError("Empty required param 'method'")
     if (!Object.values(methods).includes(method)) throw new TypeError('Invalid method param')
     let promises = []
     objects.forEach((params) => {
-      promises.push(this.fetch(method, params))
+      promises.push(async () => {
+        try {
+          return await this.fetch(method, params)
+        } catch (err) {
+          return err
+        }
+      })
     })
     if (!options.throw) batchResponse = await Q.allSettled(promises)
     else batchResponse = await Q.all(promises)
@@ -195,5 +201,16 @@ export default class TmLabs extends EventEmitter {
    */
   get balanceReset () {
     return this._map.get(this).balance_reset
+  }
+
+  /**
+   * Returns SDK version
+   * @member TmLabs#version
+   * @returns {String}
+   */
+  static get version () {
+    const version = process.env.TMLABS_VERSION
+    if (!version) throw new Error('Use bundled packages in /dist/ folder to get version')
+    return version
   }
 }

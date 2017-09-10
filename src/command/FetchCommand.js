@@ -10,9 +10,11 @@ import isEmail from 'validator/lib/isEmail'
 import isInt from 'validator/lib/isInt'
 import matches from 'validator/lib/matches'
 import AbstractCommand from './AbstractCommand'
+import TmLabs from './../TmLabs'
 import { endpoint, specification, argument, error } from '../constant'
 promisePonyfill.polyfill()
 const { fetch } = fetchPonyfill()
+const { InsufficientFundsError, ResponseError, NotFoundError } = error
 
 const validator = {
   isIP,
@@ -36,14 +38,13 @@ class FetchCommand extends AbstractCommand {
   constructor (params) {
     super('fetch', params)
     const { method, version, data, key, fetchFunc } = params // todo: do data parsing
-    const methods = FetchCommand.getMethods()
+    const methods = FetchCommand.methods
 
     if (!method) throw new TypeError("Empty required param 'method'")
     if (!Object.values(methods).includes(method)) throw new TypeError('Invalid method param')
     if (fetchFunc) this.fetchFunc = fetchFunc
-    else this.fetchFunc = fetch
+    else this.fetchFunc = FetchCommand.fetchClass
 
-    this.api_url = 'https://tempicolabs.com'
     if (version !== undefined) this.version = version
     else this.version = 'v2'
 
@@ -65,31 +66,47 @@ class FetchCommand extends AbstractCommand {
     this._map.get(this).balance_lastbill = undefined
     this._map.get(this).balance_reset = undefined
   }
+
   /**
    * Available methods
    * @static
    * @property {array} method list
    */
-  static getMethods () {
+  static get methods () {
     return endpoint
+  }
+
+  /**
+   * API hostname
+   * @static
+   * @returns {String}
+   */
+  static get apiUrl () {
+    return 'https://tempicolabs.com'
   }
 
   /**
    * Get method specifications
    * @static
    * @param {String|false} [method=false] if method defined get specifications for this method, else get all
-   * @returns {Object[]}
+   * @returns {Object|Object[]}
    */
   static getMethodSpecifications (method = false) {
-    const methods = FetchCommand.getMethods()
+    const methods = FetchCommand.methods
     const newMethods = {}
     const getOneMethodData = (method) => {
       const args = argument[method]
       const spec = specification[method]
       const methodData = {}
       if (spec) methodData.spec = spec
-      if (args) methodData.args = args
-      else methodData.args = []
+      if (args) {
+        methodData.args = args.map((arg) => {
+          let checkFunc = null
+          if (arg.check && arg.check.func) checkFunc = validator[arg.check.func]
+          arg.checkFunc = checkFunc
+          return arg
+        })
+      } else methodData.args = []
       return methodData
     }
     if (!method) {
@@ -178,7 +195,7 @@ class FetchCommand extends AbstractCommand {
   }
 
   /**
-   * Main fetch function
+   * Instance function for making request
    * @param {String} url fetching url
    * @param {Object} [params={}] request parameters
    * @param {function|false} [fetchFunc=false] fetch function
@@ -189,6 +206,35 @@ class FetchCommand extends AbstractCommand {
    * @private
    */
   async _makeRequest (url, params = {}, fetchFunc = false) {
+    try {
+      this.emit('fetch', params, this)
+      this._map.get(this).pending = true
+      const fetchResponse = await FetchCommand.makeRequest(url, params, fetchFunc)
+      const { response, options } = fetchResponse
+      this._map.get(this).pending = false
+      this.emit('raw_response', response, this)
+      return response
+    } catch (err) {
+      this._map.get(this).error = true
+      this._map.get(this).errorText = err.message
+      this.emit('error', err, this)
+      throw err
+    }
+  }
+
+  /**
+   * Main static fetch function
+   * @static
+   * @param {String} url fetching url
+   * @param {Object} [params={}] request parameters
+   * @param {function|false} [fetchFunc=false] fetch function
+   * @throws Error
+   * @throws ReferenceError
+   * @member FetchCommand#makeRequest
+   * @returns {Promise}
+   * @private
+   */
+  static async makeRequest (url, params = {}, fetchFunc = false) {
     if (!url) throw new ReferenceError('Empty url')
     if (!fetchFunc) fetchFunc = fetch
     try {
@@ -197,8 +243,8 @@ class FetchCommand extends AbstractCommand {
         headers = {
           'Content-Type': 'application/json'
         }
-        if (typeof module !== 'undefined' && module.exports) {
-          headers['User-Agent'] = `${os.type()}_${process.arch} Node ${process.version} - TempicoLabs SDK`
+        if (!process.env.browser) {
+          headers['User-Agent'] = `${os.type()}_${process.arch} Node ${process.version} - TempicoLabs SDK v${TmLabs.version}`
         }
       }
       let options = {
@@ -211,16 +257,9 @@ class FetchCommand extends AbstractCommand {
         }
       }
       options.method = method
-      this.emit('fetch', options, this)
-      this._map.get(this).pending = true
       const response = await fetchFunc(url, options)
-      this._map.get(this).pending = false
-      this.emit('raw_response', response, this)
-      return response
+      return { response, options }
     } catch (err) {
-      this._map.get(this).error = true
-      this._map.get(this).errorText = err.message
-      this.emit('error', err, this)
       throw err
     }
   }
@@ -255,19 +294,22 @@ class FetchCommand extends AbstractCommand {
    * @param {String} [options.method='GET'] - Custom method. e.g 'POST', 'GET'
    * @member FetchCommand#fetch
    * @throws InsufficientFundsError
+   * @throws NotFoundError
+   * @throws ResponseError
    * @throws Error
    * @returns {Promise}
    */
   async fetch (options = {}) {
     let params = {}
-    const method = options.method || 'GET'
-    const headers = options.headers || false
-    if (options.key !== undefined && typeof options.key === 'string') this._map.get(this).key = options.key
-    else if (process.env.TMLABS_KEY) this._map.get(this).key = process.env.TMLABS_KEY
     let fetchResponse
+    if (!options) options = {}
     try {
-      this._map.get(this).rawArgs = options
+      // if (options.key !== undefined && typeof options.key === 'string') this._map.get(this).key = options.key
       const args = this._checkArguments(options)
+      const method = options.method || 'GET'
+      const headers = options.headers || false
+      if (process.env.TMLABS_KEY) options.key = process.env.TMLABS_KEY
+      this._map.get(this).rawArgs = options
       params = {
         method
       }
@@ -286,13 +328,14 @@ class FetchCommand extends AbstractCommand {
         fetchResponse = {
           content,
           headers: {},
-          error: !response.ok && ![404].includes(status),
+          error: !response.ok,
           status,
           statusText
         }
         this._map.get(this).content = content
+        this._map.get(this).status = status
         let responseHeaders = {}
-        if (headers._headers) responseHeaders = headers._headers;
+        if (headers._headers) responseHeaders = headers._headers
         else {
           for (let header of headers.entries()) {
             responseHeaders[header[0]] = header[1]
@@ -310,17 +353,22 @@ class FetchCommand extends AbstractCommand {
         Object.keys(fetchResponse).forEach((key) => {
           this._map.get(this)[key] = fetchResponse[key]
         })
-        if (fetchResponse.error && content && content.error) {
-          this._map.get(this).errorText = content.error
-          if (status === 429) throw new error.InsufficientFundsError(content.error)
-          this.emit('error', new Error(content.error), this)
+        if (fetchResponse.error || (content && content.error)) {
+          if (status === 429) throw new InsufficientFundsError(content.error, this._map.get(this).balance_reset)
+          if (status === 404 && options.throwNotFound === true) throw new NotFoundError(content.error, response)
+          else if (status === 404 && !options.throwNotFound) fetchResponse.content = null
+          else throw new ResponseError(content.error, response)
         }
       } else {
-        throw new Error('Response is empty!')
+        throw new ResponseError('Response is empty!')
       }
       this.emit('response', fetchResponse, this)
       return fetchResponse
     } catch (err) {
+      // if (err instanceof NotFoundError) {
+      //
+      // } else {
+      // }
       this._map.get(this).error = true
       this._map.get(this).errorText = err.message
       this.emit('error', err, this)
@@ -391,6 +439,7 @@ class FetchCommand extends AbstractCommand {
   }
 
   /**
+   * todo: fix
    * Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
    * @example
    * return 'OK'
@@ -459,7 +508,7 @@ class FetchCommand extends AbstractCommand {
    * @member FetchCommand#url
    */
   get url () {
-    const parts = [this.api_url, 'api', this.version, this.method]
+    const parts = [FetchCommand.apiUrl, 'api', this.version, this.method]
     const args = this.args
     let url = ''
     parts.forEach((part) => {
@@ -482,6 +531,17 @@ class FetchCommand extends AbstractCommand {
    */
   get key () {
     return this._map.get(this).key
+  }
+
+  /**
+   * Fetch class used in module, fetch-ponyfill
+   * @type {Function}
+   * @static
+   * @readonly
+   * @member FetchCommand#fetchClass
+   */
+  static get fetchClass () {
+    return fetch
   }
 }
 

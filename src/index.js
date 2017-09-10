@@ -5,27 +5,39 @@ import StatusCommand from './command/StatusCommand'
 import HashCommand from './command/HashCommand'
 
 /**
- * Simple fetch function
+ * Simple fetch function.
+ * @example
+ * // es6
+ * import { fetch } from '@tempicolabs/tmlabs'
+ * fetch('ip', { ip: '8.8.8.8' }).then((ipData) => {
+ *  console.log('Status data:', ipData);
+ * });
  * @function fetch
- * @param params
+ * @param method
+ * @param params See options argument {@link FetchCommand#fetch}
  * @member module:TmLabs.fetch
  * @returns {Promise}
  */
-const fetch = async (params) => {
-  const command = new FetchCommand(params)
+const fetch = async (method, params) => {
+  const command = new FetchCommand({ method })
   const answer = await command.run(params)
   return answer
 }
 
 /**
  * Simple hash function
+ * @example
+ * // es6
+ * import { hash } from '@tempicolabs/tmlabs'
+ * hash({ hash: 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051' }).then((hashData) => {
+ *  console.log('Hash data:', hashData);
+ * });
  * @function hash
- * @param params
+ * @param params See options argument {@link HashCommand#run}
  * @member module:TmLabs.hash
  * @returns {Promise}
  */
 const hash = async (params) => {
-  console.log('hash', params)
   const command = new HashCommand()
   const answer = await command.run(params)
   return answer
@@ -39,7 +51,7 @@ export default TmLabs
  * @example
  * // es6
  * // returns specific classes from package module
- * import { HashCommand as HashClass } '@tempicolabs/tmlabs'
+ * import { HashCommand as HashClass } from '@tempicolabs/tmlabs'
  *
  * // or
  *
@@ -54,7 +66,7 @@ export default TmLabs
  * @example
  * // es6
  * // returns default TmLabs main object class
- * import TmLabs '@tempicolabs/tmlabs'
+ * import TmLabs from '@tempicolabs/tmlabs'
  *
  * // or
  * var TmLabs = require('@tempicolabs/tmlabs');

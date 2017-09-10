@@ -22,7 +22,7 @@ describe('Class Tests', () => {
     try {
       results = await tmLabs.fetchBatch('dns', domains.map(domain => ({
         domain: domain
-      })), {throw: true})
+      })), { throw: true })
     } catch (e) {
       assert.isUndefined(results)
       assert.equal(e.message, 'Method required param \'domain\' validation error', 'exception message')
@@ -51,39 +51,19 @@ describe('Class Tests', () => {
     }), {
       ip: '173.194.122.234'
     }]]
-    const results = await tmLabs.runBatch(commands.map(command => ({
-      command: command[0],
-      params: command[1]
-    })))
-    assert.lengthOf(results, 3)
-    assert.equal(results[0].state, 'rejected')
-    assert.instanceOf(results[0].reason, Error)
-  })
-  it('Multiple commands. fetch commands. error in results array', async () => {
-    const tmLabs = new TmLabs()
     let results
-    const commands = [[new Fetch({
-      method: 'ip'
-    }), {
-      ip: '127.0.0.1'
-    }], [new Fetch({
-      method: 'ip'
-    }), {
-      ip: '173.194.122.233'
-    }], [new Command('fetch', {
-      method: 'ip'
-    }), {
-      ip: '173.194.122.234'
-    }]]
     try {
       results = await tmLabs.runBatch(commands.map(command => ({
         command: command[0],
         params: command[1]
-      })), { throw: true })
+      })))
     } catch (e) {
-      assert.isUndefined(results)
-      assert.equal(e.message, 'Incorrect IPv4 address', 'exception message')
+      assert.equal(e.message, 'Method required param \'domain\' validation error', 'exception message')
+      // assert.isUndefined(results)
     }
+    assert.lengthOf(results, 3)
+    assert.equal(results[0].state, 'rejected')
+    assert.instanceOf(results[0].reason, Error)
   })
   it('Multiple commands. hash & fetch commands. error in results array', async () => {
     const tmLabs = new TmLabs()
@@ -106,12 +86,13 @@ describe('Class Tests', () => {
       command: command[0],
       params: command[1]
     })))
+    console.log(results)
     assert.lengthOf(results, 6)
     assert.equal(results[0].state, 'rejected')
     assert.instanceOf(results[0].reason, Error)
     assert.equal(results[5].state, 'fulfilled')
     assert.hasAllKeys(results[5].value.content, [
-      'balance', 'stats'
+      'stats'
     ], 'has balance & stats keys in body')
   })
 })

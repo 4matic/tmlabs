@@ -1,4 +1,4 @@
-const TmLabs = require('../../dist/tmlabs.umd')
+var TmLabs = require('../../dist/tmlabs.umd')
 /* eslint-disable new-cap */
 var tmLabs = new TmLabs['default']()
 tmLabs.on('error', function (error, command) {

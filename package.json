@@ -119,10 +119,10 @@
     "es6-promise": "^4.1.1",
     "fetch-ponyfill": "^4.0.0",
     "hasha": "^3.0.0",
-    "isomorphic-fetch": "^2.2.1",
     "p-queue": "^1.1.0",
     "q": "^1.5.0",
     "smelly-event-emitter": "^0.1.1",
     "validator": "^8.0.0"
-  }
+  },
+  "runkitExampleFilename": "runkit.js"
 }

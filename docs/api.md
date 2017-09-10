@@ -46,6 +46,14 @@ Default export is Main TmLabs object class.</p>
 </dd>
 </dl>
 
+## Functions
+
+<dl>
+<dt><a href="#value">value([method])</a> ⇒ <code>Object</code> | <code>Array.&lt;Object&gt;</code></dt>
+<dd><p>Get method specifications</p>
+</dd>
+</dl>
+
 <a name="module_TmLabs"></a>
 
 ## TmLabs
@@ -66,7 +74,7 @@ Default export is Main TmLabs object class.
 ```js
 // es6
 // returns specific classes from package module
-import { HashCommand as HashClass } '@tempicolabs/tmlabs'
+import { HashCommand as HashClass } from '@tempicolabs/tmlabs'
 
 // or
 
@@ -85,7 +93,7 @@ var HashCommand = tmLabs.HashCommand;
 ```js
 // es6
 // returns default TmLabs main object class
-import TmLabs '@tempicolabs/tmlabs'
+import TmLabs from '@tempicolabs/tmlabs'
 
 // or
 var TmLabs = require('@tempicolabs/tmlabs');
@@ -112,13 +120,24 @@ var tmLabs = TmLabs.default();
 
 ### TmLabs.fetch ⇒ <code>Promise</code>
 Simple fetch function
+Params can be found in [fetch method](#FetchCommand+fetch)
 
 **Kind**: static property of [<code>TmLabs</code>](#module_TmLabs)  
 
 | Param |
 | --- |
+| method | 
 | params | 
 
+**Example**  
+```js
+// es6
+// returns specific classes from package module
+import { fetch } from '@tempicolabs/tmlabs'
+fetch('ip', { ip: '8.8.8.8' }).then((ipData) => {
+ console.log('Status data:', ipData);
+});
+```
 <a name="module_TmLabs.hash"></a>
 
 ### TmLabs.hash ⇒ <code>Promise</code>
@@ -281,6 +300,8 @@ Main Universal Command
 <a name="Command+getClass"></a>
 
 ### command.getClass ⇒ [<code>FetchCommand</code>](#FetchCommand) \| [<code>StatusCommand</code>](#StatusCommand) \| <code>HashCommand</code>
+Get Class by action name
+
 **Kind**: instance property of [<code>Command</code>](#Command)  
 **Throws**:
 
@@ -902,3 +923,14 @@ Pending status
 Params
 
 **Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  
+<a name="value"></a>
+
+## value([method]) ⇒ <code>Object</code> \| <code>Array.&lt;Object&gt;</code>
+Get method specifications
+
+**Kind**: global function  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [method] | <code>String</code> \| <code>false</code> | <code>false</code> | if method defined get specifications for this method, else get all |
+

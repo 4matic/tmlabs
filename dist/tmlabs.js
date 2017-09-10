@@ -5131,6 +5131,17 @@ var AbstractCommand = function (_EventEmitter) {
   return AbstractCommand;
 }(EventEmitter);
 
+var $JSON$1 = _core.JSON || (_core.JSON = {stringify: JSON.stringify});
+var stringify$1 = function stringify(it){ // eslint-disable-line no-unused-vars
+  return $JSON$1.stringify.apply($JSON$1, arguments);
+};
+
+var stringify = createCommonjsModule(function (module) {
+module.exports = { "default": stringify$1, __esModule: true };
+});
+
+var _JSON$stringify = unwrapExports(stringify);
+
 var core_getIterator = _core.getIterator = function(it){
   var iterFn = core_getIteratorMethod(it);
   if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
@@ -5144,17 +5155,6 @@ module.exports = { "default": getIterator$1, __esModule: true };
 });
 
 var _getIterator = unwrapExports(getIterator);
-
-var $JSON$1 = _core.JSON || (_core.JSON = {stringify: JSON.stringify});
-var stringify$1 = function stringify(it){ // eslint-disable-line no-unused-vars
-  return $JSON$1.stringify.apply($JSON$1, arguments);
-};
-
-var stringify = createCommonjsModule(function (module) {
-module.exports = { "default": stringify$1, __esModule: true };
-});
-
-var _JSON$stringify = unwrapExports(stringify);
 
 var _createProperty = function(object, index, value){
   if(index in object)_objectDp.f(object, index, _propertyDesc(0, value));
@@ -7471,22 +7471,88 @@ var argument = (_EMAIL_LEAKS$SCAN$HAS = {}, _defineProperty$1(_EMAIL_LEAKS$SCAN$
  */
 
 /**
- * Error for insufficient funds
+ * Response error
  * @class
  */
-var InsufficientFundsError = function (_Error) {
-  _inherits(InsufficientFundsError, _Error);
+var ResponseError$1 = function (_Error) {
+  _inherits(ResponseError, _Error);
 
   /**
    * @constructor
    * @param {string} [message] - Error message
+   * @param {Object} [response] - Fetch function object
+   */
+  function ResponseError() {
+    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Response error';
+    var response = arguments[1];
+
+    _classCallCheck(this, ResponseError);
+
+    var _this = _possibleConstructorReturn(this, (ResponseError.__proto__ || _Object$getPrototypeOf(ResponseError)).call(this, message));
+
+    _this.message = message;
+    _this.name = 'ResponseError';
+    _this.response = response;
+    return _this;
+  }
+
+  return ResponseError;
+}(Error);
+
+/**
+ * Not found error
+ * @class
+ */
+
+
+var NotFoundError$1 = function (_ResponseError) {
+  _inherits(NotFoundError, _ResponseError);
+
+  /**
+   * @constructor
+   * @param {string} [message] - Error message
+   * @param {Object} [response] - Fetch function object
+   */
+  function NotFoundError() {
+    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Not found!';
+    var response = arguments[1];
+
+    _classCallCheck(this, NotFoundError);
+
+    var _this2 = _possibleConstructorReturn(this, (NotFoundError.__proto__ || _Object$getPrototypeOf(NotFoundError)).call(this, message, response));
+
+    _this2.name = 'NotFoundError';
+    return _this2;
+  }
+
+  return NotFoundError;
+}(ResponseError$1);
+
+/**
+ * Error for insufficient funds
+ * @class
+ */
+
+
+var InsufficientFundsError$1 = function (_Error2) {
+  _inherits(InsufficientFundsError, _Error2);
+
+  /**
+   * @constructor
+   * @param {string} [message] - Error message
+   * @param {number} [balanceReset] - Seconds until balance change
    */
   function InsufficientFundsError() {
     var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Insufficient funds for request';
+    var balanceReset = arguments[1];
 
     _classCallCheck(this, InsufficientFundsError);
 
-    return _possibleConstructorReturn(this, (InsufficientFundsError.__proto__ || _Object$getPrototypeOf(InsufficientFundsError)).call(this, message));
+    var _this3 = _possibleConstructorReturn(this, (InsufficientFundsError.__proto__ || _Object$getPrototypeOf(InsufficientFundsError)).call(this, message));
+
+    _this3.name = 'InsufficientFundsError';
+    _this3.balanceReset = balanceReset;
+    return _this3;
   }
 
   return InsufficientFundsError;
@@ -7512,6 +7578,11 @@ es6Promise.polyfill();
 
 var _fetchPonyfill = fetchBrowser$1();
 var fetch$1 = _fetchPonyfill.fetch;
+
+var InsufficientFundsError = InsufficientFundsError$1;
+var ResponseError = ResponseError$1;
+var NotFoundError = NotFoundError$1;
+
 
 var validator = {
   isIP: isIP,
@@ -7545,13 +7616,12 @@ var FetchCommand = function (_AbstractCommand) {
         key = params.key,
         fetchFunc = params.fetchFunc; // todo: do data parsing
 
-    var methods = FetchCommand.getMethods();
+    var methods = FetchCommand.methods;
 
     if (!method) throw new TypeError("Empty required param 'method'");
     if (!_Object$values(methods).includes(method)) throw new TypeError('Invalid method param');
-    if (fetchFunc) _this.fetchFunc = fetchFunc;else _this.fetchFunc = fetch$1;
+    if (fetchFunc) _this.fetchFunc = fetchFunc;else _this.fetchFunc = FetchCommand.fetchClass;
 
-    _this.api_url = 'https://tempicolabs.com';
     if (version !== undefined) _this.version = version;else _this.version = 'v2';
 
     if (key !== undefined && typeof key === 'string') _this._map.get(_this).key = key;else {}
@@ -7572,6 +7642,7 @@ var FetchCommand = function (_AbstractCommand) {
     _this._map.get(_this).balance_reset = undefined;
     return _this;
   }
+
   /**
    * Available methods
    * @static
@@ -7675,7 +7746,7 @@ var FetchCommand = function (_AbstractCommand) {
     }
 
     /**
-     * Main fetch function
+     * Instance function for making request
      * @param {String} url fetching url
      * @param {Object} [params={}] request parameters
      * @param {function|false} [fetchFunc=false] fetch function
@@ -7692,68 +7763,41 @@ var FetchCommand = function (_AbstractCommand) {
       var _ref = _asyncToGenerator(index.mark(function _callee(url) {
         var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var fetchFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-        var headers, body, method, options, response;
+        var fetchResponse, response, options;
         return index.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (url) {
-                  _context.next = 2;
-                  break;
-                }
+                _context.prev = 0;
 
-                throw new ReferenceError('Empty url');
-
-              case 2:
-                if (!fetchFunc) fetchFunc = fetch$1;
-                _context.prev = 3;
-                headers = params.headers, body = params.body, method = params.method;
-
-                if (!headers) {
-                  headers = {
-                    'Content-Type': 'application/json'
-                  };
-                  if (typeof module !== 'undefined' && module.exports) {
-                    headers['User-Agent'] = os.type() + '_' + process.arch + ' Node ' + process.version + ' - TempicoLabs SDK';
-                  }
-                }
-                options = {
-                  headers: headers
-                };
-
-                if (!method) method = 'GET';else {
-                  if (method.toLocaleLowerCase() === 'post' && body) {
-                    options.body = _JSON$stringify(body);
-                  }
-                }
-                options.method = method;
-                this.emit('fetch', options, this);
+                this.emit('fetch', params, this);
                 this._map.get(this).pending = true;
-                _context.next = 13;
-                return fetchFunc(url, options);
+                _context.next = 5;
+                return FetchCommand.makeRequest(url, params, fetchFunc);
 
-              case 13:
-                response = _context.sent;
+              case 5:
+                fetchResponse = _context.sent;
+                response = fetchResponse.response, options = fetchResponse.options;
 
                 this._map.get(this).pending = false;
                 this.emit('raw_response', response, this);
                 return _context.abrupt('return', response);
 
-              case 19:
-                _context.prev = 19;
-                _context.t0 = _context['catch'](3);
+              case 12:
+                _context.prev = 12;
+                _context.t0 = _context['catch'](0);
 
                 this._map.get(this).error = true;
                 this._map.get(this).errorText = _context.t0.message;
                 this.emit('error', _context.t0, this);
                 throw _context.t0;
 
-              case 25:
+              case 18:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[3, 19]]);
+        }, _callee, this, [[0, 12]]);
       }));
 
       function _makeRequest(_x) {
@@ -7762,6 +7806,20 @@ var FetchCommand = function (_AbstractCommand) {
 
       return _makeRequest;
     }()
+
+    /**
+     * Main static fetch function
+     * @static
+     * @param {String} url fetching url
+     * @param {Object} [params={}] request parameters
+     * @param {function|false} [fetchFunc=false] fetch function
+     * @throws Error
+     * @throws ReferenceError
+     * @member FetchCommand#makeRequest
+     * @returns {Promise}
+     * @private
+     */
+
   }, {
     key: 'run',
 
@@ -7787,6 +7845,8 @@ var FetchCommand = function (_AbstractCommand) {
      * @param {String} [options.method='GET'] - Custom method. e.g 'POST', 'GET'
      * @member FetchCommand#fetch
      * @throws InsufficientFundsError
+     * @throws NotFoundError
+     * @throws ResponseError
      * @throws Error
      * @returns {Promise}
      */
@@ -7799,36 +7859,38 @@ var FetchCommand = function (_AbstractCommand) {
 
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        var params, method, headers, fetchResponse, args, response, _headers, status, statusText, content, contentType, responseHeaders, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, header, billHeaders;
+        var params, fetchResponse, args, method, headers, response, _headers, status, statusText, content, contentType, responseHeaders, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, header, billHeaders;
 
         return index.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 params = {};
+                fetchResponse = void 0;
+
+                if (!options) options = {};
+                _context2.prev = 3;
+
+                // if (options.key !== undefined && typeof options.key === 'string') this._map.get(this).key = options.key
+                args = this._checkArguments(options);
                 method = options.method || 'GET';
                 headers = options.headers || false;
 
-                if (options.key !== undefined && typeof options.key === 'string') this._map.get(this).key = options.key;else {}
-                fetchResponse = void 0;
-                _context2.prev = 5;
-
+                
                 this._map.get(this).rawArgs = options;
-                args = this._checkArguments(options);
-
                 params = {
                   method: method
                 };
                 if (headers !== false) params.headers = headers;
                 this._map.get(this).args = params.body = args;
-                _context2.next = 13;
+                _context2.next = 14;
                 return this._makeRequest(this.url, params);
 
-              case 13:
+              case 14:
                 response = _context2.sent;
 
                 if (!response) {
-                  _context2.next = 63;
+                  _context2.next = 72;
                   break;
                 }
 
@@ -7837,95 +7899,96 @@ var FetchCommand = function (_AbstractCommand) {
                 contentType = _headers.get('Content-Type');
 
                 if (!(contentType.indexOf('text/html') !== -1)) {
-                  _context2.next = 24;
+                  _context2.next = 25;
                   break;
                 }
 
-                _context2.next = 21;
+                _context2.next = 22;
                 return response.text();
 
-              case 21:
+              case 22:
                 content = _context2.sent;
-                _context2.next = 28;
+                _context2.next = 29;
                 break;
 
-              case 24:
+              case 25:
                 if (!(contentType.indexOf('application/json') !== -1)) {
-                  _context2.next = 28;
+                  _context2.next = 29;
                   break;
                 }
 
-                _context2.next = 27;
+                _context2.next = 28;
                 return response.json();
 
-              case 27:
+              case 28:
                 content = _context2.sent;
 
-              case 28:
+              case 29:
                 fetchResponse = {
                   content: content,
                   headers: {},
-                  error: !response.ok && ![404].includes(status),
+                  error: !response.ok,
                   status: status,
                   statusText: statusText
                 };
                 this._map.get(this).content = content;
+                this._map.get(this).status = status;
                 responseHeaders = {};
 
                 if (!_headers._headers) {
-                  _context2.next = 35;
+                  _context2.next = 37;
                   break;
                 }
 
                 responseHeaders = _headers._headers;
-                _context2.next = 54;
+                _context2.next = 56;
                 break;
 
-              case 35:
+              case 37:
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
                 _iteratorError = undefined;
-                _context2.prev = 38;
+                _context2.prev = 40;
 
                 for (_iterator = _getIterator(_headers.entries()); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                   header = _step.value;
 
                   responseHeaders[header[0]] = header[1];
                 }
-                _context2.next = 46;
+                _context2.next = 48;
                 break;
 
-              case 42:
-                _context2.prev = 42;
-                _context2.t0 = _context2['catch'](38);
+              case 44:
+                _context2.prev = 44;
+                _context2.t0 = _context2['catch'](40);
                 _didIteratorError = true;
                 _iteratorError = _context2.t0;
 
-              case 46:
-                _context2.prev = 46;
-                _context2.prev = 47;
+              case 48:
+                _context2.prev = 48;
+                _context2.prev = 49;
 
                 if (!_iteratorNormalCompletion && _iterator.return) {
                   _iterator.return();
                 }
 
-              case 49:
-                _context2.prev = 49;
+              case 51:
+                _context2.prev = 51;
 
                 if (!_didIteratorError) {
-                  _context2.next = 52;
+                  _context2.next = 54;
                   break;
                 }
 
                 throw _iteratorError;
 
-              case 52:
-                return _context2.finish(49);
-
-              case 53:
-                return _context2.finish(46);
-
               case 54:
+                return _context2.finish(51);
+
+              case 55:
+                return _context2.finish(48);
+
+              case 56:
                 if (responseHeaders) {
                   billHeaders = ['remaining', 'lastbill', 'reset'];
 
@@ -7940,49 +8003,69 @@ var FetchCommand = function (_AbstractCommand) {
                   _this3._map.get(_this3)[key] = fetchResponse[key];
                 });
 
-                if (!(fetchResponse.error && content && content.error)) {
+                if (!(fetchResponse.error || content && content.error)) {
+                  _context2.next = 70;
+                  break;
+                }
+
+                if (!(status === 429)) {
                   _context2.next = 61;
                   break;
                 }
 
-                this._map.get(this).errorText = content.error;
+                throw new InsufficientFundsError(content.error, this._map.get(this).balance_reset);
 
-                if (!(status === 429)) {
-                  _context2.next = 60;
+              case 61:
+                if (!(status === 404 && options.throwNotFound === true)) {
+                  _context2.next = 65;
                   break;
                 }
 
-                throw new InsufficientFundsError(content.error);
+                throw new NotFoundError(content.error, response);
 
-              case 60:
-                this.emit('error', new Error(content.error), this);
+              case 65:
+                if (!(status === 404 && !options.throwNotFound)) {
+                  _context2.next = 69;
+                  break;
+                }
 
-              case 61:
-                _context2.next = 64;
+                fetchResponse.content = null;
+                _context2.next = 70;
                 break;
 
-              case 63:
-                throw new Error('Response is empty!');
+              case 69:
+                throw new ResponseError(content.error, response);
 
-              case 64:
+              case 70:
+                _context2.next = 73;
+                break;
+
+              case 72:
+                throw new ResponseError('Response is empty!');
+
+              case 73:
                 this.emit('response', fetchResponse, this);
                 return _context2.abrupt('return', fetchResponse);
 
-              case 68:
-                _context2.prev = 68;
-                _context2.t1 = _context2['catch'](5);
+              case 77:
+                _context2.prev = 77;
+                _context2.t1 = _context2['catch'](3);
 
+                // if (err instanceof NotFoundError) {
+                //
+                // } else {
+                // }
                 this._map.get(this).error = true;
                 this._map.get(this).errorText = _context2.t1.message;
                 this.emit('error', _context2.t1, this);
                 throw _context2.t1;
 
-              case 74:
+              case 83:
               case 'end':
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[5, 68], [38, 42, 46, 54], [47,, 49, 53]]);
+        }, _callee2, this, [[3, 77], [40, 44, 48, 56], [49,, 51, 55]]);
       }));
 
       function fetch() {
@@ -8084,6 +8167,7 @@ var FetchCommand = function (_AbstractCommand) {
     }
 
     /**
+     * todo: fix
      * Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
      * @example
      * return 'OK'
@@ -8173,7 +8257,7 @@ var FetchCommand = function (_AbstractCommand) {
   }, {
     key: 'url',
     get: function get() {
-      var parts = [this.api_url, 'api', this.version, this.method];
+      var parts = [FetchCommand.apiUrl, 'api', this.version, this.method];
       var args = this.args;
       var url = '';
       parts.forEach(function (part) {
@@ -8200,32 +8284,43 @@ var FetchCommand = function (_AbstractCommand) {
     get: function get() {
       return this._map.get(this).key;
     }
+
+    /**
+     * Fetch class used in module, fetch-ponyfill
+     * @type {Function}
+     * @static
+     * @readonly
+     * @member FetchCommand#fetchClass
+     */
+
   }], [{
-    key: 'getMethods',
-    value: function getMethods() {
-      return endpoint;
-    }
+    key: 'getMethodSpecifications',
+
 
     /**
      * Get method specifications
      * @static
      * @param {String|false} [method=false] if method defined get specifications for this method, else get all
-     * @returns {Object[]}
+     * @returns {Object|Object[]}
      */
-
-  }, {
-    key: 'getMethodSpecifications',
     value: function getMethodSpecifications() {
       var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-      var methods = FetchCommand.getMethods();
+      var methods = FetchCommand.methods;
       var newMethods = {};
       var getOneMethodData = function getOneMethodData(method) {
         var args = argument[method];
         var spec = specification[method];
         var methodData = {};
         if (spec) methodData.spec = spec;
-        if (args) methodData.args = args;else methodData.args = [];
+        if (args) {
+          methodData.args = args.map(function (arg) {
+            var checkFunc = null;
+            if (arg.check && arg.check.func) checkFunc = validator[arg.check.func];
+            arg.checkFunc = checkFunc;
+            return arg;
+          });
+        } else methodData.args = [];
         return methodData;
       };
       if (!method) {
@@ -8235,6 +8330,93 @@ var FetchCommand = function (_AbstractCommand) {
         });
       } else return getOneMethodData(method);
       return newMethods;
+    }
+  }, {
+    key: 'makeRequest',
+    value: function () {
+      var _ref3 = _asyncToGenerator(index.mark(function _callee3(url) {
+        var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var fetchFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+        var headers, body, method, options, response;
+        return index.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (url) {
+                  _context3.next = 2;
+                  break;
+                }
+
+                throw new ReferenceError('Empty url');
+
+              case 2:
+                if (!fetchFunc) fetchFunc = fetch$1;
+                _context3.prev = 3;
+                headers = params.headers, body = params.body, method = params.method;
+
+                if (!headers) {
+                  headers = {
+                    'Content-Type': 'application/json'
+                  };
+                  
+                }
+                options = {
+                  headers: headers
+                };
+
+                if (!method) method = 'GET';else {
+                  if (method.toLocaleLowerCase() === 'post' && body) {
+                    options.body = _JSON$stringify(body);
+                  }
+                }
+                options.method = method;
+                _context3.next = 11;
+                return fetchFunc(url, options);
+
+              case 11:
+                response = _context3.sent;
+                return _context3.abrupt('return', { response: response, options: options });
+
+              case 15:
+                _context3.prev = 15;
+                _context3.t0 = _context3['catch'](3);
+                throw _context3.t0;
+
+              case 18:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this, [[3, 15]]);
+      }));
+
+      function makeRequest(_x7) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return makeRequest;
+    }()
+  }, {
+    key: 'methods',
+    get: function get() {
+      return endpoint;
+    }
+
+    /**
+     * API hostname
+     * @static
+     * @returns {String}
+     */
+
+  }, {
+    key: 'apiUrl',
+    get: function get() {
+      return 'https://tempicolabs.com';
+    }
+  }, {
+    key: 'fetchClass',
+    get: function get() {
+      return fetch$1;
     }
   }]);
 
@@ -9419,7 +9601,7 @@ var HashCommand = function (_FetchCommand) {
    * @param {{stream: Stream}|{file: string}|{hash: string}} options
    * @fulfil {Object}
    * @reject {Error}
-   * @throws {InsufficientFundsError}
+   * @throws {InsufficientFundsError|TypeError}
    * @returns {Promise}
    */
 
@@ -9683,7 +9865,7 @@ var Command = function (_AbstractCommand) {
   }
 
   /**
-   *
+   * Get Class by action name
    * @param {Boolean|String} [action]
    * @static
    * @member Command#getClass
@@ -9860,21 +10042,21 @@ var TmLabs$1 = function (_EventEmitter) {
   }, {
     key: 'fetchBatch',
     value: function () {
-      var _ref2 = _asyncToGenerator(index.mark(function _callee2(method) {
+      var _ref2 = _asyncToGenerator(index.mark(function _callee3(method) {
         var _this3 = this;
 
         var objects = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { throw: false };
         var batchResponse, methods, promises;
-        return index.wrap(function _callee2$(_context2) {
+        return index.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 batchResponse = [];
-                methods = FetchCommand.getMethods();
+                methods = FetchCommand.methods;
 
                 if (method) {
-                  _context2.next = 4;
+                  _context3.next = 4;
                   break;
                 }
 
@@ -9882,7 +10064,7 @@ var TmLabs$1 = function (_EventEmitter) {
 
               case 4:
                 if (_Object$values(methods).includes(method)) {
-                  _context2.next = 6;
+                  _context3.next = 6;
                   break;
                 }
 
@@ -9892,38 +10074,61 @@ var TmLabs$1 = function (_EventEmitter) {
                 promises = [];
 
                 objects.forEach(function (params) {
-                  promises.push(_this3.fetch(method, params));
+                  promises.push(_asyncToGenerator(index.mark(function _callee2() {
+                    return index.wrap(function _callee2$(_context2) {
+                      while (1) {
+                        switch (_context2.prev = _context2.next) {
+                          case 0:
+                            _context2.prev = 0;
+                            _context2.next = 3;
+                            return _this3.fetch(method, params);
+
+                          case 3:
+                            return _context2.abrupt('return', _context2.sent);
+
+                          case 6:
+                            _context2.prev = 6;
+                            _context2.t0 = _context2['catch'](0);
+                            return _context2.abrupt('return', _context2.t0);
+
+                          case 9:
+                          case 'end':
+                            return _context2.stop();
+                        }
+                      }
+                    }, _callee2, _this3, [[0, 6]]);
+                  })));
                 });
 
                 if (options.throw) {
-                  _context2.next = 14;
+                  _context3.next = 14;
                   break;
                 }
 
-                _context2.next = 11;
+                _context3.next = 11;
                 return q.allSettled(promises);
 
               case 11:
-                batchResponse = _context2.sent;
-                _context2.next = 17;
+                batchResponse = _context3.sent;
+                _context3.next = 17;
                 break;
 
               case 14:
-                _context2.next = 16;
+                _context3.next = 16;
                 return q.all(promises);
 
               case 16:
-                batchResponse = _context2.sent;
+                batchResponse = _context3.sent;
 
               case 17:
-                return _context2.abrupt('return', batchResponse);
+                return _context3.abrupt('return', batchResponse);
 
               case 18:
               case 'end':
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
       function fetchBatch(_x3) {
@@ -10083,6 +10288,20 @@ var TmLabs$1 = function (_EventEmitter) {
     get: function get() {
       return this._map.get(this).balance_reset;
     }
+
+    /**
+     * Returns SDK version
+     * @member TmLabs#version
+     * @returns {String}
+     */
+
+  }], [{
+    key: 'version',
+    get: function get() {
+      var version = "3.0.0";
+      if (!version) throw new Error('Use bundled packages in /dist/ folder to get version');
+      return version;
+    }
   }]);
 
   return TmLabs;
@@ -10091,20 +10310,27 @@ var TmLabs$1 = function (_EventEmitter) {
 var _this = undefined;
 
 /**
- * Simple fetch function
+ * Simple fetch function.
+ * @example
+ * // es6
+ * import { fetch } from '@tempicolabs/tmlabs'
+ * fetch('ip', { ip: '8.8.8.8' }).then((ipData) => {
+ *  console.log('Status data:', ipData);
+ * });
  * @function fetch
- * @param params
+ * @param method
+ * @param params See options argument {@link FetchCommand#fetch}
  * @member module:TmLabs.fetch
  * @returns {Promise}
  */
 var fetch = function () {
-  var _ref = _asyncToGenerator(index.mark(function _callee(params) {
+  var _ref = _asyncToGenerator(index.mark(function _callee(method, params) {
     var command, answer;
     return index.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            command = new FetchCommand(params);
+            command = new FetchCommand({ method: method });
             _context.next = 3;
             return command.run(params);
 
@@ -10120,15 +10346,21 @@ var fetch = function () {
     }, _callee, _this);
   }));
 
-  return function fetch(_x) {
+  return function fetch(_x, _x2) {
     return _ref.apply(this, arguments);
   };
 }();
 
 /**
  * Simple hash function
+ * @example
+ * // es6
+ * import { hash } from '@tempicolabs/tmlabs'
+ * hash({ hash: 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051' }).then((hashData) => {
+ *  console.log('Hash data:', hashData);
+ * });
  * @function hash
- * @param params
+ * @param params See options argument {@link HashCommand#run}
  * @member module:TmLabs.hash
  * @returns {Promise}
  */
@@ -10139,16 +10371,15 @@ var hash = function () {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            console.log('hash', params);
             command = new HashCommand();
-            _context2.next = 4;
+            _context2.next = 3;
             return command.run(params);
 
-          case 4:
+          case 3:
             answer = _context2.sent;
             return _context2.abrupt('return', answer);
 
-          case 6:
+          case 5:
           case 'end':
             return _context2.stop();
         }
@@ -10156,7 +10387,7 @@ var hash = function () {
     }, _callee2, _this);
   }));
 
-  return function hash(_x2) {
+  return function hash(_x3) {
     return _ref2.apply(this, arguments);
   };
 }();

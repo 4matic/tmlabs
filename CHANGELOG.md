@@ -1,3 +1,8 @@
+3.0.1
+* fixing fetch function in main package
+* some static methods added
+* Updated Examples & Docs
+
 3.0.0
 * UMD Module fix
 * Hashing string, streams, files

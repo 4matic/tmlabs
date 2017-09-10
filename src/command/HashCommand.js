@@ -25,7 +25,7 @@ class HashCommand extends FetchCommand {
    * @param {{stream: Stream}|{file: string}|{hash: string}} options
    * @fulfil {Object}
    * @reject {Error}
-   * @throws {InsufficientFundsError}
+   * @throws {InsufficientFundsError|TypeError}
    * @returns {Promise}
    */
   async run (options = {}) {

@@ -29,7 +29,7 @@ class Command extends AbstractCommand {
   }
 
   /**
-   *
+   * Get Class by action name
    * @param {Boolean|String} [action]
    * @static
    * @member Command#getClass

@@ -17,6 +17,9 @@ Default export is Main TmLabs object class.</p>
 <dt><a href="#module_error">error</a></dt>
 <dd><p>SDK errors</p>
 </dd>
+<dt><a href="#module_constants.module_event">event</a></dt>
+<dd><p>Event constants</p>
+</dd>
 <dt><a href="#module_constants">constants</a></dt>
 <dd><p>SDK constants</p>
 </dd>
@@ -119,20 +122,18 @@ var tmLabs = TmLabs.default();
 <a name="module_TmLabs.fetch"></a>
 
 ### TmLabs.fetch ⇒ <code>Promise</code>
-Simple fetch function
-Params can be found in [fetch method](#FetchCommand+fetch)
+Simple fetch function.
 
 **Kind**: static property of [<code>TmLabs</code>](#module_TmLabs)  
 
-| Param |
-| --- |
-| method | 
-| params | 
+| Param | Description |
+| --- | --- |
+| method |  |
+| params | See options argument [fetch](#FetchCommand+fetch) |
 
 **Example**  
 ```js
 // es6
-// returns specific classes from package module
 import { fetch } from '@tempicolabs/tmlabs'
 fetch('ip', { ip: '8.8.8.8' }).then((ipData) => {
  console.log('Status data:', ipData);
@@ -145,10 +146,18 @@ Simple hash function
 
 **Kind**: static property of [<code>TmLabs</code>](#module_TmLabs)  
 
-| Param |
-| --- |
-| params | 
+| Param | Description |
+| --- | --- |
+| params | See options argument [run](#HashCommand+run) |
 
+**Example**  
+```js
+// es6
+import { hash } from '@tempicolabs/tmlabs'
+hash({ hash: 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051' }).then((hashData) => {
+ console.log('Hash data:', hashData);
+});
+```
 <a name="module_command"></a>
 
 ## command
@@ -237,10 +246,47 @@ Email Leaks
 ## error
 SDK errors
 
+**Example**  
+```js
+// Good way for handling errors created using TmLabs Object
+var tmLabs = new TmLabs['default']();
+tmLabs.on('error', function (error, command) {
+  console.error('[ SDK ERROR ]', error)
+});
+tmLabs.fetch('ip', {
+   ip: '127.0.0.1'
+}).then(function(ipAnswer){
+    console.log('ipAnswer', ipAnswer);
+}).catch(function(err){
+    console.log('error', err);
+});
+```
 
 * [error](#module_error)
+    * [~ResponseError](#module_error..ResponseError)
+        * [new ResponseError()](#new_module_error..ResponseError_new)
+    * [~NotFoundError](#module_error..NotFoundError)
+        * [new NotFoundError()](#new_module_error..NotFoundError_new)
     * [~InsufficientFundsError](#module_error..InsufficientFundsError)
         * [new InsufficientFundsError()](#new_module_error..InsufficientFundsError_new)
+
+<a name="module_error..ResponseError"></a>
+
+### error~ResponseError
+**Kind**: inner class of [<code>error</code>](#module_error)  
+<a name="new_module_error..ResponseError_new"></a>
+
+#### new ResponseError()
+Response error
+
+<a name="module_error..NotFoundError"></a>
+
+### error~NotFoundError
+**Kind**: inner class of [<code>error</code>](#module_error)  
+<a name="new_module_error..NotFoundError_new"></a>
+
+#### new NotFoundError()
+Not found error
 
 <a name="module_error..InsufficientFundsError"></a>
 
@@ -251,6 +297,62 @@ SDK errors
 #### new InsufficientFundsError()
 Error for insufficient funds
 
+<a name="module_constants.module_event"></a>
+
+## event
+Event constants
+
+
+* [event](#module_constants.module_event)
+    * [~ERROR](#module_constants.module_event..ERROR) : <code>string</code>
+    * [~FETCH](#module_constants.module_event..FETCH) : <code>string</code>
+    * [~RAW_RESPONSE](#module_constants.module_event..RAW_RESPONSE) : <code>string</code>
+    * [~RESPONSE](#module_constants.module_event..RESPONSE) : <code>string</code>
+    * [~RESOLVED](#module_constants.module_event..RESOLVED) : <code>string</code>
+    * [~COMMAND](#module_constants.module_event..COMMAND) : <code>string</code>
+
+<a name="module_constants.module_event..ERROR"></a>
+
+### event~ERROR : <code>string</code>
+Error
+
+**Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
+**Default**: <code>&quot;error&quot;</code>  
+<a name="module_constants.module_event..FETCH"></a>
+
+### event~FETCH : <code>string</code>
+Fetch
+
+**Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
+**Default**: <code>&quot;fetch&quot;</code>  
+<a name="module_constants.module_event..RAW_RESPONSE"></a>
+
+### event~RAW_RESPONSE : <code>string</code>
+Raw response
+
+**Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
+**Default**: <code>&quot;raw_response&quot;</code>  
+<a name="module_constants.module_event..RESPONSE"></a>
+
+### event~RESPONSE : <code>string</code>
+Response
+
+**Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
+**Default**: <code>&quot;response&quot;</code>  
+<a name="module_constants.module_event..RESOLVED"></a>
+
+### event~RESOLVED : <code>string</code>
+Resolved
+
+**Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
+**Default**: <code>&quot;response&quot;</code>  
+<a name="module_constants.module_event..COMMAND"></a>
+
+### event~COMMAND : <code>string</code>
+Command
+
+**Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
+**Default**: <code>&quot;command&quot;</code>  
 <a name="module_constants"></a>
 
 ## constants
@@ -368,6 +470,7 @@ Params
     * [.balanceRemaining](#TmLabs+balanceRemaining) ⇒ <code>double</code> \| <code>undefined</code>
     * [.balanceLastbill](#TmLabs+balanceLastbill) ⇒ <code>double</code> \| <code>undefined</code>
     * [.balanceReset](#TmLabs+balanceReset) ⇒ <code>undefined</code> \| <code>double</code>
+    * [.version](#TmLabs+version) ⇒ <code>String</code>
 
 <a name="new_TmLabs_new"></a>
 
@@ -479,6 +582,12 @@ Returns number of seconds before free key credits renew
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
 **See**: [balanceReset](#FetchCommand+balanceReset)  
+<a name="TmLabs+version"></a>
+
+### tmLabs.version ⇒ <code>String</code>
+Returns SDK version
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
 <a name="FetchCommand"></a>
 
 ## FetchCommand ⇐ [<code>AbstractCommand</code>](#AbstractCommand)
@@ -504,6 +613,7 @@ Returns number of seconds before free key credits renew
     * [.pending](#FetchCommand+pending) : <code>Boolean</code>
     * [.url](#FetchCommand+url) : <code>String</code>
     * [.key](#FetchCommand+key) : <code>String</code>
+    * [.fetchClass](#FetchCommand+fetchClass) : <code>function</code>
     * [.action](#AbstractCommand+action) : <code>String</code>
     * [.params](#AbstractCommand+params) : <code>Array</code>
 
@@ -555,6 +665,8 @@ Fetch method
 **Throws**:
 
 - InsufficientFundsError
+- NotFoundError
+- ResponseError
 - Error
 
 
@@ -614,6 +726,7 @@ return 200
 <a name="FetchCommand+statusText"></a>
 
 ### fetchCommand.statusText ⇒ <code>String</code> \| <code>undefined</code>
+todo: fix
 Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
 
 **Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
@@ -672,6 +785,13 @@ Token key
 
 **Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
 **Read only**: true  
+<a name="FetchCommand+fetchClass"></a>
+
+### fetchCommand.fetchClass : <code>function</code>
+Fetch class used in module, fetch-ponyfill
+
+**Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
+**Read only**: true  
 <a name="AbstractCommand+action"></a>
 
 ### fetchCommand.action : <code>String</code>
@@ -709,6 +829,7 @@ Params
     * [.pending](#FetchCommand+pending) : <code>Boolean</code>
     * [.url](#FetchCommand+url) : <code>String</code>
     * [.key](#FetchCommand+key) : <code>String</code>
+    * [.fetchClass](#FetchCommand+fetchClass) : <code>function</code>
     * [.action](#AbstractCommand+action) : <code>String</code>
     * [.params](#AbstractCommand+params) : <code>Array</code>
 
@@ -753,6 +874,8 @@ Fetch method
 **Throws**:
 
 - InsufficientFundsError
+- NotFoundError
+- ResponseError
 - Error
 
 
@@ -812,6 +935,7 @@ return 200
 <a name="FetchCommand+statusText"></a>
 
 ### statusCommand.statusText ⇒ <code>String</code> \| <code>undefined</code>
+todo: fix
 Get command request statusText. e.g 'OK', 'NOT FOUND' and etc.
 
 **Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
@@ -866,6 +990,13 @@ Request url
 
 ### statusCommand.key : <code>String</code>
 Token key
+
+**Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
+**Read only**: true  
+<a name="FetchCommand+fetchClass"></a>
+
+### statusCommand.fetchClass : <code>function</code>
+Fetch class used in module, fetch-ponyfill
 
 **Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
 **Read only**: true  

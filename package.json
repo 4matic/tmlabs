@@ -1,7 +1,7 @@
 {
   "name": "@tempicolabs/tmlabs",
   "version": "3.0.0",
-  "description": "NodeJS SDK for TempicoLabs API",
+  "description": "Javascript SDK for TempicoLabs API",
   "main": "dist/tmlabs.umd.js",
   "browser": "dist/tmlabs.js",
   "module": "dist/tmlabs.es.js",
@@ -94,7 +94,6 @@
     "eslint-plugin-node": "^5.1.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "husky": "^0.14.3",
     "jsdoc-babel": "^0.3.0",
     "jsdoc-to-markdown": "^3.0.0",
     "lint-staged": "^4.0.0",

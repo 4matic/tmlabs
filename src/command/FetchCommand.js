@@ -11,7 +11,7 @@ import isInt from 'validator/lib/isInt'
 import matches from 'validator/lib/matches'
 import AbstractCommand from './AbstractCommand'
 import TmLabs from './../TmLabs'
-import { endpoint, specification, argument, error } from '../constant'
+import { endpoint, specification, argument, error, event } from '../constant'
 promisePonyfill.polyfill()
 const { fetch } = fetchPonyfill()
 const { InsufficientFundsError, ResponseError, NotFoundError } = error
@@ -207,17 +207,17 @@ class FetchCommand extends AbstractCommand {
    */
   async _makeRequest (url, params = {}, fetchFunc = false) {
     try {
-      this.emit('fetch', params, this)
+      this.emit(event.FETCH, params, this)
       this._map.get(this).pending = true
       const fetchResponse = await FetchCommand.makeRequest(url, params, fetchFunc)
       const { response, options } = fetchResponse
       this._map.get(this).pending = false
-      this.emit('raw_response', response, this)
+      this.emit(event.RAW_RESPONSE, response, this)
       return response
     } catch (err) {
       this._map.get(this).error = true
       this._map.get(this).errorText = err.message
-      this.emit('error', err, this)
+      this.emit(event.ERROR, err, this)
       throw err
     }
   }
@@ -362,7 +362,7 @@ class FetchCommand extends AbstractCommand {
       } else {
         throw new ResponseError('Response is empty!')
       }
-      this.emit('response', fetchResponse, this)
+      this.emit(event.RESPONSE, fetchResponse, this)
       return fetchResponse
     } catch (err) {
       // if (err instanceof NotFoundError) {
@@ -371,7 +371,7 @@ class FetchCommand extends AbstractCommand {
       // }
       this._map.get(this).error = true
       this._map.get(this).errorText = err.message
-      this.emit('error', err, this)
+      this.emit(event.ERROR, err, this)
       throw err
     }
   }

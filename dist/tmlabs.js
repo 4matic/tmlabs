@@ -7468,6 +7468,19 @@ var argument = (_EMAIL_LEAKS$SCAN$HAS = {}, _defineProperty$1(_EMAIL_LEAKS$SCAN$
 /**
  * @module error
  * @desc SDK errors
+ * @example
+ * // Good way for handling errors created using TmLabs Object
+ * var tmLabs = new TmLabs['default']();
+ * tmLabs.on('error', function (error, command) {
+ *   console.error('[ SDK ERROR ]', error)
+ * });
+ * tmLabs.fetch('ip', {
+ *    ip: '127.0.0.1'
+ * }).then(function(ipAnswer){
+ *     console.log('ipAnswer', ipAnswer);
+ * }).catch(function(err){
+ *     console.log('error', err);
+ * });
  */
 
 /**
@@ -7557,6 +7570,60 @@ var InsufficientFundsError$1 = function (_Error2) {
 
   return InsufficientFundsError;
 }(Error);
+
+/**
+ * @module event
+ * @desc Event constants
+ * @memberOf module:constants
+ */
+
+/**
+ * Error
+ * @type {string}
+ * @constant
+ * @default error
+ */
+var ERROR = 'error';
+
+/**
+ * Fetch
+ * @type {string}
+ * @constant
+ * @default fetch
+ */
+var FETCH = 'fetch';
+
+/**
+ * Raw response
+ * @type {string}
+ * @constant
+ * @default raw_response
+ */
+var RAW_RESPONSE = 'raw_response';
+
+/**
+ * Response
+ * @type {string}
+ * @constant
+ * @default response
+ */
+var RESPONSE = 'response';
+
+/**
+ * Resolved
+ * @type {string}
+ * @constant
+ * @default response
+ */
+var RESOLVED = 'resolved';
+
+/**
+ * Command
+ * @type {string}
+ * @constant
+ * @default command
+ */
+var COMMAND = 'command';
 
 var _specification;
 
@@ -7770,7 +7837,7 @@ var FetchCommand = function (_AbstractCommand) {
               case 0:
                 _context.prev = 0;
 
-                this.emit('fetch', params, this);
+                this.emit(FETCH, params, this);
                 this._map.get(this).pending = true;
                 _context.next = 5;
                 return FetchCommand.makeRequest(url, params, fetchFunc);
@@ -7780,7 +7847,7 @@ var FetchCommand = function (_AbstractCommand) {
                 response = fetchResponse.response, options = fetchResponse.options;
 
                 this._map.get(this).pending = false;
-                this.emit('raw_response', response, this);
+                this.emit(RAW_RESPONSE, response, this);
                 return _context.abrupt('return', response);
 
               case 12:
@@ -7789,7 +7856,7 @@ var FetchCommand = function (_AbstractCommand) {
 
                 this._map.get(this).error = true;
                 this._map.get(this).errorText = _context.t0.message;
-                this.emit('error', _context.t0, this);
+                this.emit(ERROR, _context.t0, this);
                 throw _context.t0;
 
               case 18:
@@ -8044,7 +8111,7 @@ var FetchCommand = function (_AbstractCommand) {
                 throw new ResponseError('Response is empty!');
 
               case 73:
-                this.emit('response', fetchResponse, this);
+                this.emit(RESPONSE, fetchResponse, this);
                 return _context2.abrupt('return', fetchResponse);
 
               case 77:
@@ -8057,7 +8124,7 @@ var FetchCommand = function (_AbstractCommand) {
                 // }
                 this._map.get(this).error = true;
                 this._map.get(this).errorText = _context2.t1.message;
-                this.emit('error', _context2.t1, this);
+                this.emit(ERROR, _context2.t1, this);
                 throw _context2.t1;
 
               case 83:
@@ -9688,7 +9755,7 @@ var HashCommand = function (_FetchCommand) {
 
                 this._map.get(this).error = true;
                 this._map.get(this).errorText = _context.t0.message;
-                this.emit('error', _context.t0, this);
+                this.emit(ERROR, _context.t0, this);
                 throw _context.t0;
 
               case 36:
@@ -9952,7 +10019,7 @@ var TmLabs$1 = function (_EventEmitter) {
       balance_lastbill: undefined,
       balance_reset: undefined
     });
-    _this.on('resolved', function (command) {
+    _this.on(RESOLVED, function (command) {
       _this._map.get(_this).history.push(command);
     });
     return _this;
@@ -10175,26 +10242,26 @@ var TmLabs$1 = function (_EventEmitter) {
       var newParams = params;
       if (this.key) newParams.key = this.key;
       return new _Promise(function (resolve, reject) {
-        _this4.emit('command', command, newParams);
-        command.on('error', function (error, cmd) {
-          _this4.emit('error', error, cmd);
-          reject(error);
+        _this4.emit(COMMAND, command, newParams);
+        command.on(ERROR, function (error$$1, cmd) {
+          _this4.emit(ERROR, error$$1, cmd);
+          reject(error$$1);
         });
-        command.on('fetch', function (options, cmd) {
-          _this4.emit('fetch', cmd, options);
+        command.on(FETCH, function (options, cmd) {
+          _this4.emit(FETCH, cmd, options);
         });
-        command.on('response', function (response, cmd) {
-          _this4.emit('response', cmd, response);
+        command.on(RESPONSE, function (response, cmd) {
+          _this4.emit(RESPONSE, cmd, response);
           _this4._map.get(_this4).balance_remaining = cmd.balanceRemaining;
           _this4._map.get(_this4).balance_lastbill = cmd.balanceLastbill;
           _this4._map.get(_this4).balance_reset = cmd.balanceReset;
         });
-        command.on('raw_response', function (response, cmd) {
-          _this4.emit('raw_response', cmd, response);
+        command.on(RAW_RESPONSE, function (response, cmd) {
+          _this4.emit(RAW_RESPONSE, cmd, response);
         });
         _this4._map.get(_this4).queue.add(function () {
           return command.run(newParams).then(function (response) {
-            _this4.emit('resolved', command, response);
+            _this4.emit(RESOLVED, command, response);
             resolve(response);
           });
         });

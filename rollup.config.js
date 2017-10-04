@@ -11,6 +11,8 @@ let external = !process.env.production && !process.env.browser ? ['os', 'url', '
 
 const pkg = require('./package.json')
 
+pkg.version = '3.2.0' // override
+
 const replaceOptions = {
   exclude: 'node_modules/**',
   'process.env.TMLABS_VERSION': JSON.stringify(pkg.version),

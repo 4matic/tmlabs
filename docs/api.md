@@ -31,6 +31,8 @@ Default export is Main TmLabs object class.</p>
 ## Classes
 
 <dl>
+<dt><a href="#Account">Account</a></dt>
+<dd></dd>
 <dt><a href="#Command">Command</a> ⇐ <code><a href="#AbstractCommand">AbstractCommand</a></code></dt>
 <dd></dd>
 <dt><a href="#TmLabs">TmLabs</a> ⇐ <code>EventEmitter</code></dt>
@@ -69,6 +71,7 @@ Default export is Main TmLabs object class.
 | --- | --- | --- |
 | TmLabs | [<code>TmLabs</code>](#TmLabs) | Main object TmLabs class |
 | Command | [<code>Command</code>](#Command) | Main Command object class |
+| Account | [<code>Account</code>](#Account) | Class for account |
 | FetchCommand | [<code>FetchCommand</code>](#FetchCommand) | FetchCommand object class |
 | HashCommand | <code>HashCommand</code> | HashCommand object class |
 | StatusCommand | [<code>StatusCommand</code>](#StatusCommand) | StatusCommand object class |
@@ -188,6 +191,7 @@ Endpoint constants
     * [~HASH](#module_constants.module_endpoint..HASH) : <code>string</code>
     * [~SCAN](#module_constants.module_endpoint..SCAN) : <code>string</code>
     * [~STATUS](#module_constants.module_endpoint..STATUS) : <code>string</code>
+    * [~ACCOUNT_STATUS](#module_constants.module_endpoint..ACCOUNT_STATUS) : <code>string</code>
     * [~DNS](#module_constants.module_endpoint..DNS) : <code>string</code>
     * [~ME](#module_constants.module_endpoint..ME) : <code>string</code>
     * [~EMAIL_LEAKS](#module_constants.module_endpoint..EMAIL_LEAKS) : <code>string</code>
@@ -220,6 +224,13 @@ Status
 
 **Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
 **Default**: <code>&quot;status&quot;</code>  
+<a name="module_constants.module_endpoint..ACCOUNT_STATUS"></a>
+
+### endpoint~ACCOUNT_STATUS : <code>string</code>
+Account Status
+
+**Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
+**Default**: <code>&quot;account/status&quot;</code>  
 <a name="module_constants.module_endpoint..DNS"></a>
 
 ### endpoint~DNS : <code>string</code>
@@ -230,7 +241,7 @@ DNS
 <a name="module_constants.module_endpoint..ME"></a>
 
 ### endpoint~ME : <code>string</code>
-Me. Data about myself
+Me. Data based on your ip address
 
 **Kind**: inner constant of [<code>endpoint</code>](#module_constants.module_endpoint)  
 **Default**: <code>&quot;me&quot;</code>  
@@ -302,6 +313,7 @@ Error for insufficient funds
 ## event
 Event constants
 
+**Read only**: true  
 
 * [event](#module_constants.module_event)
     * [~ERROR](#module_constants.module_event..ERROR) : <code>string</code>
@@ -310,6 +322,7 @@ Event constants
     * [~RESPONSE](#module_constants.module_event..RESPONSE) : <code>string</code>
     * [~RESOLVED](#module_constants.module_event..RESOLVED) : <code>string</code>
     * [~COMMAND](#module_constants.module_event..COMMAND) : <code>string</code>
+    * [~BALANCE_CHANGED](#module_constants.module_event..BALANCE_CHANGED) : <code>string</code>
 
 <a name="module_constants.module_event..ERROR"></a>
 
@@ -353,6 +366,13 @@ Command
 
 **Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
 **Default**: <code>&quot;command&quot;</code>  
+<a name="module_constants.module_event..BALANCE_CHANGED"></a>
+
+### event~BALANCE_CHANGED : <code>string</code>
+Balance change
+
+**Kind**: inner constant of [<code>event</code>](#module_constants.module_event)  
+**Default**: <code>&quot;balance_changed&quot;</code>  
 <a name="module_constants"></a>
 
 ## constants
@@ -366,6 +386,7 @@ SDK constants
 | argument | <code>Object</code> | Endpoint arguments |
 | specification | <code>Object</code> | Endpoint specifications |
 | error | <code>Object</code> | SDK Errors |
+| event | <code>Object</code> | SDK Events |
 
 <a name="module_specification"></a>
 
@@ -373,6 +394,88 @@ SDK constants
 Endpoint specifications object
 
 **Read only**: true  
+<a name="Account"></a>
+
+## Account
+**Kind**: global class  
+
+* [Account](#Account)
+    * [new Account(options)](#new_Account_new)
+    * [.runCommand](#Account+runCommand) ⇒ <code>Promise</code>
+    * [.getBalance](#Account+getBalance) ⇒ <code>Object</code>
+    * [.balanceRemaining](#Account+balanceRemaining) ⇒ <code>double</code> \| <code>undefined</code>
+    * [.getSubscriptions](#Account+getSubscriptions) ⇒ <code>null</code> \| <code>Object</code>
+    * [.getStatus](#Account+getStatus) ⇒ <code>Object</code>
+    * [.balanceLastBill](#Account+balanceLastBill) ⇒ <code>double</code> \| <code>undefined</code>
+    * [.balanceReset](#Account+balanceReset) ⇒ <code>undefined</code> \| <code>double</code>
+
+<a name="new_Account_new"></a>
+
+### new Account(options)
+Account for API requests
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | The options object |
+| [options.key] | <code>String</code> | Token key |
+
+<a name="Account+runCommand"></a>
+
+### account.runCommand ⇒ <code>Promise</code>
+Run command with params on behalf of this account
+
+**Kind**: instance property of [<code>Account</code>](#Account)  
+**Returns**: <code>Promise</code> - result  
+**See**: [module:event~BALANCE_CHANGED](module:event~BALANCE_CHANGED)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| command | [<code>Command</code>](#Command) |  |
+| params |  | command params |
+
+<a name="Account+getBalance"></a>
+
+### account.getBalance ⇒ <code>Object</code>
+Get account balance by making new request
+
+**Kind**: instance property of [<code>Account</code>](#Account)  
+**See**: [getStatus](#Account+getStatus)  
+<a name="Account+balanceRemaining"></a>
+
+### account.balanceRemaining ⇒ <code>double</code> \| <code>undefined</code>
+Remaining balance
+
+**Kind**: instance property of [<code>Account</code>](#Account)  
+**See**: [balanceRemaining](#FetchCommand+balanceRemaining)  
+<a name="Account+getSubscriptions"></a>
+
+### account.getSubscriptions ⇒ <code>null</code> \| <code>Object</code>
+Get account subscriptions by making new request
+
+**Kind**: instance property of [<code>Account</code>](#Account)  
+**See**: [getStatus](#Account+getStatus)  
+<a name="Account+getStatus"></a>
+
+### account.getStatus ⇒ <code>Object</code>
+Get account status by making new request
+
+**Kind**: instance property of [<code>Account</code>](#Account)  
+**See**: [StatusCommand](#StatusCommand)  
+<a name="Account+balanceLastBill"></a>
+
+### account.balanceLastBill ⇒ <code>double</code> \| <code>undefined</code>
+Last billing cost
+
+**Kind**: instance property of [<code>Account</code>](#Account)  
+**See**: [balanceLastBill](#Account+balanceLastBill)  
+<a name="Account+balanceReset"></a>
+
+### account.balanceReset ⇒ <code>undefined</code> \| <code>double</code>
+Returns number of seconds before free key credits renew
+
+**Kind**: instance property of [<code>Account</code>](#Account)  
+**See**: [balanceReset](#Account+balanceReset)  
 <a name="Command"></a>
 
 ## Command ⇐ [<code>AbstractCommand</code>](#AbstractCommand)
@@ -459,16 +562,18 @@ Params
 
 * [TmLabs](#TmLabs) ⇐ <code>EventEmitter</code>
     * [new TmLabs([options])](#new_TmLabs_new)
+    * [.account](#TmLabs+account) : [<code>Account</code>](#Account)
     * [.runBatch](#TmLabs+runBatch) ⇒ <code>Promise</code>
     * [.fetchBatch](#TmLabs+fetchBatch) ⇒ <code>Promise</code>
     * [.fetch](#TmLabs+fetch) ⇒ <code>Promise</code>
     * [.runCommand](#TmLabs+runCommand) ⇒ <code>Promise</code>
+    * [.getSubscriptions](#TmLabs+getSubscriptions) ⇒ <code>Object</code> \| <code>null</code>
     * [.history](#TmLabs+history) ⇒ [<code>Array.&lt;AbstractCommand&gt;</code>](#AbstractCommand)
     * [.key](#TmLabs+key) ⇒ <code>string</code>
     * [.limit](#TmLabs+limit) ⇒ <code>number</code>
     * [.pending](#TmLabs+pending) ⇒ <code>number</code>
     * [.balanceRemaining](#TmLabs+balanceRemaining) ⇒ <code>double</code> \| <code>undefined</code>
-    * [.balanceLastbill](#TmLabs+balanceLastbill) ⇒ <code>double</code> \| <code>undefined</code>
+    * [.balanceLastBill](#TmLabs+balanceLastBill) ⇒ <code>double</code> \| <code>undefined</code>
     * [.balanceReset](#TmLabs+balanceReset) ⇒ <code>undefined</code> \| <code>double</code>
     * [.version](#TmLabs+version) ⇒ <code>String</code>
 
@@ -482,14 +587,21 @@ Main TmLabs class.
 | --- | --- | --- |
 | [options] | <code>Object</code> | The options object |
 | [options.key] | <code>Object</code> | API token |
-| [options.limit] | <code>Object</code> | Queue limit |
+| [options.limit] | <code>Object</code> | Queue limit. Note: default is Infinity! |
 
+<a name="TmLabs+account"></a>
+
+### tmLabs.account : [<code>Account</code>](#Account)
+Account
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
 <a name="TmLabs+runBatch"></a>
 
 ### tmLabs.runBatch ⇒ <code>Promise</code>
 Run commands
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**Resolves**: <code>Array.&lt;Object&gt;</code> result  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -503,6 +615,7 @@ Run commands
 Fetch specific method multiple times with different params
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**Resolves**: <code>Array.&lt;Object&gt;</code> result  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -529,13 +642,19 @@ Run command with params
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
 **Returns**: <code>Promise</code> - result  
-**Resolves**: <code>Array.&lt;Object&gt;</code> result  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | command | [<code>Command</code>](#Command) |  |
 | params |  | command params |
 
+<a name="TmLabs+getSubscriptions"></a>
+
+### tmLabs.getSubscriptions ⇒ <code>Object</code> \| <code>null</code>
+Get account subscriptions
+Additional request required
+
+**Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
 <a name="TmLabs+history"></a>
 
 ### tmLabs.history ⇒ [<code>Array.&lt;AbstractCommand&gt;</code>](#AbstractCommand)
@@ -567,21 +686,21 @@ Get number of pending requests
 Remaining balance
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
-**See**: [balanceRemaining](#FetchCommand+balanceRemaining)  
-<a name="TmLabs+balanceLastbill"></a>
+**See**: [balanceRemaining](#Account+balanceRemaining)  
+<a name="TmLabs+balanceLastBill"></a>
 
-### tmLabs.balanceLastbill ⇒ <code>double</code> \| <code>undefined</code>
+### tmLabs.balanceLastBill ⇒ <code>double</code> \| <code>undefined</code>
 Last billing cost
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
-**See**: [balanceLastbill](#FetchCommand+balanceLastbill)  
+**See**: [balanceLastBill](#Account+balanceLastBill)  
 <a name="TmLabs+balanceReset"></a>
 
 ### tmLabs.balanceReset ⇒ <code>undefined</code> \| <code>double</code>
 Returns number of seconds before free key credits renew
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
-**See**: [balanceReset](#FetchCommand+balanceReset)  
+**See**: [balanceReset](#Account+balanceReset)  
 <a name="TmLabs+version"></a>
 
 ### tmLabs.version ⇒ <code>String</code>
@@ -631,7 +750,7 @@ FetchCommand for API requests
 | Param | Type | Description |
 | --- | --- | --- |
 | params | <code>Object</code> | The params object |
-| params.key | <code>String</code> | Token key |
+| [params.key] | <code>String</code> | Token key |
 | params.method | <code>String</code> | Fetch method |
 
 <a name="FetchCommand+method"></a>

@@ -1,6 +1,7 @@
 /**
  * @module event
  * @desc Event constants
+ * @readonly
  * @memberOf module:constants
  */
 
@@ -51,3 +52,11 @@ export const RESOLVED = 'resolved'
  * @default command
  */
 export const COMMAND = 'command'
+
+/**
+ * Balance change
+ * @type {string}
+ * @constant
+ * @default balance_changed
+ */
+export const BALANCE_CHANGED = 'balance_changed'

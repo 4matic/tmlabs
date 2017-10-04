@@ -315,7 +315,9 @@ describe('Commands Tests', () => {
             }], 'arguments')
             assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/dns/google.com', 'correct url')
             assert.equal(command.statusText, 'OK')
-            assert.hasAllKeys(command.content, ['google.com'])
+            assert.hasAllKeys(command.content, ['ipv4', 'ipv6'])
+            assert.isAtLeast(command.content.ipv4.length, 1)
+            assert.isAtLeast(command.content.ipv6.length, 1)
           })
         })
         describe('method hash', () => {
@@ -342,7 +344,7 @@ describe('Commands Tests', () => {
         })
         describe('method scan', () => {
           it('do command. with required parameter alias', async () => {
-            const ip = '173.194.122.233'
+            const ip = '74.125.131.102'
             const command = new Command('fetch', {
               method: 'scan'
             })
@@ -353,14 +355,14 @@ describe('Commands Tests', () => {
             assert.equal(command.error, false, 'error=false')
             assert.deepEqual(command.args, [{
               arg: 'ipaddr',
-              val: '173.194.122.233'
+              val: ip
             }], 'arguments')
             assert.startsWith(command.url, `https://tempicolabs.com/api/v2/scan/${ip}`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor'])
           })
           it('do command. with required parameter alias + portmin & portmax', async () => {
-            const ip = '173.194.122.233'
+            const ip = '74.125.131.102'
             const portmin = 79
             const portmax = 100
             const command = new Command('fetch', {
@@ -375,7 +377,7 @@ describe('Commands Tests', () => {
             assert.equal(command.error, false, 'error=false')
             assert.deepEqual(command.args, [{
               arg: 'ipaddr',
-              val: '173.194.122.233'
+              val: ip
             }, {
               arg: 'portmin',
               val: portmin
@@ -455,11 +457,8 @@ describe('Commands Tests', () => {
           'x-balance-remaining', 'x-balance-lastbill', 'x-balance-reset'
         ], 'has balance keys in headers')
         assert.hasAllKeys(command.content, [
-          'stats'
+          'balance-remaining', 'subscriptions'
         ], 'has balance & stats keys in body')
-        assert.hasAllKeys(command.content.stats, [
-          'blacklisted', 'objects', 'queue'
-        ], 'check stats object')
         assert.equal(command.status, 200, 'code 200')
       })
     })
@@ -619,12 +618,12 @@ describe('Commands Tests', () => {
       await command.run()
       assert.equal(command.status, 200, 'code 200')
       assert.equal(command.error, false, 'error=false')
-      assert.startsWith(command.url, 'https://tempicolabs.com/api/status', 'correct url')
+      assert.startsWith(command.url, 'https://tempicolabs.com/api/account/status', 'correct url')
       assert.equal(command.statusText, 'OK')
       assert.equal(command.errorText, undefined)
       assert.hasAllKeys(command.content, [
-        'stats'
-      ], 'has balance & stats keys in body')
+        'subscriptions', 'balance-remaining'
+      ], 'has subscriptions && balance keys in body')
       assert.deepEqual(command.args, [], 'arguments')
     })
   })

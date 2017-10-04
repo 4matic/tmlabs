@@ -1,5 +1,6 @@
 import TmLabs from './TmLabs'
 import Command from './Command'
+import Account from './Account'
 import FetchCommand from './command/FetchCommand'
 import StatusCommand from './command/StatusCommand'
 import HashCommand from './command/HashCommand'
@@ -84,6 +85,7 @@ export default TmLabs
  * @module TmLabs
  * @property {TmLabs} TmLabs - Main object TmLabs class
  * @property {Command} Command - Main Command object class
+ * @property {Account} Account - Class for account
  * @property {FetchCommand} FetchCommand - FetchCommand object class
  * @property {HashCommand} HashCommand - HashCommand object class
  * @property {StatusCommand} StatusCommand - StatusCommand object class
@@ -91,6 +93,7 @@ export default TmLabs
 export {
   TmLabs,
   Command,
+  Account,
   fetch,
   hash,
   FetchCommand,

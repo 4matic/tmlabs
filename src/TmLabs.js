@@ -2,6 +2,7 @@ import EventEmitter from 'smelly-event-emitter'
 import Q from 'q'
 import PQueue from 'p-queue'
 import Command from './Command'
+import Account from './Account'
 import { event } from './constant'
 import FetchCommand from './command/FetchCommand'
 
@@ -12,27 +13,38 @@ export default class TmLabs extends EventEmitter {
    * @augments EventEmitter
    * @param {Object} [options] - The options object
    * @param {Object} [options.key] - API token
-   * @param {Object} [options.limit] - Queue limit
+   * @param {Object} [options.limit] - Queue limit. Note: default is Infinity!
    */
-  constructor (options) {
+  constructor (options = {}) {
     super()
-    const key = options && options.key ? options.key : false
+    const account = new Account({
+      key: options.key
+    })
     const limit = options && options.limit ? options.limit : Infinity
     const queue = new PQueue({ concurrency: limit })
     const history = []
     this._map = new WeakMap()
     this._map.set(this, {
-      key,
+      /**
+       * Account
+       * @type {Account}
+       * @member TmLabs#account
+       */
+      account,
       limit,
       queue,
-      history,
-      balance_remaining: undefined,
-      balance_lastbill: undefined,
-      balance_reset: undefined
+      history
     })
     this.on(event.RESOLVED, (command) => {
       this._map.get(this).history.push(command)
     })
+
+    // return new Proxy(this, {
+    //   get (target, name) {
+    //     if (['balanceRemaining', 'balanceLastbill', 'balanceReset'].includes(name)) return target._map.get(target).account[name]
+    //     else return target[name]
+    //   }
+    // })
   }
 
   /**
@@ -41,6 +53,7 @@ export default class TmLabs extends EventEmitter {
    * @param {Object} [options] Batch command options
    * @param {Boolean} [options.throw=false] If true command will throw exceptions
    * @member TmLabs#runBatch
+   * @resolves {Array.<Object>} result
    * @returns {Promise}
    */
   async runBatch (commands = [], options = {}) {
@@ -64,6 +77,7 @@ export default class TmLabs extends EventEmitter {
    * @param {Object[]} objects array of request parameters
    * @param options additional options
    * @member TmLabs#fetchBatch
+   * @resolves {Array.<Object>} result
    * @returns {Promise}
    */
   async fetchBatch (method, objects = [], options = { throw: false }) {
@@ -106,13 +120,13 @@ export default class TmLabs extends EventEmitter {
    * @param {Command} command
    * @param params command params
    * @member TmLabs#runCommand
-   * @resolves {Array.<Object>} result
    * @returns {Promise} result
    */
   runCommand (command, params) {
     let newParams = params
     if (this.key) newParams.key = this.key
     return new Promise((resolve, reject) => {
+      const { queue, account } = this._map.get(this)
       this.emit(event.COMMAND, command, newParams)
       command.on(event.ERROR, (error, cmd) => {
         this.emit(event.ERROR, error, cmd)
@@ -123,18 +137,28 @@ export default class TmLabs extends EventEmitter {
       })
       command.on(event.RESPONSE, (response, cmd) => {
         this.emit(event.RESPONSE, cmd, response)
-        this._map.get(this).balance_remaining = cmd.balanceRemaining
-        this._map.get(this).balance_lastbill = cmd.balanceLastbill
-        this._map.get(this).balance_reset = cmd.balanceReset
+      })
+      command.on(event.BALANCE_CHANGED, (cmd, lastBill) => {
+        this.emit(event.BALANCE_CHANGED, cmd, lastBill)
       })
       command.on(event.RAW_RESPONSE, (response, cmd) => {
         this.emit(event.RAW_RESPONSE, cmd, response)
       })
-      this._map.get(this).queue.add(() => command.run(newParams).then((response) => {
+      queue.add(() => account.runCommand(command, newParams).then((response) => {
         this.emit(event.RESOLVED, command, response)
         resolve(response)
       }))
     })
+  }
+
+  /**
+   * Get account subscriptions
+   * Additional request required
+   * @member TmLabs#getSubscriptions
+   * @returns {{}|null}
+   */
+  getSubscriptions () {
+    return this._map.get(this).account.getSubscriptions()
   }
 
   /**
@@ -146,6 +170,15 @@ export default class TmLabs extends EventEmitter {
     return this._map.get(this).history
   }
 
+  set account (account) {
+    if (!(account instanceof Account)) throw new ReferenceError('Only Account instances are allowed')
+    this._map.get(this).account = account
+  }
+
+  get account () {
+    return this._map.get(this).account
+  }
+
   /**
    * Active token for TmLabs Object.
    * Overrides if passed into params of [FetchCommand Class]{@link FetchCommand} <code>key</code> or
@@ -153,7 +186,7 @@ export default class TmLabs extends EventEmitter {
    * @returns {string}
    */
   get key () {
-    return this._map.get(this).key
+    return this._map.get(this).account.key
   }
 
   /**
@@ -177,31 +210,31 @@ export default class TmLabs extends EventEmitter {
   /**
    * Remaining balance
    * @member TmLabs#balanceRemaining
-   * @see {@link FetchCommand#balanceRemaining}
+   * @see {@link Account#balanceRemaining}
    * @returns {double|undefined}
    */
   get balanceRemaining () {
-    return this._map.get(this).balance_remaining
+    return this._map.get(this).account.balanceRemaining()
   }
 
   /**
    * Last billing cost
-   * @member TmLabs#balanceLastbill
-   * @see {@link FetchCommand#balanceLastbill}
+   * @member TmLabs#balanceLastBill
+   * @see {@link Account#balanceLastBill}
    * @returns {double|undefined}
    */
-  get balanceLastbill () {
-    return this._map.get(this).balance_lastbill
+  get balanceLastBill () {
+    return this._map.get(this).account.balanceLastBill()
   }
 
   /**
    * Returns number of seconds before free key credits renew
    * @member TmLabs#balanceReset
-   * @see {@link FetchCommand#balanceReset}
+   * @see {@link Account#balanceReset}
    * @returns {undefined|double}
    */
   get balanceReset () {
-    return this._map.get(this).balance_reset
+    return this._map.get(this).account.balanceReset()
   }
 
   /**

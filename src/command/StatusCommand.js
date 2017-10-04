@@ -9,8 +9,9 @@ class StatusCommand extends FetchCommand {
    * @param {Object|false|undefined} [params] - command params
    */
   constructor (params) {
+    let method = endpoint.ACCOUNT_STATUS
     super(Object.assign({}, params, {
-      method: endpoint.STATUS,
+      method,
       version: false
     }))
   }

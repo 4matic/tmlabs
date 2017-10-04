@@ -1,6 +1,12 @@
+3.2.0
+* New endpoint added `account/status`
+* Tests updates
+* Account class added
+* Updated Examples & Docs
+
 3.1.0
-* fixing fetch function in main package
-* some static methods added
+* Fixing fetch function in main package
+* Some static methods added
 * RunKit support added
 * Updated Examples & Docs
 * Added event constants module
@@ -15,7 +21,7 @@
 2.0.0
 * Added bower support
 * TmLabs class init options added limit. Queue concurrency option value
-* Email Leaks endpoint added
+* New endpoint added `email/leaks`
 * Queue added to TmLabs class.
 
 1.0.0

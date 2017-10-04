@@ -10365,7 +10365,7 @@ var TmLabs$1 = function (_EventEmitter) {
   }], [{
     key: 'version',
     get: function get() {
-      var version = "3.0.0";
+      var version = "3.1.0";
       if (!version) throw new Error('Use bundled packages in /dist/ folder to get version');
       return version;
     }

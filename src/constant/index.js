@@ -11,6 +11,7 @@ import specification from './specification'
  * @property {Object} argument - Endpoint arguments
  * @property {Object} specification - Endpoint specifications
  * @property {Object} error - SDK Errors
+ * @property {Object} event - SDK Events
  */
 export {
   endpoint,

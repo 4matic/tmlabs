@@ -57,6 +57,14 @@ export const SCAN = 'scan'
 export const STATUS = 'status'
 
 /**
+ * Account Status
+ * @type {string}
+ * @constant
+ * @default account/status
+ */
+export const ACCOUNT_STATUS = 'account/status'
+
+/**
  * DNS
  * @type {string}
  * @constant
@@ -65,7 +73,7 @@ export const STATUS = 'status'
 export const DNS = 'dns'
 
 /**
- * Me. Data about myself
+ * Me. Data based on your ip address
  * @type {string}
  * @constant
  * @default me

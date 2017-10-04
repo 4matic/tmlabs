@@ -11,9 +11,18 @@
 
 <p align="center">
   <img src="https://img.shields.io/bower/v/tmlabs.svg" alt="Bower version">
-  <a href="https://www.npmjs.com/package/@tempicolabs/tmlabs"><img src="https://img.shields.io/npm/v/@tempicolabs/tmlabs.svg" alt="Npm version"></a>
-  <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code/style-standard-brightgreen.svg" alt="Javascipt Standart Style"></a>
-  <a href="https://github.com/TempicoLabs/tmlabs/blob/master/LICENSE"><img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence"></a>
+  <a href="https://www.npmjs.com/package/@tempicolabs/tmlabs">
+    <img src="https://img.shields.io/npm/v/@tempicolabs/tmlabs.svg" alt="Npm version">
+  </a>
+  <a href="https://standardjs.com">
+    <img src="https://img.shields.io/badge/code/style-standard-brightgreen.svg" alt="Javascipt Standart Style">
+  </a>
+  <a href="https://github.com/TempicoLabs/tmlabs/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence">
+  </a>
+  <a href="https://npm.runkit.com/@tempicolabs/tmlabs">
+      <img src="https://badge.runkitcdn.com/@tempicolabs/tmlabs.svg" alt="Try @tempicolabs/tmlabs on RunKit"/>
+  </a>
 </p>
 <br>
 
@@ -36,13 +45,15 @@ bower install tmlabs --save
 
 #### SDK contain:
 
-`dist/tmlabs.umd.js` - Standart package for node.js
+`dist/tmlabs.umd.js` - Standard package for node.js
 
 `dist/tmlabs.es.js` - ES6 Package for node.js using import
 
 `dist/tmlabs.js` - Unminified browser version
 
 `dist/tmlabs.min.js` - Minified browser version
+
+`src/*` - Sources. Javascript ES2016
 
 ### TmLabs API Documentation
 

@@ -29,7 +29,7 @@ class FetchCommand extends AbstractCommand {
    * FetchCommand for API requests
    * @constructs FetchCommand
    * @param {Object} params - The params object
-   * @param {String} [params.key - Token key
+   * @param {String} [params.key] - Token key
    * @param {String} params.method - Fetch method
    * @augments AbstractCommand
    * @throws TypeError

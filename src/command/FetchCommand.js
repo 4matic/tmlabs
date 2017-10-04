@@ -89,6 +89,7 @@ class FetchCommand extends AbstractCommand {
    * Get method specifications
    * @static
    * @param {String|false} [method=false] if method defined get specifications for this method, else get all
+   * @member FetchCommand#getMethodSpecifications
    * @returns {Object|Object[]}
    */
   static getMethodSpecifications (method = false) {

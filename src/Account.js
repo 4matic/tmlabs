@@ -30,7 +30,7 @@ class Account extends EventEmitter {
    * @param {Command} command
    * @param params command params
    * @member Account#runCommand
-   * @see {@link module:event~BALANCE_CHANGED}
+   * @see {@link module:constants~event}
    * @returns {Promise} result
    */
   runCommand (command, params) {
@@ -61,7 +61,7 @@ class Account extends EventEmitter {
   /**
    * Last billing cost
    * @member Account#balanceLastBill
-   * @see {@link Account#balanceLastBill}
+   * @see {@link FetchCommand#balanceLastBill}
    * @returns {double|undefined}
    */
   get balanceLastBill () {
@@ -71,7 +71,7 @@ class Account extends EventEmitter {
   /**
    * Returns number of seconds before free key credits renew
    * @member Account#balanceReset
-   * @see {@link Account#balanceReset}
+   * @see {@link FetchCommand#balanceReset}
    * @returns {undefined|double}
    */
   get balanceReset () {
@@ -115,10 +115,9 @@ class Account extends EventEmitter {
       key: this.key
     })
     const { content, headers } = await this.runCommand(statusCommand, false)
-    return {
-      'balance-reset': parseInt(headers['x-balance-reset'][0], 10),
-      ...content
-    }
+    return Object.assign({}, {
+      'balance-reset': parseInt(headers['x-balance-reset'][0], 10)
+    }, content)
   }
 }
 

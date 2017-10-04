@@ -2,7 +2,7 @@
 * New endpoint added `account/status`
 * Tests updates
 * Account class added
-* Updated Examples & Docs
+* Docs updated
 
 3.1.0
 * Fixing fetch function in main package

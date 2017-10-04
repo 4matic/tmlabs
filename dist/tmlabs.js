@@ -7318,6 +7318,14 @@ var SCAN = 'scan';
 var STATUS = 'status';
 
 /**
+ * Account Status
+ * @type {string}
+ * @constant
+ * @default account/status
+ */
+var ACCOUNT_STATUS = 'account/status';
+
+/**
  * DNS
  * @type {string}
  * @constant
@@ -7326,7 +7334,7 @@ var STATUS = 'status';
 var DNS = 'dns';
 
 /**
- * Me. Data about myself
+ * Me. Data based on your ip address
  * @type {string}
  * @constant
  * @default me
@@ -7346,6 +7354,7 @@ var endpoint = Object.freeze({
 	HASH: HASH,
 	SCAN: SCAN,
 	STATUS: STATUS,
+	ACCOUNT_STATUS: ACCOUNT_STATUS,
 	DNS: DNS,
 	ME: ME,
 	EMAIL_LEAKS: EMAIL_LEAKS
@@ -7574,6 +7583,7 @@ var InsufficientFundsError$1 = function (_Error2) {
 /**
  * @module event
  * @desc Event constants
+ * @readonly
  * @memberOf module:constants
  */
 
@@ -7625,6 +7635,14 @@ var RESOLVED = 'resolved';
  */
 var COMMAND = 'command';
 
+/**
+ * Balance change
+ * @type {string}
+ * @constant
+ * @default balance_changed
+ */
+var BALANCE_CHANGED = 'balance_changed';
+
 var _specification;
 
 /**
@@ -7635,6 +7653,8 @@ var _specification;
 var specification = (_specification = {}, _defineProperty$1(_specification, STATUS, {
   version: false
 }), _defineProperty$1(_specification, EMAIL_LEAKS, {
+  version: false
+}), _defineProperty$1(_specification, ACCOUNT_STATUS, {
   version: false
 }), _specification);
 
@@ -7666,7 +7686,7 @@ var FetchCommand = function (_AbstractCommand) {
    * FetchCommand for API requests
    * @constructs FetchCommand
    * @param {Object} params - The params object
-   * @param {String} [params.key - Token key
+   * @param {String} [params.key] - Token key
    * @param {String} params.method - Fetch method
    * @augments AbstractCommand
    * @throws TypeError
@@ -8368,6 +8388,7 @@ var FetchCommand = function (_AbstractCommand) {
      * Get method specifications
      * @static
      * @param {String|false} [method=false] if method defined get specifications for this method, else get all
+     * @member FetchCommand#getMethodSpecifications
      * @returns {Object|Object[]}
      */
     value: function getMethodSpecifications() {
@@ -8515,8 +8536,9 @@ var StatusCommand = function (_FetchCommand) {
   function StatusCommand(params) {
     _classCallCheck(this, StatusCommand);
 
+    var method = ACCOUNT_STATUS;
     return _possibleConstructorReturn(this, (StatusCommand.__proto__ || _Object$getPrototypeOf(StatusCommand)).call(this, _Object$assign({}, params, {
-      method: STATUS,
+      method: method,
       version: false
     })));
   }
@@ -9649,7 +9671,7 @@ var HashCommand = function (_FetchCommand) {
   /**
    * HashCommand class for file & stream hashing.
    * Run method sends hash to API
-   * @constructors HashCommand
+   * @constructs HashCommand
    * @augments FetchCommand
    * @param [params]
    * @param {string} [params.key] - API key.
@@ -9989,6 +10011,235 @@ var Command = function (_AbstractCommand) {
   return Command;
 }(AbstractCommand);
 
+var Account = function (_EventEmitter) {
+  _inherits(Account, _EventEmitter);
+
+  /**
+   * Account for API requests
+   * @constructs Account
+   * @param {Object} options - The options object
+   * @param {String} [options.key] - Token key
+   */
+  function Account() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Account);
+
+    var _this = _possibleConstructorReturn(this, (Account.__proto__ || _Object$getPrototypeOf(Account)).call(this));
+
+    if (typeof options === 'string') {
+      _this.key = options;
+    } else {
+      if (options.key) _this.key = options.key;
+    }
+    if (!_this.key) _this.key = false;
+    _this._map = new _WeakMap();
+    _this._map.set(_this, {
+      balance_remaining: undefined,
+      balance_lastbill: undefined,
+      balance_reset: undefined
+    });
+    return _this;
+  }
+
+  /**
+   * Run command with params on behalf of this account
+   * @param {Command} command
+   * @param params command params
+   * @member Account#runCommand
+   * @see {@link module:constants~event}
+   * @returns {Promise} result
+   */
+
+
+  _createClass(Account, [{
+    key: 'runCommand',
+    value: function runCommand(command, params) {
+      var _this2 = this;
+
+      var newParams = params;
+      if (this.key) newParams.key = this.key;
+      command.on(RESPONSE, function (response, cmd) {
+        var prevBalance = _this2._map.get(_this2).balance_remaining;
+        if (prevBalance !== cmd.balanceRemaining) {
+          _this2.emit(BALANCE_CHANGED, cmd, cmd.balanceLastbill);
+        }
+        _this2._map.get(_this2).balance_remaining = cmd.balanceRemaining;
+        _this2._map.get(_this2).balance_lastbill = cmd.balanceLastbill;
+        _this2._map.get(_this2).balance_reset = cmd.balanceReset;
+      });
+      return command.run(newParams);
+    }
+
+    /**
+     * Remaining balance
+     * @member Account#balanceRemaining
+     * @see {@link FetchCommand#balanceRemaining}
+     * @returns {double|undefined}
+     */
+
+  }, {
+    key: 'getBalance',
+
+
+    /**
+     * Get account balance by making new request
+     * @member Account#getBalance
+     * @see {@link Account#getStatus}
+     * @returns {{}}
+     */
+    value: function () {
+      var _ref = _asyncToGenerator(index.mark(function _callee() {
+        var statusData;
+        return index.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.getStatus();
+
+              case 2:
+                statusData = _context.sent;
+                return _context.abrupt('return', {
+                  remaining: statusData['balance-remaining'],
+                  reset: statusData['balance-reset']
+                });
+
+              case 4:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function getBalance() {
+        return _ref.apply(this, arguments);
+      }
+
+      return getBalance;
+    }()
+
+    /**
+     * Get account subscriptions by making new request
+     * @member Account#getSubscriptions
+     * @see {@link Account#getStatus}
+     * @returns {null|{}}
+     */
+
+  }, {
+    key: 'getSubscriptions',
+    value: function () {
+      var _ref2 = _asyncToGenerator(index.mark(function _callee2() {
+        var statusData, subscriptions;
+        return index.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.getStatus();
+
+              case 2:
+                statusData = _context2.sent;
+                subscriptions = statusData.subscriptions;
+                return _context2.abrupt('return', subscriptions);
+
+              case 5:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function getSubscriptions() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return getSubscriptions;
+    }()
+
+    /**
+     * Get account status by making new request
+     * @member Account#getStatus
+     * @see {@link StatusCommand}
+     * @returns {{}}
+     */
+
+  }, {
+    key: 'getStatus',
+    value: function () {
+      var _ref3 = _asyncToGenerator(index.mark(function _callee3() {
+        var statusCommand, _ref4, content, headers;
+
+        return index.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                statusCommand = new StatusCommand({
+                  key: this.key
+                });
+                _context3.next = 3;
+                return this.runCommand(statusCommand, false);
+
+              case 3:
+                _ref4 = _context3.sent;
+                content = _ref4.content;
+                headers = _ref4.headers;
+                return _context3.abrupt('return', _Object$assign({}, {
+                  'balance-reset': parseInt(headers['x-balance-reset'][0], 10)
+                }, content));
+
+              case 7:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function getStatus() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return getStatus;
+    }()
+  }, {
+    key: 'balanceRemaining',
+    get: function get() {
+      return this._map.get(this).balance_remaining;
+    }
+
+    /**
+     * Last billing cost
+     * @member Account#balanceLastBill
+     * @see {@link FetchCommand#balanceLastBill}
+     * @returns {double|undefined}
+     */
+
+  }, {
+    key: 'balanceLastBill',
+    get: function get() {
+      return this._map.get(this).balance_lastbill;
+    }
+
+    /**
+     * Returns number of seconds before free key credits renew
+     * @member Account#balanceReset
+     * @see {@link FetchCommand#balanceReset}
+     * @returns {undefined|double}
+     */
+
+  }, {
+    key: 'balanceReset',
+    get: function get() {
+      return this._map.get(this).balance_reset;
+    }
+  }]);
+
+  return Account;
+}(EventEmitter);
+
 var TmLabs$1 = function (_EventEmitter) {
   _inherits(TmLabs, _EventEmitter);
 
@@ -9998,26 +10249,32 @@ var TmLabs$1 = function (_EventEmitter) {
    * @augments EventEmitter
    * @param {Object} [options] - The options object
    * @param {Object} [options.key] - API token
-   * @param {Object} [options.limit] - Queue limit
+   * @param {Object} [options.limit] - Queue limit. Note: default is Infinity!
    */
-  function TmLabs(options) {
+  function TmLabs() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     _classCallCheck(this, TmLabs);
 
     var _this = _possibleConstructorReturn(this, (TmLabs.__proto__ || _Object$getPrototypeOf(TmLabs)).call(this));
 
-    var key = options && options.key ? options.key : false;
+    var account = new Account({
+      key: options.key
+    });
     var limit = options && options.limit ? options.limit : Infinity;
     var queue = new index$3({ concurrency: limit });
     var history = [];
     _this._map = new _WeakMap();
     _this._map.set(_this, {
-      key: key,
+      /**
+       * Account
+       * @type {Account}
+       * @member TmLabs#account
+       */
+      account: account,
       limit: limit,
       queue: queue,
-      history: history,
-      balance_remaining: undefined,
-      balance_lastbill: undefined,
-      balance_reset: undefined
+      history: history
     });
     _this.on(RESOLVED, function (command) {
       _this._map.get(_this).history.push(command);
@@ -10031,6 +10288,7 @@ var TmLabs$1 = function (_EventEmitter) {
    * @param {Object} [options] Batch command options
    * @param {Boolean} [options.throw=false] If true command will throw exceptions
    * @member TmLabs#runBatch
+   * @resolves {Array.<Object>} result
    * @returns {Promise}
    */
 
@@ -10038,15 +10296,15 @@ var TmLabs$1 = function (_EventEmitter) {
   _createClass(TmLabs, [{
     key: 'runBatch',
     value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee() {
+      var _ref = _asyncToGenerator(index.mark(function _callee2() {
         var _this2 = this;
 
         var commands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var batchResponse, promises;
-        return index.wrap(function _callee$(_context) {
+        return index.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 batchResponse = [];
                 promises = [];
@@ -10056,38 +10314,73 @@ var TmLabs$1 = function (_EventEmitter) {
                   if ((typeof commandObj === 'undefined' ? 'undefined' : _typeof(commandObj)) !== 'object') throw new ReferenceError('Invalid command type');
                   if (!commandObj.command) throw new TypeError("Empty required param 'method'");
                   var command = commandObj.command;
-                  promises.push(_this2.runCommand(command, commandObj.params));
+                  promises.push(new _Promise(function () {
+                    var _ref2 = _asyncToGenerator(index.mark(function _callee(resolve, reject) {
+                      var answer;
+                      return index.wrap(function _callee$(_context) {
+                        while (1) {
+                          switch (_context.prev = _context.next) {
+                            case 0:
+                              _context.prev = 0;
+                              _context.next = 3;
+                              return _this2.runCommand(command, commandObj.params);
+
+                            case 3:
+                              answer = _context.sent;
+
+                              resolve(answer);
+                              _context.next = 10;
+                              break;
+
+                            case 7:
+                              _context.prev = 7;
+                              _context.t0 = _context['catch'](0);
+
+                              reject(_context.t0);
+
+                            case 10:
+                            case 'end':
+                              return _context.stop();
+                          }
+                        }
+                      }, _callee, _this2, [[0, 7]]);
+                    }));
+
+                    return function (_x4, _x5) {
+                      return _ref2.apply(this, arguments);
+                    };
+                  }()));
                 });
 
                 if (options.throw) {
-                  _context.next = 9;
+                  _context2.next = 9;
                   break;
                 }
 
-                _context.next = 6;
+                _context2.next = 6;
                 return q.allSettled(promises);
 
               case 6:
-                batchResponse = _context.sent;
-                _context.next = 12;
+                batchResponse = _context2.sent;
+                _context2.next = 12;
                 break;
 
               case 9:
-                _context.next = 11;
+                _context2.next = 11;
                 return q.all(promises);
 
               case 11:
-                batchResponse = _context.sent;
+                batchResponse = _context2.sent;
 
               case 12:
-                return _context.abrupt('return', batchResponse);
+                return _context2.abrupt('return', batchResponse);
 
               case 13:
               case 'end':
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function runBatch() {
@@ -10103,27 +10396,28 @@ var TmLabs$1 = function (_EventEmitter) {
      * @param {Object[]} objects array of request parameters
      * @param options additional options
      * @member TmLabs#fetchBatch
+     * @resolves {Array.<Object>} result
      * @returns {Promise}
      */
 
   }, {
     key: 'fetchBatch',
     value: function () {
-      var _ref2 = _asyncToGenerator(index.mark(function _callee3(method) {
+      var _ref3 = _asyncToGenerator(index.mark(function _callee4(method) {
         var _this3 = this;
 
         var objects = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
         var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { throw: false };
         var batchResponse, methods, promises;
-        return index.wrap(function _callee3$(_context3) {
+        return index.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 batchResponse = [];
                 methods = FetchCommand.methods;
 
                 if (method) {
-                  _context3.next = 4;
+                  _context4.next = 4;
                   break;
                 }
 
@@ -10131,7 +10425,7 @@ var TmLabs$1 = function (_EventEmitter) {
 
               case 4:
                 if (_Object$values(methods).includes(method)) {
-                  _context3.next = 6;
+                  _context4.next = 6;
                   break;
                 }
 
@@ -10141,65 +10435,77 @@ var TmLabs$1 = function (_EventEmitter) {
                 promises = [];
 
                 objects.forEach(function (params) {
-                  promises.push(_asyncToGenerator(index.mark(function _callee2() {
-                    return index.wrap(function _callee2$(_context2) {
-                      while (1) {
-                        switch (_context2.prev = _context2.next) {
-                          case 0:
-                            _context2.prev = 0;
-                            _context2.next = 3;
-                            return _this3.fetch(method, params);
+                  promises.push(new _Promise(function () {
+                    var _ref4 = _asyncToGenerator(index.mark(function _callee3(resolve, reject) {
+                      var answer;
+                      return index.wrap(function _callee3$(_context3) {
+                        while (1) {
+                          switch (_context3.prev = _context3.next) {
+                            case 0:
+                              _context3.prev = 0;
+                              _context3.next = 3;
+                              return _this3.fetch(method, params);
 
-                          case 3:
-                            return _context2.abrupt('return', _context2.sent);
+                            case 3:
+                              answer = _context3.sent;
 
-                          case 6:
-                            _context2.prev = 6;
-                            _context2.t0 = _context2['catch'](0);
-                            return _context2.abrupt('return', _context2.t0);
+                              resolve(answer);
+                              _context3.next = 10;
+                              break;
 
-                          case 9:
-                          case 'end':
-                            return _context2.stop();
+                            case 7:
+                              _context3.prev = 7;
+                              _context3.t0 = _context3['catch'](0);
+
+                              reject(_context3.t0);
+
+                            case 10:
+                            case 'end':
+                              return _context3.stop();
+                          }
                         }
-                      }
-                    }, _callee2, _this3, [[0, 6]]);
-                  })));
+                      }, _callee3, _this3, [[0, 7]]);
+                    }));
+
+                    return function (_x9, _x10) {
+                      return _ref4.apply(this, arguments);
+                    };
+                  }()));
                 });
 
                 if (options.throw) {
-                  _context3.next = 14;
+                  _context4.next = 14;
                   break;
                 }
 
-                _context3.next = 11;
+                _context4.next = 11;
                 return q.allSettled(promises);
 
               case 11:
-                batchResponse = _context3.sent;
-                _context3.next = 17;
+                batchResponse = _context4.sent;
+                _context4.next = 17;
                 break;
 
               case 14:
-                _context3.next = 16;
+                _context4.next = 16;
                 return q.all(promises);
 
               case 16:
-                batchResponse = _context3.sent;
+                batchResponse = _context4.sent;
 
               case 17:
-                return _context3.abrupt('return', batchResponse);
+                return _context4.abrupt('return', batchResponse);
 
               case 18:
               case 'end':
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
-      function fetchBatch(_x3) {
-        return _ref2.apply(this, arguments);
+      function fetchBatch(_x6) {
+        return _ref3.apply(this, arguments);
       }
 
       return fetchBatch;
@@ -10230,7 +10536,6 @@ var TmLabs$1 = function (_EventEmitter) {
      * @param {Command} command
      * @param params command params
      * @member TmLabs#runCommand
-     * @resolves {Array.<Object>} result
      * @returns {Promise} result
      */
 
@@ -10242,6 +10547,10 @@ var TmLabs$1 = function (_EventEmitter) {
       var newParams = params;
       if (this.key) newParams.key = this.key;
       return new _Promise(function (resolve, reject) {
+        var _map$get = _this4._map.get(_this4),
+            queue = _map$get.queue,
+            account = _map$get.account;
+
         _this4.emit(COMMAND, command, newParams);
         command.on(ERROR, function (error$$1, cmd) {
           _this4.emit(ERROR, error$$1, cmd);
@@ -10252,20 +10561,35 @@ var TmLabs$1 = function (_EventEmitter) {
         });
         command.on(RESPONSE, function (response, cmd) {
           _this4.emit(RESPONSE, cmd, response);
-          _this4._map.get(_this4).balance_remaining = cmd.balanceRemaining;
-          _this4._map.get(_this4).balance_lastbill = cmd.balanceLastbill;
-          _this4._map.get(_this4).balance_reset = cmd.balanceReset;
+        });
+        command.on(BALANCE_CHANGED, function (cmd, lastBill) {
+          _this4.emit(BALANCE_CHANGED, cmd, lastBill);
         });
         command.on(RAW_RESPONSE, function (response, cmd) {
           _this4.emit(RAW_RESPONSE, cmd, response);
         });
-        _this4._map.get(_this4).queue.add(function () {
-          return command.run(newParams).then(function (response) {
+        queue.add(function () {
+          return account.runCommand(command, newParams).then(function (response) {
             _this4.emit(RESOLVED, command, response);
             resolve(response);
+          }).catch(function (err) {
+            reject(err);
           });
         });
       });
+    }
+
+    /**
+     * Get account subscriptions
+     * Additional request required
+     * @member TmLabs#getSubscriptions
+     * @returns {{}|null}
+     */
+
+  }, {
+    key: 'getSubscriptions',
+    value: function getSubscriptions() {
+      return this._map.get(this).account.getSubscriptions();
     }
 
     /**
@@ -10279,6 +10603,15 @@ var TmLabs$1 = function (_EventEmitter) {
     get: function get() {
       return this._map.get(this).history;
     }
+  }, {
+    key: 'account',
+    set: function set(account) {
+      if (!(account instanceof Account)) throw new ReferenceError('Only Account instances are allowed');
+      this._map.get(this).account = account;
+    },
+    get: function get() {
+      return this._map.get(this).account;
+    }
 
     /**
      * Active token for TmLabs Object.
@@ -10290,7 +10623,7 @@ var TmLabs$1 = function (_EventEmitter) {
   }, {
     key: 'key',
     get: function get() {
-      return this._map.get(this).key;
+      return this._map.get(this).account.key;
     }
 
     /**
@@ -10320,40 +10653,40 @@ var TmLabs$1 = function (_EventEmitter) {
     /**
      * Remaining balance
      * @member TmLabs#balanceRemaining
-     * @see {@link FetchCommand#balanceRemaining}
+     * @see {@link Account#balanceRemaining}
      * @returns {double|undefined}
      */
 
   }, {
     key: 'balanceRemaining',
     get: function get() {
-      return this._map.get(this).balance_remaining;
+      return this._map.get(this).account.balanceRemaining;
     }
 
     /**
      * Last billing cost
-     * @member TmLabs#balanceLastbill
-     * @see {@link FetchCommand#balanceLastbill}
+     * @member TmLabs#balanceLastBill
+     * @see {@link Account#balanceLastBill}
      * @returns {double|undefined}
      */
 
   }, {
-    key: 'balanceLastbill',
+    key: 'balanceLastBill',
     get: function get() {
-      return this._map.get(this).balance_lastbill;
+      return this._map.get(this).account.balanceLastBill;
     }
 
     /**
      * Returns number of seconds before free key credits renew
      * @member TmLabs#balanceReset
-     * @see {@link FetchCommand#balanceReset}
+     * @see {@link Account#balanceReset}
      * @returns {undefined|double}
      */
 
   }, {
     key: 'balanceReset',
     get: function get() {
-      return this._map.get(this).balance_reset;
+      return this._map.get(this).account.balanceReset;
     }
 
     /**
@@ -10462,6 +10795,7 @@ var hash = function () {
 exports['default'] = TmLabs$1;
 exports.TmLabs = TmLabs$1;
 exports.Command = Command;
+exports.Account = Account;
 exports.fetch = fetch;
 exports.hash = hash;
 exports.FetchCommand = FetchCommand;

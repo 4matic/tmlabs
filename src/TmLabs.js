@@ -38,13 +38,6 @@ export default class TmLabs extends EventEmitter {
     this.on(event.RESOLVED, (command) => {
       this._map.get(this).history.push(command)
     })
-
-    // return new Proxy(this, {
-    //   get (target, name) {
-    //     if (['balanceRemaining', 'balanceLastbill', 'balanceReset'].includes(name)) return target._map.get(target).account[name]
-    //     else return target[name]
-    //   }
-    // })
   }
 
   /**
@@ -64,7 +57,14 @@ export default class TmLabs extends EventEmitter {
       if (typeof commandObj !== 'object') throw new ReferenceError('Invalid command type')
       if (!commandObj.command) throw new TypeError("Empty required param 'method'")
       const command = commandObj.command
-      promises.push(this.runCommand(command, commandObj.params))
+      promises.push(new Promise(async (resolve, reject) => {
+        try {
+          const answer = await this.runCommand(command, commandObj.params)
+          resolve(answer)
+        } catch (err) {
+          reject(err)
+        }
+      }))
     })
     if (!options.throw) batchResponse = await Q.allSettled(promises)
     else batchResponse = await Q.all(promises)
@@ -87,13 +87,14 @@ export default class TmLabs extends EventEmitter {
     if (!Object.values(methods).includes(method)) throw new TypeError('Invalid method param')
     let promises = []
     objects.forEach((params) => {
-      promises.push(async () => {
+      promises.push(new Promise(async (resolve, reject) => {
         try {
-          return await this.fetch(method, params)
+          const answer = await this.fetch(method, params)
+          resolve(answer)
         } catch (err) {
-          return err
+          reject(err)
         }
-      })
+      }))
     })
     if (!options.throw) batchResponse = await Q.allSettled(promises)
     else batchResponse = await Q.all(promises)
@@ -147,6 +148,8 @@ export default class TmLabs extends EventEmitter {
       queue.add(() => account.runCommand(command, newParams).then((response) => {
         this.emit(event.RESOLVED, command, response)
         resolve(response)
+      }).catch((err) => {
+        reject(err)
       }))
     })
   }
@@ -214,7 +217,7 @@ export default class TmLabs extends EventEmitter {
    * @returns {double|undefined}
    */
   get balanceRemaining () {
-    return this._map.get(this).account.balanceRemaining()
+    return this._map.get(this).account.balanceRemaining
   }
 
   /**
@@ -224,7 +227,7 @@ export default class TmLabs extends EventEmitter {
    * @returns {double|undefined}
    */
   get balanceLastBill () {
-    return this._map.get(this).account.balanceLastBill()
+    return this._map.get(this).account.balanceLastBill
   }
 
   /**
@@ -234,7 +237,7 @@ export default class TmLabs extends EventEmitter {
    * @returns {undefined|double}
    */
   get balanceReset () {
-    return this._map.get(this).account.balanceReset()
+    return this._map.get(this).account.balanceReset
   }
 
   /**

@@ -13,12 +13,16 @@ const pkg = require('./package.json')
 
 const replaceOptions = {
   exclude: 'node_modules/**',
-  'process.env.TMLABS_VERSION': JSON.stringify(pkg.version)
+  'process.env.TMLABS_VERSION': JSON.stringify(pkg.version),
+  'process.env.browser': false
 }
 
-if (process.env.production || process.env.browser) replaceOptions['process.env.TMLABS_KEY'] = false
-if (process.env.browser) replaceOptions['process.env.browser'] = true
-else replaceOptions['process.env.browser'] = false
+if (process.env.production || process.env.browser) {
+  replaceOptions['process.env.TMLABS_KEY'] = false
+  replaceOptions['process.env.browser'] = true
+}
+
+console.log(replaceOptions)
 
 export default {
   entry: 'src/index.js',

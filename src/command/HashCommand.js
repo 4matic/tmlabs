@@ -7,7 +7,7 @@ class HashCommand extends FetchCommand {
   /**
    * HashCommand class for file & stream hashing.
    * Run method sends hash to API
-   * @constructors HashCommand
+   * @constructs HashCommand
    * @augments FetchCommand
    * @param [params]
    * @param {string} [params.key] - API key.

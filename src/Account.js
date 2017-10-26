@@ -87,8 +87,8 @@ class Account extends EventEmitter {
   async getBalance () {
     const statusData = await this.getStatus()
     return {
-      remaining: statusData['balance-remaining'],
-      reset: statusData['balance-reset']
+      remaining: statusData['balance_remaining'],
+      reset: statusData['balance_reset']
     }
   }
 
@@ -114,9 +114,9 @@ class Account extends EventEmitter {
     const statusCommand = new StatusCommand({
       key: this.key
     })
-    const { content, headers } = await this.runCommand(statusCommand, false)
+    const { content, headers } = await this.runCommand(statusCommand, {})
     return Object.assign({}, {
-      'balance-reset': parseInt(headers['x-balance-reset'][0], 10)
+      'balance_reset': parseInt(headers['x-balance-reset'][0], 10)
     }, content)
   }
 }

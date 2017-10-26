@@ -22,7 +22,7 @@ class Command extends AbstractCommand {
     return new Proxy(this, {
       get (target, name) {
         if (['run', 'instance', 'class'].includes(name)) return target[name]
-        else if (name.startsWith('get')) return (...args) => target.instance[name].call(null, ...args)
+        else if (typeof name === 'string' && name.startsWith('get')) return (...args) => target.instance[name].call(null, ...args)
         else return target.instance[name]
       }
     })

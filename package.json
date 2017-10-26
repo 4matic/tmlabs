@@ -5,6 +5,7 @@
   "main": "dist/tmlabs.umd.js",
   "browser": "dist/tmlabs.js",
   "module": "dist/tmlabs.es.js",
+  "esnext": "dist/tmlabs.es.js",
   "files": [
     "src",
     "dist",

@@ -94,7 +94,7 @@ describe('Class Tests', () => {
       assert.instanceOf(results[0].reason, Error)
       assert.equal(results[5].state, 'fulfilled')
       assert.hasAllKeys(results[5].value.content, [
-        'balance-remaining', 'subscriptions'
+        'balance_remaining', 'subscriptions'
       ], 'has balance & stats keys in body')
     })
     it('Get account subscriptions', async () => {
@@ -107,7 +107,7 @@ describe('Class Tests', () => {
     it('get account status', async () => {
       const account = new Account()
       const statusData = await account.getStatus()
-      assert.hasAllKeys(statusData, ['balance-reset', 'balance-remaining', 'subscriptions'])
+      assert.hasAllKeys(statusData, ['balance_reset', 'balance_remaining', 'subscriptions'])
     })
     it('get account balance', async () => {
       const account = new Account()

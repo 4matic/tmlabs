@@ -20,6 +20,9 @@ chai.use(chaiString)
 
 const execFile = ChildProcess.execFile
 
+const baseUrl = 'https://tempicolabs.com/api/v3'
+const testIP = '173.194.222.139'
+
 const getFileRealHash = (filepath) => {
   return new Promise((resolve, reject) => {
     execFile('sha256sum', [filepath], (error, stdout, stderr) => {
@@ -215,7 +218,7 @@ describe('Commands Tests', () => {
               'val': email
             }], 'arguments')
             assert.equal(command.statusText, 'OK')
-            assert.hasAllKeys(command.content, ['mtime', 'payload', 'source'])
+            assert.hasAllKeys(command.content, ['last_modified', 'payload', 'source'])
           })
         })
         describe('method ip', () => {
@@ -237,7 +240,7 @@ describe('Commands Tests', () => {
               'arg': 'ip',
               'val': '127.0.0.1'
             }], 'arguments')
-            assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/127.0.0.1/', 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/ip/127.0.0.1/`, 'correct url')
             assert.equal(command.statusText, 'BAD REQUEST')
             // assert.equal(command.errorText, 'Incorrect IPv4 address', 'incorrect ipv4 address')
           })
@@ -246,15 +249,15 @@ describe('Commands Tests', () => {
               method: 'ip'
             })
             await command.run({
-              ipaddr: '173.194.122.233' // google ip address. using alias
+              ipaddr: testIP // google ip address. using alias
             })
             assert.equal(command.status, 200, 'code 400')
             assert.equal(command.error, false, 'error=false')
             assert.deepEqual(command.args, [{
               'arg': 'ipaddr',
-              'val': '173.194.122.233'
+              'val': testIP
             }], 'arguments')
-            assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/', 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/ip/${testIP}/`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.equal(command.errorText, undefined)
             assert.equal(command.content.isp, 'Google')
@@ -265,7 +268,7 @@ describe('Commands Tests', () => {
             })
             try {
               await command.run({
-                ipaddr: '173.194.122.233', // google ip address. using alias
+                ipaddr: testIP, // google ip address. using alias
                 mode: 'string'
               })
             } catch (e) {
@@ -281,19 +284,19 @@ describe('Commands Tests', () => {
               method: 'ip'
             })
             await command.run({
-              ipaddr: '173.194.122.233', // google ip address. using alias
+              ipaddr: testIP, // google ip address. using alias
               mode: 'blacklist'
             })
-            assert.equal(command.status, 404, 'not blacklisted')
+            assert.equal(command.status, 200)
             assert.deepEqual(command.args, [{
               arg: 'ipaddr',
-              val: '173.194.122.233'
+              val: testIP
             }, {
               arg: 'mode',
               val: 'blacklist'
             }], 'arguments')
-            assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/blacklist/', 'correct url')
-            assert.equal(command.statusText, 'NOT FOUND')
+            assert.startsWith(command.url, `${baseUrl}/ip/${testIP}/blacklist/`, 'correct url')
+            assert.equal(command.statusText, 'OK')
             assert.equal(command.content.blacklisted, false)
           })
         })
@@ -313,7 +316,7 @@ describe('Commands Tests', () => {
               arg: 'domain',
               val: 'google.com'
             }], 'arguments')
-            assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/dns/google.com', 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/dns/google.com`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.hasAllKeys(command.content, ['ipv4', 'ipv6'])
             assert.isAtLeast(command.content.ipv4.length, 1)
@@ -329,47 +332,46 @@ describe('Commands Tests', () => {
             const response = await command.run({
               hash
             })
-            assert.equal(command.status, 404, 'not found')
+            assert.equal(command.status, 200)
             assert.equal(response.content, null, 'response content is null')
             assert.notEqual(command.content, null, 'command content is not null')
             assert.deepEqual(command.args, [{
               arg: 'hash',
               val: hash
             }], 'arguments')
-            assert.startsWith(command.url, `https://tempicolabs.com/api/v2/hash/${hash}`, 'correct url')
-            assert.equal(command.statusText, 'NOT FOUND')
+            assert.startsWith(command.url, `${baseUrl}/hash/${hash}`, 'correct url')
+            assert.equal(command.statusText, 'OK')
+            assert.equal(command.content.error, 'No results found')
             // assert.hasAllKeys(command.content, ['mtime', 'mtime-human', 'sha256', 'status'])
             // assert.equal(command.content.sha256, hash, 'equal hash')
           })
         })
         describe('method scan', () => {
           it('do command. with required parameter alias', async () => {
-            const ip = '74.125.131.102'
             const command = new Command('fetch', {
               method: 'scan'
             })
             await command.run({
-              ipaddr: ip
+              ipaddr: testIP
             })
             assert.equal(command.status, 200)
             assert.equal(command.error, false, 'error=false')
             assert.deepEqual(command.args, [{
               arg: 'ipaddr',
-              val: ip
+              val: testIP
             }], 'arguments')
-            assert.startsWith(command.url, `https://tempicolabs.com/api/v2/scan/${ip}`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/scan/${testIP}`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor'])
           })
           it('do command. with required parameter alias + portmin & portmax', async () => {
-            const ip = '74.125.131.102'
             const portmin = 79
             const portmax = 100
             const command = new Command('fetch', {
               method: 'scan'
             })
             await command.run({
-              ipaddr: ip,
+              ipaddr: testIP,
               portmin,
               portmax
             })
@@ -377,7 +379,7 @@ describe('Commands Tests', () => {
             assert.equal(command.error, false, 'error=false')
             assert.deepEqual(command.args, [{
               arg: 'ipaddr',
-              val: ip
+              val: testIP
             }, {
               arg: 'portmin',
               val: portmin
@@ -385,7 +387,7 @@ describe('Commands Tests', () => {
               arg: 'portmax',
               val: portmax
             }], 'arguments')
-            assert.startsWith(command.url, `https://tempicolabs.com/api/v2/scan/${ip}/${portmin}/${portmax}`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/scan/${testIP}/${portmin}/${portmax}`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor'])
           })
@@ -399,13 +401,13 @@ describe('Commands Tests', () => {
             assert.equal(command.status, 200)
             assert.equal(command.error, false, 'error=true')
             assert.deepEqual(command.args, [], 'arguments')
-            assert.startsWith(command.url, `https://tempicolabs.com/api/v2/me`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/me`, 'correct url')
             assert.equal(command.statusText, 'OK')
-            assert.containsAllKeys(command.content, ['as-name', 'ports', 'device', 'browser', 'blacklisted', 'touchscreen'])
+            assert.containsAllKeys(command.content, ['as_name', 'ports', 'device', 'browser', 'blacklisted', 'touchscreen'])
             assert.equal(command.content.browser, 'Other')
             assert.equal(command.content.device, 'Other')
             assert.equal(command.content.touchscreen, false)
-            assert.equal(command.content['ua-raw'], `${os.type()}_${process.arch} Node ${process.version} - TempicoLabs SDK v${TmLabsPackage.version}`)
+            assert.equal(command.content.ua_raw, `${os.type()}_${process.arch} Node ${process.version} - TempicoLabs SDK v${TmLabsPackage.version}`)
           })
         })
         it('do command. custom header, User-Agent', async () => {
@@ -420,13 +422,13 @@ describe('Commands Tests', () => {
           assert.equal(command.status, 200)
           assert.equal(command.error, false, 'error=true')
           assert.deepEqual(command.args, [], 'arguments')
-          assert.startsWith(command.url, `https://tempicolabs.com/api/v2/me`, 'correct url')
+          assert.startsWith(command.url, `${baseUrl}/me`, 'correct url')
           assert.equal(command.statusText, 'OK')
-          assert.containsAllKeys(command.content, ['as-name', 'ports', 'device', 'browser', 'blacklisted', 'touchscreen'])
+          assert.containsAllKeys(command.content, ['location', 'os', 'as_name', 'ports', 'device', 'browser', 'blacklisted', 'touchscreen'])
           assert.equal(command.content.browser, 'Chrome 58.0.3029')
           assert.equal(command.content.device, 'PC')
           assert.equal(command.content.touchscreen, false)
-          assert.equal(command.content['ua-raw'], 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36')
+          assert.equal(command.content['ua_raw'], 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36')
         })
         it('do command. with mode parameter', async () => {
           const command = new Command('fetch', {
@@ -440,7 +442,7 @@ describe('Commands Tests', () => {
             arg: 'mode',
             val: 'blacklist'
           }], 'arguments')
-          assert.startsWith(command.url, `https://tempicolabs.com/api/v2/me/blacklist`, 'correct url')
+          assert.startsWith(command.url, `${baseUrl}/me/blacklist`, 'correct url')
           assert.equal(command.statusText, 'NOT FOUND')
           assert.containsAllKeys(command.content, ['blacklisted'])
         })
@@ -457,7 +459,7 @@ describe('Commands Tests', () => {
           'x-balance-remaining', 'x-balance-lastbill', 'x-balance-reset'
         ], 'has balance keys in headers')
         assert.hasAllKeys(command.content, [
-          'balance-remaining', 'subscriptions'
+          'balance_remaining', 'subscriptions'
         ], 'has balance & stats keys in body')
         assert.equal(command.status, 200, 'code 200')
       })
@@ -497,15 +499,15 @@ describe('Commands Tests', () => {
         method: 'ip'
       })
       await command.run({
-        ipaddr: '173.194.122.233' // google ip address. using alias
+        ipaddr: testIP // google ip address. using alias
       })
       assert.equal(command.status, 200, 'code 200')
       assert.equal(command.error, false, 'error=false')
       assert.deepEqual(command.args, [{
         'arg': 'ipaddr',
-        'val': '173.194.122.233'
+        'val': testIP
       }], 'arguments')
-      assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/', 'correct url')
+      assert.startsWith(command.url, `${baseUrl}/ip/${testIP}/`, 'correct url')
       assert.equal(command.statusText, 'OK')
       assert.equal(command.errorText, undefined)
       assert.equal(command.content.isp, 'Google')
@@ -622,7 +624,7 @@ describe('Commands Tests', () => {
       assert.equal(command.statusText, 'OK')
       assert.equal(command.errorText, undefined)
       assert.hasAllKeys(command.content, [
-        'subscriptions', 'balance-remaining'
+        'subscriptions', 'balance_remaining'
       ], 'has subscriptions && balance keys in body')
       assert.deepEqual(command.args, [], 'arguments')
     })

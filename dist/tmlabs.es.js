@@ -12500,7 +12500,7 @@ var FetchCommand = function (_AbstractCommand) {
     if (!_Object$values(methods).includes(method)) throw new TypeError('Invalid method param');
     if (fetchFunc) _this.fetchFunc = fetchFunc;else _this.fetchFunc = FetchCommand.fetchClass;
 
-    if (version !== undefined) _this.version = version;else _this.version = 'v2';
+    if (version !== undefined) _this.version = version;else _this.version = 'v3';
 
     if (key !== undefined && typeof key === 'string') _this._map.get(_this).key = key;else if (process.env.TMLABS_KEY) _this._map.get(_this).key = process.env.TMLABS_KEY;
 
@@ -12902,7 +12902,7 @@ var FetchCommand = function (_AbstractCommand) {
                 throw new NotFoundError(content.error, response);
 
               case 65:
-                if (!(status === 404 && !options.throwNotFound)) {
+                if (!((status === 404 || status === 200) && !options.throwNotFound)) {
                   _context2.next = 69;
                   break;
                 }
@@ -14709,7 +14709,7 @@ var Command = function (_AbstractCommand) {
     }
     return _ret = new Proxy(_this, {
       get: function get(target, name) {
-        if (['run', 'instance', 'class'].includes(name)) return target[name];else if (name.startsWith('get')) return function () {
+        if (['run', 'instance', 'class'].includes(name)) return target[name];else if (typeof name === 'string' && name.startsWith('get')) return function () {
           var _target$instance$name;
 
           for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -14870,8 +14870,8 @@ var Account = function (_EventEmitter) {
               case 2:
                 statusData = _context.sent;
                 return _context.abrupt('return', {
-                  remaining: statusData['balance-remaining'],
-                  reset: statusData['balance-reset']
+                  remaining: statusData['balance_remaining'],
+                  reset: statusData['balance_reset']
                 });
 
               case 4:
@@ -14949,14 +14949,14 @@ var Account = function (_EventEmitter) {
                   key: this.key
                 });
                 _context3.next = 3;
-                return this.runCommand(statusCommand, false);
+                return this.runCommand(statusCommand, {});
 
               case 3:
                 _ref4 = _context3.sent;
                 content = _ref4.content;
                 headers = _ref4.headers;
                 return _context3.abrupt('return', _Object$assign({}, {
-                  'balance-reset': parseInt(headers['x-balance-reset'][0], 10)
+                  'balance_reset': parseInt(headers['x-balance-reset'][0], 10)
                 }, content));
 
               case 7:

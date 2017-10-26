@@ -1,3 +1,7 @@
+3.2.1
+* Updated API version to `v3`
+* Fixed tests in accordance with the version
+
 3.2.0
 * New endpoint added `account/status`
 * Tests updates

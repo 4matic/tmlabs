@@ -46,7 +46,7 @@ class FetchCommand extends AbstractCommand {
     else this.fetchFunc = FetchCommand.fetchClass
 
     if (version !== undefined) this.version = version
-    else this.version = 'v2'
+    else this.version = 'v3'
 
     if (key !== undefined && typeof key === 'string') this._map.get(this).key = key
     else if (process.env.TMLABS_KEY) this._map.get(this).key = process.env.TMLABS_KEY
@@ -357,7 +357,7 @@ class FetchCommand extends AbstractCommand {
         if (fetchResponse.error || (content && content.error)) {
           if (status === 429) throw new InsufficientFundsError(content.error, this._map.get(this).balance_reset)
           if (status === 404 && options.throwNotFound === true) throw new NotFoundError(content.error, response)
-          else if (status === 404 && !options.throwNotFound) fetchResponse.content = null
+          else if ((status === 404 || status === 200) && !options.throwNotFound) fetchResponse.content = null
           else throw new ResponseError(content.error, response)
         }
       } else {

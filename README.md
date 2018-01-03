@@ -20,6 +20,12 @@
   <a href="https://github.com/TempicoLabs/tmlabs/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence">
   </a>
+  <a href="https://docs.tempicolabs.com/">
+    <img src="https://img.shields.io/badge/docs-postman-orange.svg" alt="Postman Documentation">
+  </a>
+  <a href="https://runkit.com/4matic/get-started-with-tmlabs">
+    <img src="https://img.shields.io/badge/guide-%40runkit-brightgreen.svg" alt="SDK Usage Guide">
+  </a>
   <a href="https://npm.runkit.com/@tempicolabs/tmlabs">
       <img src="https://badge.runkitcdn.com/@tempicolabs/tmlabs.svg" alt="Try @tempicolabs/tmlabs on RunKit"/>
   </a>
@@ -27,7 +33,7 @@
 <br>
 
 **TmLabs** is a SDK for [TempicoLabs API](https://www.tempicolabs.com/index.t3m#api-description) using in **node.js** and the **browser**.
-It is written in clean ES6 Javascript.
+It is written in clean ES6 Javascript. 
 
 ### Install
 
@@ -59,11 +65,14 @@ bower install tmlabs --save
 
 **[Read SDK Documentation](docs/api.md).**
 
-**[Read the full API Documentation](https://www.tempicolabs.com/documentation.t3m).**
+**[Read the full API Documentation](https://docs.tempicolabs.com/).**
 
 ### Usage
 
+**[Read Usage Guide](https://runkit.com/4matic/get-started-with-tmlabs).**
+
 TmLabs is the wrapper for API. It uses [fetch-ponyfill](https://github.com/qubyte/fetch-ponyfill) for HTTP requests.
+
 
 #### In the browser
 

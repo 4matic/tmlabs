@@ -347,49 +347,75 @@ describe('Commands Tests', () => {
           })
         })
         describe('method scan', () => {
-          it('do command. with required parameter alias', async () => {
-            const command = new Command('fetch', {
-              method: 'scan'
+          describe('method scan. TCP', () => {
+            const scanIP = '192.168.0.1'
+            it('do command. with only one required parameter alias', async () => {
+              const command = new Command('fetch', {
+                method: 'scan'
+              })
+              try {
+                await command.run({
+                  ipaddr: scanIP
+                })
+              } catch (e) {
+                assert.instanceOf(e, TypeError)
+                assert.equal(e.message, 'Method required param \'proto\' validation error', 'exception message')
+              }
+              assert.equal(command.status, undefined, 'code undefined')
+              assert.equal(command.error, true, 'error=true')
             })
-            await command.run({
-              ipaddr: testIP
+            it('do command. with required parameter alias', async () => {
+              const command = new Command('fetch', {
+                method: 'scan'
+              })
+              await command.run({
+                ipaddr: scanIP,
+                proto: 'tcp'
+              })
+              assert.equal(command.status, 200)
+              assert.equal(command.error, false, 'error=false')
+              assert.deepEqual(command.args, [{
+                arg: 'proto',
+                val: 'tcp'
+              }, {
+                arg: 'ipaddr',
+                val: scanIP
+              }], 'arguments')
+              assert.startsWith(command.url, `${baseUrl}/scan/tcp/${scanIP}`, 'correct url')
+              assert.equal(command.statusText, 'OK')
+              assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor', 'osmatch', 'portused'])
             })
-            assert.equal(command.status, 200)
-            assert.equal(command.error, false, 'error=false')
-            assert.deepEqual(command.args, [{
-              arg: 'ipaddr',
-              val: testIP
-            }], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/scan/${testIP}`, 'correct url')
-            assert.equal(command.statusText, 'OK')
-            assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor'])
-          })
-          it('do command. with required parameter alias + portmin & portmax', async () => {
-            const portmin = 79
-            const portmax = 100
-            const command = new Command('fetch', {
-              method: 'scan'
+            it('do command. with required parameter alias + portmin & portmax', async () => {
+              const portmin = 79
+              const portmax = 100
+              const command = new Command('fetch', {
+                method: 'scan'
+              })
+              await command.run({
+                proto: 'tcp',
+                ipaddr: scanIP,
+                portmin,
+                portmax
+              })
+              assert.equal(command.status, 200)
+              assert.equal(command.error, false, 'error=false')
+              assert.deepEqual(command.args, [{
+                arg: 'proto',
+                val: 'tcp'
+              }, {
+                arg: 'ipaddr',
+                val: scanIP
+              }, {
+                arg: 'portmin',
+                val: portmin
+              }, {
+                arg: 'portmax',
+                val: portmax
+              }], 'arguments')
+              assert.startsWith(command.url, `${baseUrl}/scan/tcp/${scanIP}/${portmin}/${portmax}`, 'correct url')
+              assert.equal(command.statusText, 'OK')
+              assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor', 'osmatch', 'portused'])
             })
-            await command.run({
-              ipaddr: testIP,
-              portmin,
-              portmax
-            })
-            assert.equal(command.status, 200)
-            assert.equal(command.error, false, 'error=false')
-            assert.deepEqual(command.args, [{
-              arg: 'ipaddr',
-              val: testIP
-            }, {
-              arg: 'portmin',
-              val: portmin
-            }, {
-              arg: 'portmax',
-              val: portmax
-            }], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/scan/${testIP}/${portmin}/${portmax}`, 'correct url')
-            assert.equal(command.statusText, 'OK')
-            assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor'])
           })
         })
         describe('method me', () => {

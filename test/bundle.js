@@ -7,6 +7,9 @@ import TmLabs, { FetchCommand } from '../dist/tmlabs.umd'
 
 chai.use(chaiString)
 
+const baseUrl = 'https://tempicolabs.com/api/v3'
+const testIP = '173.194.122.233'
+
 describe('Bundle Tests', () => {
   it('Main class object initialization', () => {
     const tmLabs = new TmLabs()
@@ -22,15 +25,15 @@ describe('Bundle Tests', () => {
       method: 'ip'
     })
     await command.run({
-      ipaddr: '173.194.122.233' // google ip address. using alias
+      ipaddr: testIP // google ip address. using alias
     })
     assert.equal(command.status, 200, 'code 400')
     assert.equal(command.error, false, 'error=false')
     assert.deepEqual(command.args, [{
       'arg': 'ipaddr',
-      'val': '173.194.122.233'
+      'val': testIP
     }], 'arguments')
-    assert.startsWith(command.url, 'https://tempicolabs.com/api/v2/ip/173.194.122.233/', 'correct url')
+    assert.startsWith(command.url, `${baseUrl}/ip/${testIP}/`, 'correct url')
     assert.equal(command.statusText, 'OK')
     assert.equal(command.errorText, undefined)
     assert.equal(command.content.isp, 'Google')

@@ -32,6 +32,14 @@ export default {
   ],
   [SCAN]: [
     {
+      arg: 'proto',
+      required: true,
+      check: {
+        func: 'matches',
+        args: [/(tcp|udp)/i]
+      }
+    },
+    {
       arg: 'ip',
       alias: 'ipaddr',
       required: true,

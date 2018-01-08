@@ -50,7 +50,8 @@ export default {
     },
     {
       arg: 'portmin',
-      required: false,
+      // alias: 'port_min',
+      required: true,
       check: {
         func: 'isInt',
         args: [{
@@ -61,6 +62,7 @@ export default {
     },
     {
       arg: 'portmax',
+      // alias: 'port_max',
       required: false,
       check: {
         func: 'isInt',

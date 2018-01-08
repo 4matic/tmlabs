@@ -88,7 +88,6 @@ describe('Class Tests', () => {
         command: command[0],
         params: command[1]
       })))
-      console.log(results)
       assert.lengthOf(results, 6)
       assert.equal(results[0].state, 'rejected')
       assert.instanceOf(results[0].reason, Error)

@@ -14,7 +14,7 @@ describe('Function Tests', () => {
       }
     })
     it('Google DNS ip checking', async () => {
-      const answer = await fetch('ip', { ipaddr: '8.8.8.8' });
+      const answer = await fetch('ip', { ipaddr: '8.8.8.8' })
       assert.equal(answer.status, 200, 'code 400')
       assert.equal(answer.error, false, 'error=false')
       assert.equal(answer.statusText, 'OK')

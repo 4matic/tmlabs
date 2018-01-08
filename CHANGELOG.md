@@ -1,5 +1,6 @@
 3.2.1
 * Updated API version to `v3`
+* Added new option for FetchCommand `formatting` (enabled by default). This option add header `X-Requested-With: XMLHttpRequest` which is useful for performance increase.
 * Fixed tests in accordance with the version
 
 3.2.0

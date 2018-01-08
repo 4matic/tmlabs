@@ -31,13 +31,14 @@ class FetchCommand extends AbstractCommand {
    * @param {Object} params - The params object
    * @param {String} [params.key] - Token key
    * @param {String} params.method - Fetch method
+   * @param {Boolean} [params.formatting=true] - Enable JSON formatting (for better performance)
    * @augments AbstractCommand
    * @throws TypeError
    * @throws ReferenceError
    */
   constructor (params) {
     super('fetch', params)
-    const { method, version, data, key, fetchFunc } = params // todo: do data parsing
+    const { method, version, data, key, fetchFunc, formatting } = params // todo: do data parsing
     const methods = FetchCommand.methods
 
     if (!method) throw new TypeError("Empty required param 'method'")
@@ -50,6 +51,9 @@ class FetchCommand extends AbstractCommand {
 
     if (key !== undefined && typeof key === 'string') this._map.get(this).key = key
     else if (process.env.TMLABS_KEY) this._map.get(this).key = process.env.TMLABS_KEY
+
+    if (formatting !== undefined) this.formatting = formatting
+    else this.formatting = true
 
     /**
      * Command method
@@ -246,6 +250,9 @@ class FetchCommand extends AbstractCommand {
         }
         if (!process.env.browser) {
           headers['User-Agent'] = `${os.type()}_${process.arch} Node ${process.version} - TempicoLabs SDK v${TmLabs.version}`
+        }
+        if (this.formatting) {
+          headers['X-Requested-With'] = 'XMLHttpRequest'
         }
       }
       let options = {

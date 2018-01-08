@@ -12202,6 +12202,13 @@ var argument = (_EMAIL_LEAKS$SCAN$HAS = {}, _defineProperty$1(_EMAIL_LEAKS$SCAN$
     }]
   }
 }]), _defineProperty$1(_EMAIL_LEAKS$SCAN$HAS, SCAN, [{
+  arg: 'proto',
+  required: true,
+  check: {
+    func: 'matches',
+    args: [/(tcp|udp)/i]
+  }
+}, {
   arg: 'ip',
   alias: 'ipaddr',
   required: true,
@@ -12211,7 +12218,8 @@ var argument = (_EMAIL_LEAKS$SCAN$HAS = {}, _defineProperty$1(_EMAIL_LEAKS$SCAN$
   }
 }, {
   arg: 'portmin',
-  required: false,
+  // alias: 'port_min',
+  required: true,
   check: {
     func: 'isInt',
     args: [{
@@ -12221,6 +12229,7 @@ var argument = (_EMAIL_LEAKS$SCAN$HAS = {}, _defineProperty$1(_EMAIL_LEAKS$SCAN$
   }
 }, {
   arg: 'portmax',
+  // alias: 'port_max',
   required: false,
   check: {
     func: 'isInt',
@@ -12479,6 +12488,7 @@ var FetchCommand = function (_AbstractCommand) {
    * @param {Object} params - The params object
    * @param {String} [params.key] - Token key
    * @param {String} params.method - Fetch method
+   * @param {Boolean} [params.formatting=true] - Enable JSON formatting (for better performance)
    * @augments AbstractCommand
    * @throws TypeError
    * @throws ReferenceError
@@ -12492,7 +12502,8 @@ var FetchCommand = function (_AbstractCommand) {
         version = params.version,
         data = params.data,
         key = params.key,
-        fetchFunc = params.fetchFunc; // todo: do data parsing
+        fetchFunc = params.fetchFunc,
+        formatting = params.formatting; // todo: do data parsing
 
     var methods = FetchCommand.methods;
 
@@ -12503,6 +12514,8 @@ var FetchCommand = function (_AbstractCommand) {
     if (version !== undefined) _this.version = version;else _this.version = 'v3';
 
     if (key !== undefined && typeof key === 'string') _this._map.get(_this).key = key;else if (process.env.TMLABS_KEY) _this._map.get(_this).key = process.env.TMLABS_KEY;
+
+    if (formatting !== undefined) _this.formatting = formatting;else _this.formatting = true;
 
     /**
      * Command method
@@ -13239,6 +13252,9 @@ var FetchCommand = function (_AbstractCommand) {
                   };
                   {
                     headers['User-Agent'] = os.type() + '_' + process.arch + ' Node ' + process.version + ' - TempicoLabs SDK v' + TmLabs$1.version;
+                  }
+                  if (this.formatting) {
+                    headers['X-Requested-With'] = 'XMLHttpRequest';
                   }
                 }
                 options = {
@@ -15467,7 +15483,7 @@ var TmLabs$1 = function (_EventEmitter) {
   }], [{
     key: 'version',
     get: function get() {
-      var version = "3.2.0";
+      var version = "3.2.1";
       if (!version) throw new Error('Use bundled packages in /dist/ folder to get version');
       return version;
     }

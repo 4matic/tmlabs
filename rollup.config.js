@@ -11,7 +11,7 @@ let external = !process.env.production && !process.env.browser ? ['os', 'url', '
 
 const pkg = require('./package.json')
 
-pkg.version = '3.2.0' // override
+pkg.version = '3.2.1' // override
 
 const replaceOptions = {
   exclude: 'node_modules/**',

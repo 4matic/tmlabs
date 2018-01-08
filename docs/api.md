@@ -742,11 +742,12 @@ FetchCommand for API requests
 - ReferenceError
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| params | <code>Object</code> | The params object |
-| [params.key] | <code>String</code> | Token key |
-| params.method | <code>String</code> | Fetch method |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| params | <code>Object</code> |  | The params object |
+| [params.key] | <code>String</code> |  | Token key |
+| params.method | <code>String</code> |  | Fetch method |
+| [params.formatting] | <code>Boolean</code> | <code>true</code> | Enable JSON formatting (for better performance) |
 
 <a name="FetchCommand+method"></a>
 

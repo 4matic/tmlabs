@@ -3,14 +3,14 @@
 
 import chai, { assert } from 'chai'
 import chaiString from 'chai-string'
-import TmLabs, { FetchCommand } from '../dist/tmlabs.umd'
+import TmLabs, { FetchCommand } from '../dist/tmlabs.es'
 
 chai.use(chaiString)
 
 const baseUrl = 'https://tempicolabs.com/api/v3'
 const testIP = '173.194.122.233'
 
-describe('Bundle Tests', () => {
+describe('ES Bundle Tests', () => {
   it('Main class object initialization', () => {
     const tmLabs = new TmLabs()
     assert.isEmpty(tmLabs.history)

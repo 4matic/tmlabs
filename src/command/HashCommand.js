@@ -43,7 +43,7 @@ class HashCommand extends FetchCommand {
    * Get file or stream hash and check it by sending request to API
    * @async
    * @member HashCommand#run
-   * @param options You can pass options used in {@link FetchCommand#fetch} merged with options below
+   * @param {Object} options={} - You can pass options used in {@link FetchCommand#fetch} merged with options below
    * @param {string} [options.hash] - Hash to check.
    * @param {Stream} [options.stream] - Stream object. {@link HashCommand#hashStream}
    * @param {string} [options.file] - The path to the file. {@link HashCommand#getFileHash}

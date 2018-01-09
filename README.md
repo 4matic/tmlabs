@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/npm/v/@tempicolabs/tmlabs.svg" alt="Npm version">
   </a>
   <a href="https://standardjs.com">
-    <img src="https://img.shields.io/badge/code/style-standard-brightgreen.svg" alt="Javascipt Standart Style">
+    <img src="https://img.shields.io/badge/code/style-standard-brightgreen.svg" alt="Javascript Standart Style">
   </a>
   <a href="https://github.com/TempicoLabs/tmlabs/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence">

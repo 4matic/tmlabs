@@ -1,3 +1,40 @@
+<h1 align="center">
+  <br>
+  <a href="https://tempicolabs.com"><img src="https://www.tempicolabs.com/img/logo_tl_H_black.png" alt="TempicoLabs" width="400"></a>
+  <br>
+  Tempico Labs SDK Documentation
+  <br>
+  <br>
+</h1>
+
+<h4 align="center">Tempico Labs SDK for API. For node.js and the web.</h4>
+
+<p align="center">
+  <img src="https://img.shields.io/bower/v/tmlabs.svg" alt="Bower version">
+  <a href="https://www.npmjs.com/package/@tempicolabs/tmlabs">
+    <img src="https://img.shields.io/npm/v/@tempicolabs/tmlabs.svg" alt="Npm version">
+  </a>
+  <a href="https://standardjs.com">
+    <img src="https://img.shields.io/badge/code/style-standard-brightgreen.svg" alt="Javascipt Standart Style">
+  </a>
+  <a href="https://github.com/TempicoLabs/tmlabs/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence">
+  </a>
+  <a href="https://docs.tempicolabs.com/">
+    <img src="https://img.shields.io/badge/docs-postman-orange.svg" alt="Postman Documentation">
+  </a>
+  <a href="https://runkit.com/4matic/get-started-with-tmlabs">
+    <img src="https://img.shields.io/badge/guide-%40runkit-brightgreen.svg" alt="SDK Usage Guide">
+  </a>
+  <a href="https://npm.runkit.com/@tempicolabs/tmlabs">
+    <img src="https://badge.runkitcdn.com/@tempicolabs/tmlabs.svg" alt="Try @tempicolabs/tmlabs on RunKit"/>
+  </a>
+</p>
+<br>
+
+**TmLabs** is a SDK for [TempicoLabs API](https://www.tempicolabs.com/index.t3m#api-description) using in **node.js** and the **browser**.
+It is written in clean ES6 Javascript.
+
 ## Modules
 
 <dl>
@@ -513,9 +550,9 @@ Get Class by action name
 - ReferenceError
 
 
-| Param | Type |
-| --- | --- |
-| [action] | <code>Boolean</code> \| <code>String</code> | 
+| Param | Type | Default |
+| --- | --- | --- |
+| [action] | <code>Boolean</code> \| <code>String</code> | <code>false</code> | 
 
 <a name="Command+run"></a>
 
@@ -524,9 +561,9 @@ Run command
 
 **Kind**: instance property of [<code>Command</code>](#Command)  
 
-| Param |
-| --- |
-| params | 
+| Param | Type | Description |
+| --- | --- | --- |
+| params | <code>Object</code> | Parameters for command running |
 
 <a name="Command+class"></a>
 
@@ -1015,13 +1052,13 @@ Get file or stream hash and check it by sending request to API
 **Fulfil**: <code>Object</code>  
 **Reject**: <code>Error</code>  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| options |  | You can pass options used in [fetch](#FetchCommand+fetch) merged with options below |
-| [options.hash] | <code>string</code> | Hash to check. |
-| [options.stream] | <code>Stream</code> | Stream object. [hashStream](#HashCommand+hashStream) |
-| [options.file] | <code>string</code> | The path to the file. [getFileHash](#HashCommand+getFileHash) |
-| [options.input] | <code>Buffer</code> \| <code>string</code> \| <code>Array.&lt;Buffer&gt;</code> \| <code>Array.&lt;string&gt;</code> | Input for hashing. [getInputHash](#HashCommand+getInputHash) |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | <code>Object</code> | <code>{}</code> | You can pass options used in [fetch](#FetchCommand+fetch) merged with options below |
+| [options.hash] | <code>string</code> |  | Hash to check. |
+| [options.stream] | <code>Stream</code> |  | Stream object. [hashStream](#HashCommand+hashStream) |
+| [options.file] | <code>string</code> |  | The path to the file. [getFileHash](#HashCommand+getFileHash) |
+| [options.input] | <code>Buffer</code> \| <code>string</code> \| <code>Array.&lt;Buffer&gt;</code> \| <code>Array.&lt;string&gt;</code> |  | Input for hashing. [getInputHash](#HashCommand+getInputHash) |
 
 <a name="HashCommand+getStreamHash"></a>
 
@@ -1501,3 +1538,7 @@ Pending status
 Params
 
 **Kind**: instance property of [<code>AbstractCommand</code>](#AbstractCommand)  
+
+* * *
+
+MIT. Copyright (c) [Maxim Maximov](http://4matikku.com) and [TempicoLabs, LLC](https://tempicolabs.com).

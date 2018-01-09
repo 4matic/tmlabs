@@ -8860,7 +8860,7 @@ var HashCommand = function (_FetchCommand) {
      * Get file or stream hash and check it by sending request to API
      * @async
      * @member HashCommand#run
-     * @param options You can pass options used in {@link FetchCommand#fetch} merged with options below
+     * @param {Object} options={} - You can pass options used in {@link FetchCommand#fetch} merged with options below
      * @param {string} [options.hash] - Hash to check.
      * @param {Stream} [options.stream] - Stream object. {@link HashCommand#hashStream}
      * @param {string} [options.file] - The path to the file. {@link HashCommand#getFileHash}
@@ -9075,7 +9075,7 @@ var Command = function (_AbstractCommand) {
 
   /**
    * Get Class by action name
-   * @param {Boolean|String} [action]
+   * @param {Boolean|String} [action=false]
    * @static
    * @member Command#getClass
    * @throws ReferenceError
@@ -9089,7 +9089,7 @@ var Command = function (_AbstractCommand) {
 
     /**
      * Run command
-     * @param params
+     * @param {Object} params - Parameters for command running
      * @member Command#run
      */
     value: function run(params) {

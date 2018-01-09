@@ -33,7 +33,7 @@ class Command extends AbstractCommand {
 
   /**
    * Get Class by action name
-   * @param {Boolean|String} [action]
+   * @param {Boolean|String} [action=false]
    * @static
    * @member Command#getClass
    * @throws ReferenceError
@@ -66,7 +66,7 @@ class Command extends AbstractCommand {
 
   /**
    * Run command
-   * @param params
+   * @param {Object} params - Parameters for command running
    * @member Command#run
    */
   run (params) {

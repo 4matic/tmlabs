@@ -11,7 +11,7 @@ import isInt from 'validator/lib/isInt'
 import matches from 'validator/lib/matches'
 import AbstractCommand from './AbstractCommand'
 import TmLabs from './../TmLabs'
-import { endpoint, specification, argument, error, event } from '../constant'
+import { endpoint, specification, argument, error, event } from '../constant/index'
 promisePonyfill.polyfill()
 const { fetch } = fetchPonyfill()
 const { InsufficientFundsError, ResponseError, NotFoundError } = error
@@ -56,7 +56,7 @@ class FetchCommand extends AbstractCommand {
     else this.formatting = true
 
     /**
-     * Command method
+     * FetchCommand method
      * @type {string}
      * @throws ReferenceError
      * @member FetchCommand#method
@@ -201,6 +201,7 @@ class FetchCommand extends AbstractCommand {
 
   /**
    * Instance function for making request
+   * @async
    * @param {String} url fetching url
    * @param {Object} [params={}] request parameters
    * @param {function|false} [fetchFunc=false] fetch function
@@ -243,7 +244,7 @@ class FetchCommand extends AbstractCommand {
     if (!url) throw new ReferenceError('Empty url')
     if (!fetchFunc) fetchFunc = fetch
     try {
-      let { headers, body, method } = params
+      let { headers, body, method, formatting } = params
       if (!headers) {
         headers = {
           'Content-Type': 'application/json'
@@ -251,7 +252,7 @@ class FetchCommand extends AbstractCommand {
         if (!process.env.browser) {
           headers['User-Agent'] = `${os.type()}_${process.arch} Node ${process.version} - TempicoLabs SDK v${TmLabs.version}`
         }
-        if (this.formatting) {
+        if (formatting) {
           headers['X-Requested-With'] = 'XMLHttpRequest'
         }
       }
@@ -296,6 +297,7 @@ class FetchCommand extends AbstractCommand {
 
   /**
    * Fetch method
+   * @async
    * @param {Object} [options={}] - The options object
    * @param {String} [options.key] - Token key
    * @param {Object} [options.headers=false] - Custom headers for request
@@ -323,6 +325,7 @@ class FetchCommand extends AbstractCommand {
       }
       if (headers !== false) params.headers = headers
       this._map.get(this).args = params.body = args
+      params.formatting = this.formatting
       const response = await this._makeRequest(this.url, params)
       if (response) {
         const {headers, status, statusText} = response

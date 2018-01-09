@@ -3,10 +3,10 @@ import Q from 'q'
 import PQueue from 'p-queue'
 import Command from './Command'
 import Account from './Account'
-import { event } from './constant'
+import { event } from './constant/index'
 import FetchCommand from './command/FetchCommand'
 
-export default class TmLabs extends EventEmitter {
+class TmLabs extends EventEmitter {
   /**
    * Main TmLabs class.
    * @constructs TmLabs
@@ -251,3 +251,5 @@ export default class TmLabs extends EventEmitter {
     return version
   }
 }
+
+export default TmLabs

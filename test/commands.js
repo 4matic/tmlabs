@@ -3,6 +3,7 @@
 import os from 'os'
 import chai, { assert } from 'chai'
 import fs from 'fs'
+import Hasha from 'hasha'
 import ChildProcess from 'child_process'
 import StreamTest from 'streamtest'
 import chaiString from 'chai-string'
@@ -32,6 +33,12 @@ const getFileRealHash = (filepath) => {
       const [hash] = stdout.split(' ')
       resolve(hash)
     })
+  })
+}
+
+const getStringRealHash = (string) => {
+  return Hasha(string, {
+    algorithm: 'sha256'
   })
 }
 
@@ -90,6 +97,14 @@ describe('Commands Tests', () => {
         const streamHash = await command.getFileHash(filepath)
         const realHash = await getFileRealHash(filepath)
         assert.equal(streamHash, realHash)
+      })
+      it('getInputHash method. get README.md hash from it content', async () => {
+        const filepath = 'README.md'
+        const contents = fs.readFileSync(filepath, 'utf8')
+        const command = new Command('hash', false)
+        const stringHash = await command.getInputHash(contents)
+        const realHash = getStringRealHash(contents)
+        assert.equal(stringHash, realHash)
       })
     })
     describe('Action FetchCommand', () => {

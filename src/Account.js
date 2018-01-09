@@ -1,6 +1,6 @@
 import EventEmitter from 'smelly-event-emitter'
 import StatusCommand from './command/StatusCommand'
-import { event } from './constant'
+import { event } from './constant/index'
 
 class Account extends EventEmitter {
   /**

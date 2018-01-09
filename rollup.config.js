@@ -27,17 +27,25 @@ if (process.env.production || process.env.browser) {
 console.log(replaceOptions)
 
 export default {
-  entry: 'src/index.js',
-  moduleName: 'TmLabs',
+  input: 'src/index.js',
+  output: {
+    name: 'TmLabs',
+    external: external,
+    sourcemap: true
+  },
   plugins: [
     json(),
+    builtins(),
+    // globals(),
     resolve({
       jsnext: true,
       main: true,
       browser: process.env.production || process.env.browser,
       preferBuiltins: false
     }),
-    commonjs(),
+    commonjs({
+      include: 'node_modules/**'
+    }),
     babel({
       babelrc: false,
       exclude: 'node_modules/**',
@@ -58,14 +66,10 @@ export default {
         'external-helpers'
       ]
     }),
-    // globals(),
-    // builtins({ crypto: true }),
     replace(replaceOptions),
     process.env.production ? babili({
       comments: false,
       banner: `/**\r* Tempico Labs SDK v${pkg.version} \r*/`
     }) : false
-  ],
-  external: external,
-  sourceMap: true
+  ]
 }

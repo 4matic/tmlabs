@@ -1,5 +1,5 @@
 import FetchCommand from './FetchCommand'
-import { endpoint } from '../constant'
+import { endpoint } from '../constant/index'
 
 class StatusCommand extends FetchCommand {
   /**

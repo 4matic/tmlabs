@@ -1,12 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('os'), require('fs'), require('crypto')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'os', 'fs', 'crypto'], factory) :
-	(factory((global.TmLabs = global.TmLabs || {}),global.os,global.fs,global.crypto));
-}(this, (function (exports,os,fs,crypto) { 'use strict';
-
-os = os && 'default' in os ? os['default'] : os;
-fs = fs && 'default' in fs ? fs['default'] : fs;
-crypto = crypto && 'default' in crypto ? crypto['default'] : crypto;
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.TmLabs = {})));
+}(this, (function (exports) { 'use strict';
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -15,7 +11,7 @@ function commonjsRequire () {
 }
 
 function unwrapExports (x) {
-	return x && x.__esModule ? x['default'] : x;
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
 
 function createCommonjsModule(fn, module) {
@@ -34,8 +30,6 @@ var runtime = createCommonjsModule(function (module) {
  */
 
 !(function(global) {
-  "use strict";
-
   var Op = Object.prototype;
   var hasOwn = Op.hasOwnProperty;
   var undefined; // More compressible than void 0.
@@ -793,7 +787,7 @@ if (hadRuntime) {
   }
 }
 
-var index = runtimeModule;
+var regenerator = runtimeModule;
 
 // 7.1.4 ToInteger
 var ceil  = Math.ceil;
@@ -837,6 +831,8 @@ var _core = createCommonjsModule(function (module) {
 var core = module.exports = {version: '2.4.0'};
 if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 });
+
+var _core_1 = _core.version;
 
 var _aFunction = function(it){
   if(typeof it != 'function')throw TypeError(it + ' is not a function!');
@@ -1283,8 +1279,6 @@ _iterDefine(String, 'String', function(iterated){
   return {value: point, done: false};
 });
 
-var _addToUnscopables = function(){ /* empty */ };
-
 var _iterStep = function(done, value){
   return {value: value, done: !!done};
 };
@@ -1313,10 +1307,6 @@ var es6_array_iterator = _iterDefine(Array, 'Array', function(iterated, kind){
 
 // argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
 _iterators.Arguments = _iterators.Array;
-
-_addToUnscopables('keys');
-_addToUnscopables('values');
-_addToUnscopables('entries');
 
 var TO_STRING_TAG = _wks('toStringTag');
 
@@ -1594,7 +1584,7 @@ var SAFE_CLOSING = false;
 try {
   var riter = [7][ITERATOR$3]();
   riter['return'] = function(){ SAFE_CLOSING = true; };
-  Array.from(riter, function(){ throw 2; });
+  
 } catch(e){ /* empty */ }
 
 var _iterDetect = function(exec, skipClosing){
@@ -1910,8 +1900,6 @@ module.exports = { "default": promise$1, __esModule: true };
 var _Promise = unwrapExports(promise);
 
 var asyncToGenerator = createCommonjsModule(function (module, exports) {
-"use strict";
-
 exports.__esModule = true;
 
 
@@ -2002,6 +1990,8 @@ var iterator = createCommonjsModule(function (module) {
 module.exports = { "default": iterator$2, __esModule: true };
 });
 
+unwrapExports(iterator);
+
 var _meta = createCommonjsModule(function (module) {
 var META     = _uid('meta')
   , setDesc  = _objectDp.f
@@ -2055,6 +2045,12 @@ var meta = module.exports = {
   onFreeze: onFreeze
 };
 });
+
+var _meta_1 = _meta.KEY;
+var _meta_2 = _meta.NEED;
+var _meta_3 = _meta.fastKey;
+var _meta_4 = _meta.getWeak;
+var _meta_5 = _meta.onFreeze;
 
 var defineProperty = _objectDp.f;
 var _wksDefine = function(name){
@@ -2361,15 +2357,15 @@ _wksDefine('asyncIterator');
 
 _wksDefine('observable');
 
-var index$1 = _core.Symbol;
+var symbol$2 = _core.Symbol;
 
 var symbol = createCommonjsModule(function (module) {
-module.exports = { "default": index$1, __esModule: true };
+module.exports = { "default": symbol$2, __esModule: true };
 });
 
-var _typeof_1 = createCommonjsModule(function (module, exports) {
-"use strict";
+unwrapExports(symbol);
 
+var _typeof_1 = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
@@ -2609,7 +2605,6 @@ var _collection = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
 };
 
 var es6_weakMap = createCommonjsModule(function (module) {
-'use strict';
 var each         = _arrayMethods(0)
   , getWeak      = _meta.getWeak
   , isExtensible = Object.isExtensible
@@ -2697,8 +2692,6 @@ module.exports = { "default": getPrototypeOf$1, __esModule: true };
 var _Object$getPrototypeOf = unwrapExports(getPrototypeOf);
 
 var classCallCheck = createCommonjsModule(function (module, exports) {
-"use strict";
-
 exports.__esModule = true;
 
 exports.default = function (instance, Constructor) {
@@ -2722,9 +2715,9 @@ var defineProperty$1 = createCommonjsModule(function (module) {
 module.exports = { "default": defineProperty$3, __esModule: true };
 });
 
-var createClass = createCommonjsModule(function (module, exports) {
-"use strict";
+unwrapExports(defineProperty$1);
 
+var createClass = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
@@ -2755,8 +2748,6 @@ exports.default = function () {
 var _createClass = unwrapExports(createClass);
 
 var possibleConstructorReturn = createCommonjsModule(function (module, exports) {
-"use strict";
-
 exports.__esModule = true;
 
 
@@ -2811,6 +2802,8 @@ var setPrototypeOf = createCommonjsModule(function (module) {
 module.exports = { "default": setPrototypeOf$2, __esModule: true };
 });
 
+unwrapExports(setPrototypeOf);
+
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 _export(_export.S, 'Object', {create: _objectCreate});
 
@@ -2823,9 +2816,9 @@ var create = createCommonjsModule(function (module) {
 module.exports = { "default": create$2, __esModule: true };
 });
 
-var inherits = createCommonjsModule(function (module, exports) {
-"use strict";
+unwrapExports(create);
 
+var inherits = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
@@ -2862,10 +2855,11 @@ exports.default = function (subClass, superClass) {
 var _inherits = unwrapExports(inherits);
 
 var eventEmitter_min = createCommonjsModule(function (module, exports) {
-!function(e,t){module.exports=t();}(commonjsGlobal,function(){return function(e){function t(r){if(n[r])return n[r].exports;var i=n[r]={exports:{},id:r,loaded:!1};return e[r].call(i.exports,i,i.exports,t),i.loaded=!0,i.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){var t,n;if(e&&e.__esModule)return e;if(t={},null!=e)for(n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t.default=e,t}function i(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var s,o,u,f;Object.defineProperty(t,"__esModule",{value:!0}),s=function(){function e(e,t){var n,r;for(n=0;n<t.length;n++)r=t[n],r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r);}return function(t,n,r){return n&&e(t.prototype,n),r&&e(t,r),t}}(),o=n(1),u=r(o),f=function(){function e(){i(this,e),this.listeners={},this.maxListeners=10;}return s(e,[{key:"setMaxListeners",value:function(e){this.maxListeners=e;}},{key:"getMaxListeners",value:function(){return this.maxListeners}},{key:"getAllListeners",value:function(){var e=void 0===arguments[0]?null:arguments[0];return e?this.listeners[e]||[]:this.listeners}},{key:"on",value:function(e,t){if(!u.isFunction(t))throw new TypeError("Listener must be a function");this.listeners[e]||(this.listeners[e]=[]);var n=this.listeners[e];n.push(t),n.length>this.maxListeners;}},{key:"once",value:function(e,t){function n(){this.off(e,n),t.apply(this,arguments);}if(!u.isFunction(t))throw new TypeError("Listener must be a function");this.on(e,n);}},{key:"off",value:function(e,t){var n,r,i,s;if(!u.isFunction(t))throw new TypeError("Listener must be a function");if(this.listeners[e])if(n=this.listeners[e],r=n.length,i=-1,1===r)this.listeners[e]=[];else{for(s=0;r>s;s++)if(n[s]===t){i=s;break}if(0>i)return;u.spliceOne(n,i);}}},{key:"emit",value:function(e){var t,n,r,i,s,o;if(this.listeners[e]){for(t=this.listeners[e],n=t.length,r=arguments.length,i=Array(r>1?r-1:0),s=1;r>s;s++)i[s-1]=arguments[s];if(1===n)t[0].apply(this,i);else for(o=0;n>o;o++)t[o].apply(this,i);}}}]),e}(),t.default=f,e.exports=t.default;},function(e,t){"use strict";function n(e){return"[object Function]"===Object.prototype.toString.call(e)}function r(e,t){for(var n=t,r=n+1,i=e.length;i>r;n+=1,r+=1)e[n]=e[r];e.pop();}Object.defineProperty(t,"__esModule",{value:!0}),t.isFunction=n,t.spliceOne=r;}])});
+!function(e,t){module.exports=t();}(commonjsGlobal,function(){return function(e){function t(r){if(n[r])return n[r].exports;var i=n[r]={exports:{},id:r,loaded:!1};return e[r].call(i.exports,i,i.exports,t), i.loaded=!0, i.exports}var n={};return t.m=e, t.c=n, t.p="", t(0)}([function(e,t,n){function r(e){var t,n;if(e&&e.__esModule)return e;if(t={}, null!=e)for(n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t.default=e, t}function i(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var s,o,u,f;Object.defineProperty(t,"__esModule",{value:!0}), s=function(){function e(e,t){var n,r;for(n=0;n<t.length;n++)r=t[n], r.enumerable=r.enumerable||!1, r.configurable=!0, "value"in r&&(r.writable=!0), Object.defineProperty(e,r.key,r);}return function(t,n,r){return n&&e(t.prototype,n), r&&e(t,r), t}}(), o=n(1), u=r(o), f=function(){function e(){i(this,e), this.listeners={}, this.maxListeners=10;}return s(e,[{key:"setMaxListeners",value:function(e){this.maxListeners=e;}},{key:"getMaxListeners",value:function(){return this.maxListeners}},{key:"getAllListeners",value:function(){var e=void 0===arguments[0]?null:arguments[0];return e?this.listeners[e]||[]:this.listeners}},{key:"on",value:function(e,t){if(!u.isFunction(t))throw new TypeError("Listener must be a function");this.listeners[e]||(this.listeners[e]=[]);var n=this.listeners[e];n.push(t), n.length>this.maxListeners;}},{key:"once",value:function(e,t){function n(){this.off(e,n), t.apply(this,arguments);}if(!u.isFunction(t))throw new TypeError("Listener must be a function");this.on(e,n);}},{key:"off",value:function(e,t){var n,r,i,s;if(!u.isFunction(t))throw new TypeError("Listener must be a function");if(this.listeners[e])if(n=this.listeners[e], r=n.length, i=-1, 1===r)this.listeners[e]=[];else{for(s=0;r>s;s++)if(n[s]===t){i=s;break}if(0>i)return;u.spliceOne(n,i);}}},{key:"emit",value:function(e){var t,n,r,i,s,o;if(this.listeners[e]){for(t=this.listeners[e], n=t.length, r=arguments.length, i=Array(r>1?r-1:0), s=1;r>s;s++)i[s-1]=arguments[s];if(1===n)t[0].apply(this,i);else for(o=0;n>o;o++)t[o].apply(this,i);}}}]), e}(), t.default=f, e.exports=t.default;},function(e,t){function n(e){return"[object Function]"===Object.prototype.toString.call(e)}function r(e,t){for(var n=t,r=n+1,i=e.length;i>r;n+=1, r+=1)e[n]=e[r];e.pop();}Object.defineProperty(t,"__esModule",{value:!0}), t.isFunction=n, t.spliceOne=r;}])});
 });
 
 var EventEmitter = unwrapExports(eventEmitter_min);
+var eventEmitter_min_1 = eventEmitter_min.EventEmitter;
 
 var q = createCommonjsModule(function (module, exports) {
 // vim:ts=4:sts=4:sw=4:
@@ -2897,14 +2891,6 @@ var q = createCommonjsModule(function (module, exports) {
  */
 
 (function (definition) {
-    "use strict";
-
-    // This file will function properly as a <script> tag, or a module
-    // using CommonJS and NodeJS or RequireJS module formats.  In
-    // Common/Node/RequireJS, the module exports the Q API and when
-    // executed as a simple <script>, it creates a Q global instead.
-
-    // Montage Require
     if (typeof bootstrap === "function") {
         bootstrap("promise", definition);
 
@@ -2916,8 +2902,6 @@ var q = createCommonjsModule(function (module, exports) {
     }
 
 })(function () {
-"use strict";
-
 var hasStacks = false;
 try {
     throw new Error();
@@ -4484,9 +4468,12 @@ function any(promises) {
         function onRejected(err) {
             pendingCount--;
             if (pendingCount === 0) {
-                err.message = ("Q can't get fulfillment value from any promise, all " +
-                    "promises were rejected. Last error message: " + err.message);
-                deferred.reject(err);
+                var rejection = err || new Error("" + err);
+
+                rejection.message = ("Q can't get fulfillment value from any promise, all " +
+                    "promises were rejected. Last error message: " + rejection.message);
+
+                deferred.reject(rejection);
             }
         }
         function onProgress(progress) {
@@ -4937,6 +4924,7 @@ class PriorityQueue {
 	constructor() {
 		this._queue = [];
 	}
+
 	enqueue(run, opts) {
 		opts = Object.assign({
 			priority: 0
@@ -4952,9 +4940,11 @@ class PriorityQueue {
 		const index = lowerBound(this._queue, element, (a, b) => b.priority - a.priority);
 		this._queue.splice(index, 0, element);
 	}
+
 	dequeue() {
 		return this._queue.shift().run;
 	}
+
 	get size() {
 		return this._queue.length;
 	}
@@ -4964,28 +4954,37 @@ class PQueue {
 	constructor(opts) {
 		opts = Object.assign({
 			concurrency: Infinity,
+			autoStart: true,
 			queueClass: PriorityQueue
 		}, opts);
 
-		if (opts.concurrency < 1) {
-			throw new TypeError('Expected `concurrency` to be a number from 1 and up');
+		if (!(typeof opts.concurrency === 'number' && opts.concurrency >= 1)) {
+			throw new TypeError(`Expected \`concurrency\` to be a number from 1 and up, got \`${opts.concurrency}\` (${typeof opts.concurrency})`);
 		}
 
 		this.queue = new opts.queueClass(); // eslint-disable-line new-cap
 		this._queueClass = opts.queueClass;
 		this._pendingCount = 0;
 		this._concurrency = opts.concurrency;
+		this._isPaused = opts.autoStart === false;
 		this._resolveEmpty = () => {};
+		this._resolveIdle = () => {};
 	}
+
 	_next() {
 		this._pendingCount--;
 
-		if (this.queue.size > 0) {
+		if (!this._isPaused && this.queue.size > 0) {
 			this.queue.dequeue()();
 		} else {
 			this._resolveEmpty();
+
+			if (this._pendingCount === 0) {
+				this._resolveIdle();
+			}
 		}
 	}
+
 	add(fn, opts) {
 		return new Promise((resolve, reject) => {
 			const run = () => {
@@ -5003,7 +5002,7 @@ class PQueue {
 				);
 			};
 
-			if (this._pendingCount < this._concurrency) {
+			if (!this._isPaused && this._pendingCount < this._concurrency) {
 				run();
 			} else {
 				this.queue.enqueue(run, opts);
@@ -5011,11 +5010,35 @@ class PQueue {
 		});
 	}
 
+	addAll(fns, opts) {
+		return Promise.all(fns.map(fn => this.add(fn, opts)));
+	}
+
+	start() {
+		if (!this._isPaused) {
+			return;
+		}
+
+		this._isPaused = false;
+		while (this.queue.size > 0 && this._pendingCount < this._concurrency) {
+			this.queue.dequeue()();
+		}
+	}
+
+	pause() {
+		this._isPaused = true;
+	}
+
 	clear() {
 		this.queue = new this._queueClass(); // eslint-disable-line new-cap
 	}
 
 	onEmpty() {
+		// Instantly resolve if the queue is empty
+		if (this.queue.size === 0) {
+			return Promise.resolve();
+		}
+
 		return new Promise(resolve => {
 			const existingResolve = this._resolveEmpty;
 			this._resolveEmpty = () => {
@@ -5024,15 +5047,36 @@ class PQueue {
 			};
 		});
 	}
+
+	onIdle() {
+		// Instantly resolve if none pending
+		if (this._pendingCount === 0) {
+			return Promise.resolve();
+		}
+
+		return new Promise(resolve => {
+			const existingResolve = this._resolveIdle;
+			this._resolveIdle = () => {
+				existingResolve();
+				resolve();
+			};
+		});
+	}
+
 	get size() {
 		return this.queue.size;
 	}
+
 	get pending() {
 		return this._pendingCount;
 	}
+
+	get isPaused() {
+		return this._isPaused;
+	}
 }
 
-var index$3 = PQueue;
+var pQueue = PQueue;
 
 // 19.1.2.14 Object.keys(O)
 
@@ -5161,7 +5205,7 @@ var _createProperty = function(object, index, value){
   else object[index] = value;
 };
 
-_export(_export.S + _export.F * !_iterDetect(function(iter){ Array.from(iter); }), 'Array', {
+_export(_export.S + _export.F * !_iterDetect(function(iter){  }), 'Array', {
   // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
   from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
     var O       = _toObject(arrayLike)
@@ -5195,9 +5239,9 @@ var from = createCommonjsModule(function (module) {
 module.exports = { "default": from$2, __esModule: true };
 });
 
-var toConsumableArray = createCommonjsModule(function (module, exports) {
-"use strict";
+unwrapExports(from);
 
+var toConsumableArray = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
@@ -5221,10 +5265,33 @@ exports.default = function (arr) {
 
 var _toConsumableArray = unwrapExports(toConsumableArray);
 
-var fetchBrowser$1 = createCommonjsModule(function (module, exports) {
-(function (self) {
-  'use strict';
+/*
+The MIT License (MIT)
 
+Copyright (c) 2016 CoderPuppy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+var fetchBrowser = createCommonjsModule(function (module, exports) {
+(function (self) {
   function fetchPonyfill(options) {
     var Promise = options && options.Promise || self.Promise;
     var XMLHttpRequest = options && options.XMLHttpRequest || self.XMLHttpRequest;
@@ -5239,8 +5306,6 @@ var fetchBrowser$1 = createCommonjsModule(function (module, exports) {
       });
 
       (function(self) {
-        'use strict';
-
         if (self.fetch) {
           return
         }
@@ -5324,7 +5389,10 @@ var fetchBrowser$1 = createCommonjsModule(function (module, exports) {
             headers.forEach(function(value, name) {
               this.append(name, value);
             }, this);
-
+          } else if (Array.isArray(headers)) {
+            headers.forEach(function(header) {
+              this.append(header[0], header[1]);
+            }, this);
           } else if (headers) {
             Object.getOwnPropertyNames(headers).forEach(function(name) {
               this.append(name, headers[name]);
@@ -5723,14 +5791,12 @@ var es6Promise = createCommonjsModule(function (module, exports) {
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   4.1.1
+ * @version   v4.2.2+97478eb6
  */
 
 (function (global, factory) {
 	module.exports = factory();
-}(commonjsGlobal, (function () { 'use strict';
-
-function objectOrFunction(x) {
+}(commonjsGlobal, (function () { function objectOrFunction(x) {
   var type = typeof x;
   return x !== null && (type === 'object' || type === 'function');
 }
@@ -5739,7 +5805,9 @@ function isFunction(x) {
   return typeof x === 'function';
 }
 
-var _isArray = undefined;
+
+
+var _isArray = void 0;
 if (Array.isArray) {
   _isArray = Array.isArray;
 } else {
@@ -5751,8 +5819,8 @@ if (Array.isArray) {
 var isArray = _isArray;
 
 var len = 0;
-var vertxNext = undefined;
-var customSchedulerFn = undefined;
+var vertxNext = void 0;
+var customSchedulerFn = void 0;
 
 var asap = function asap(callback, arg) {
   queue[len] = callback;
@@ -5781,7 +5849,7 @@ function setAsap(asapFn) {
 var browserWindow = typeof window !== 'undefined' ? window : undefined;
 var browserGlobal = browserWindow || {};
 var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && ({}).toString.call(process) === '[object process]';
+var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
 
 // test for web worker but not in IE10
 var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
@@ -5861,7 +5929,7 @@ function attemptVertx() {
   }
 }
 
-var scheduleFlush = undefined;
+var scheduleFlush = void 0;
 // Decide what async method to use to triggering processing of queued callbacks:
 if (isNode) {
   scheduleFlush = useNextTick();
@@ -5876,8 +5944,6 @@ if (isNode) {
 }
 
 function then(onFulfillment, onRejection) {
-  var _arguments = arguments;
-
   var parent = this;
 
   var child = new this.constructor(noop);
@@ -5888,13 +5954,12 @@ function then(onFulfillment, onRejection) {
 
   var _state = parent._state;
 
+
   if (_state) {
-    (function () {
-      var callback = _arguments[_state - 1];
-      asap(function () {
-        return invokeCallback(_state, child, callback, parent._result);
-      });
-    })();
+    var callback = arguments[_state - 1];
+    asap(function () {
+      return invokeCallback(_state, child, callback, parent._result);
+    });
   } else {
     subscribe(parent, child, onFulfillment, onRejection);
   }
@@ -6086,6 +6151,7 @@ function subscribe(parent, child, onFulfillment, onRejection) {
   var _subscribers = parent._subscribers;
   var length = _subscribers.length;
 
+
   parent._onerror = null;
 
   _subscribers[length] = child;
@@ -6105,8 +6171,8 @@ function publish(promise) {
     return;
   }
 
-  var child = undefined,
-      callback = undefined,
+  var child = void 0,
+      callback = void 0,
       detail = promise._result;
 
   for (var i = 0; i < subscribers.length; i += 3) {
@@ -6140,10 +6206,10 @@ function tryCatch(callback, detail) {
 
 function invokeCallback(settled, promise, callback, detail) {
   var hasCallback = isFunction(callback),
-      value = undefined,
-      error = undefined,
-      succeeded = undefined,
-      failed = undefined;
+      value = void 0,
+      error = void 0,
+      succeeded = void 0,
+      failed = void 0;
 
   if (hasCallback) {
     value = tryCatch(callback, detail);
@@ -6168,14 +6234,14 @@ function invokeCallback(settled, promise, callback, detail) {
   if (promise._state !== PENDING) {
     // noop
   } else if (hasCallback && succeeded) {
-      resolve(promise, value);
-    } else if (failed) {
-      reject(promise, error);
-    } else if (settled === FULFILLED) {
-      fulfill(promise, value);
-    } else if (settled === REJECTED) {
-      reject(promise, value);
-    }
+    resolve(promise, value);
+  } else if (failed) {
+    reject(promise, error);
+  } else if (settled === FULFILLED) {
+    fulfill(promise, value);
+  } else if (settled === REJECTED) {
+    reject(promise, value);
+  }
 }
 
 function initializePromise(promise, resolver) {
@@ -6202,97 +6268,107 @@ function makePromise(promise) {
   promise._subscribers = [];
 }
 
-function Enumerator$1(Constructor, input) {
-  this._instanceConstructor = Constructor;
-  this.promise = new Constructor(noop);
-
-  if (!this.promise[PROMISE_ID]) {
-    makePromise(this.promise);
-  }
-
-  if (isArray(input)) {
-    this.length = input.length;
-    this._remaining = input.length;
-
-    this._result = new Array(this.length);
-
-    if (this.length === 0) {
-      fulfill(this.promise, this._result);
-    } else {
-      this.length = this.length || 0;
-      this._enumerate(input);
-      if (this._remaining === 0) {
-        fulfill(this.promise, this._result);
-      }
-    }
-  } else {
-    reject(this.promise, validationError());
-  }
+function validationError() {
+  return new Error('Array Methods must be provided an Array');
 }
 
 function validationError() {
   return new Error('Array Methods must be provided an Array');
 }
 
-Enumerator$1.prototype._enumerate = function (input) {
-  for (var i = 0; this._state === PENDING && i < input.length; i++) {
-    this._eachEntry(input[i], i);
+var Enumerator = function () {
+  function Enumerator(Constructor, input) {
+    this._instanceConstructor = Constructor;
+    this.promise = new Constructor(noop);
+
+    if (!this.promise[PROMISE_ID]) {
+      makePromise(this.promise);
+    }
+
+    if (isArray(input)) {
+      this.length = input.length;
+      this._remaining = input.length;
+
+      this._result = new Array(this.length);
+
+      if (this.length === 0) {
+        fulfill(this.promise, this._result);
+      } else {
+        this.length = this.length || 0;
+        this._enumerate(input);
+        if (this._remaining === 0) {
+          fulfill(this.promise, this._result);
+        }
+      }
+    } else {
+      reject(this.promise, validationError());
+    }
   }
-};
 
-Enumerator$1.prototype._eachEntry = function (entry, i) {
-  var c = this._instanceConstructor;
-  var resolve$$1 = c.resolve;
+  Enumerator.prototype._enumerate = function _enumerate(input) {
+    for (var i = 0; this._state === PENDING && i < input.length; i++) {
+      this._eachEntry(input[i], i);
+    }
+  };
 
-  if (resolve$$1 === resolve$1) {
-    var _then = getThen(entry);
+  Enumerator.prototype._eachEntry = function _eachEntry(entry, i) {
+    var c = this._instanceConstructor;
+    var resolve$$1 = c.resolve;
 
-    if (_then === then && entry._state !== PENDING) {
-      this._settledAt(entry._state, i, entry._result);
-    } else if (typeof _then !== 'function') {
+
+    if (resolve$$1 === resolve$1) {
+      var _then = getThen(entry);
+
+      if (_then === then && entry._state !== PENDING) {
+        this._settledAt(entry._state, i, entry._result);
+      } else if (typeof _then !== 'function') {
+        this._remaining--;
+        this._result[i] = entry;
+      } else if (c === Promise$1) {
+        var promise = new c(noop);
+        handleMaybeThenable(promise, entry, _then);
+        this._willSettleAt(promise, i);
+      } else {
+        this._willSettleAt(new c(function (resolve$$1) {
+          return resolve$$1(entry);
+        }), i);
+      }
+    } else {
+      this._willSettleAt(resolve$$1(entry), i);
+    }
+  };
+
+  Enumerator.prototype._settledAt = function _settledAt(state, i, value) {
+    var promise = this.promise;
+
+
+    if (promise._state === PENDING) {
       this._remaining--;
-      this._result[i] = entry;
-    } else if (c === Promise$2) {
-      var promise = new c(noop);
-      handleMaybeThenable(promise, entry, _then);
-      this._willSettleAt(promise, i);
-    } else {
-      this._willSettleAt(new c(function (resolve$$1) {
-        return resolve$$1(entry);
-      }), i);
+
+      if (state === REJECTED) {
+        reject(promise, value);
+      } else {
+        this._result[i] = value;
+      }
     }
-  } else {
-    this._willSettleAt(resolve$$1(entry), i);
-  }
-};
 
-Enumerator$1.prototype._settledAt = function (state, i, value) {
-  var promise = this.promise;
-
-  if (promise._state === PENDING) {
-    this._remaining--;
-
-    if (state === REJECTED) {
-      reject(promise, value);
-    } else {
-      this._result[i] = value;
+    if (this._remaining === 0) {
+      fulfill(promise, this._result);
     }
-  }
+  };
 
-  if (this._remaining === 0) {
-    fulfill(promise, this._result);
-  }
-};
+  Enumerator.prototype._willSettleAt = function _willSettleAt(promise, i) {
+    var enumerator = this;
 
-Enumerator$1.prototype._willSettleAt = function (promise, i) {
-  var enumerator = this;
+    subscribe(promise, undefined, function (value) {
+      return enumerator._settledAt(FULFILLED, i, value);
+    }, function (reason) {
+      return enumerator._settledAt(REJECTED, i, reason);
+    });
+  };
 
-  subscribe(promise, undefined, function (value) {
-    return enumerator._settledAt(FULFILLED, i, value);
-  }, function (reason) {
-    return enumerator._settledAt(REJECTED, i, reason);
-  });
-};
+  return Enumerator;
+}();
 
 /**
   `Promise.all` accepts an array of promises, and returns a new promise which
@@ -6341,8 +6417,8 @@ Enumerator$1.prototype._willSettleAt = function (promise, i) {
   fulfilled, or rejected if any of them become rejected.
   @static
 */
-function all$1(entries) {
-  return new Enumerator$1(this, entries).promise;
+function all(entries) {
+  return new Enumerator(this, entries).promise;
 }
 
 /**
@@ -6410,7 +6486,7 @@ function all$1(entries) {
   @return {Promise} a promise which settles in the same way as the first passed
   promise to settle.
 */
-function race$1(entries) {
+function race(entries) {
   /*jshint validthis:true */
   var Constructor = this;
 
@@ -6577,262 +6653,283 @@ function needsNew() {
   ```
 
   @class Promise
-  @param {function} resolver
+  @param {Function} resolver
   Useful for tooling.
   @constructor
 */
-function Promise$2(resolver) {
-  this[PROMISE_ID] = nextId();
-  this._result = this._state = undefined;
-  this._subscribers = [];
 
-  if (noop !== resolver) {
-    typeof resolver !== 'function' && needsResolver();
-    this instanceof Promise$2 ? initializePromise(this, resolver) : needsNew();
+var Promise$1 = function () {
+  function Promise(resolver) {
+    this[PROMISE_ID] = nextId();
+    this._result = this._state = undefined;
+    this._subscribers = [];
+
+    if (noop !== resolver) {
+      typeof resolver !== 'function' && needsResolver();
+      this instanceof Promise ? initializePromise(this, resolver) : needsNew();
+    }
   }
-}
-
-Promise$2.all = all$1;
-Promise$2.race = race$1;
-Promise$2.resolve = resolve$1;
-Promise$2.reject = reject$1;
-Promise$2._setScheduler = setScheduler;
-Promise$2._setAsap = setAsap;
-Promise$2._asap = asap;
-
-Promise$2.prototype = {
-  constructor: Promise$2,
 
   /**
-    The primary way of interacting with a promise is through its `then` method,
-    which registers callbacks to receive either a promise's eventual value or the
-    reason why the promise cannot be fulfilled.
-  
-    ```js
-    findUser().then(function(user){
-      // user is available
-    }, function(reason){
-      // user is unavailable, and you are given the reason why
-    });
-    ```
-  
-    Chaining
-    --------
-  
-    The return value of `then` is itself a promise.  This second, 'downstream'
-    promise is resolved with the return value of the first promise's fulfillment
-    or rejection handler, or rejected if the handler throws an exception.
-  
-    ```js
-    findUser().then(function (user) {
-      return user.name;
-    }, function (reason) {
-      return 'default name';
-    }).then(function (userName) {
-      // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
-      // will be `'default name'`
-    });
-  
-    findUser().then(function (user) {
-      throw new Error('Found user, but still unhappy');
-    }, function (reason) {
-      throw new Error('`findUser` rejected and we're unhappy');
-    }).then(function (value) {
-      // never reached
-    }, function (reason) {
-      // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
-      // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
-    });
-    ```
-    If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-  
-    ```js
-    findUser().then(function (user) {
-      throw new PedagogicalException('Upstream error');
-    }).then(function (value) {
-      // never reached
-    }).then(function (value) {
-      // never reached
-    }, function (reason) {
-      // The `PedgagocialException` is propagated all the way down to here
-    });
-    ```
-  
-    Assimilation
-    ------------
-  
-    Sometimes the value you want to propagate to a downstream promise can only be
-    retrieved asynchronously. This can be achieved by returning a promise in the
-    fulfillment or rejection handler. The downstream promise will then be pending
-    until the returned promise is settled. This is called *assimilation*.
-  
-    ```js
-    findUser().then(function (user) {
-      return findCommentsByAuthor(user);
-    }).then(function (comments) {
-      // The user's comments are now available
-    });
-    ```
-  
-    If the assimliated promise rejects, then the downstream promise will also reject.
-  
-    ```js
-    findUser().then(function (user) {
-      return findCommentsByAuthor(user);
-    }).then(function (comments) {
-      // If `findCommentsByAuthor` fulfills, we'll have the value here
-    }, function (reason) {
-      // If `findCommentsByAuthor` rejects, we'll have the reason here
-    });
-    ```
-  
-    Simple Example
-    --------------
-  
-    Synchronous Example
-  
-    ```javascript
-    let result;
-  
-    try {
-      result = findResult();
-      // success
-    } catch(reason) {
+  The primary way of interacting with a promise is through its `then` method,
+  which registers callbacks to receive either a promise's eventual value or the
+  reason why the promise cannot be fulfilled.
+   ```js
+  findUser().then(function(user){
+    // user is available
+  }, function(reason){
+    // user is unavailable, and you are given the reason why
+  });
+  ```
+   Chaining
+  --------
+   The return value of `then` is itself a promise.  This second, 'downstream'
+  promise is resolved with the return value of the first promise's fulfillment
+  or rejection handler, or rejected if the handler throws an exception.
+   ```js
+  findUser().then(function (user) {
+    return user.name;
+  }, function (reason) {
+    return 'default name';
+  }).then(function (userName) {
+    // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+    // will be `'default name'`
+  });
+   findUser().then(function (user) {
+    throw new Error('Found user, but still unhappy');
+  }, function (reason) {
+    throw new Error('`findUser` rejected and we're unhappy');
+  }).then(function (value) {
+    // never reached
+  }, function (reason) {
+    // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+    // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+  });
+  ```
+  If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+   ```js
+  findUser().then(function (user) {
+    throw new PedagogicalException('Upstream error');
+  }).then(function (value) {
+    // never reached
+  }).then(function (value) {
+    // never reached
+  }, function (reason) {
+    // The `PedgagocialException` is propagated all the way down to here
+  });
+  ```
+   Assimilation
+  ------------
+   Sometimes the value you want to propagate to a downstream promise can only be
+  retrieved asynchronously. This can be achieved by returning a promise in the
+  fulfillment or rejection handler. The downstream promise will then be pending
+  until the returned promise is settled. This is called *assimilation*.
+   ```js
+  findUser().then(function (user) {
+    return findCommentsByAuthor(user);
+  }).then(function (comments) {
+    // The user's comments are now available
+  });
+  ```
+   If the assimliated promise rejects, then the downstream promise will also reject.
+   ```js
+  findUser().then(function (user) {
+    return findCommentsByAuthor(user);
+  }).then(function (comments) {
+    // If `findCommentsByAuthor` fulfills, we'll have the value here
+  }, function (reason) {
+    // If `findCommentsByAuthor` rejects, we'll have the reason here
+  });
+  ```
+   Simple Example
+  --------------
+   Synchronous Example
+   ```javascript
+  let result;
+   try {
+    result = findResult();
+    // success
+  } catch(reason) {
+    // failure
+  }
+  ```
+   Errback Example
+   ```js
+  findResult(function(result, err){
+    if (err) {
       // failure
-    }
-    ```
-  
-    Errback Example
-  
-    ```js
-    findResult(function(result, err){
-      if (err) {
-        // failure
-      } else {
-        // success
-      }
-    });
-    ```
-  
-    Promise Example;
-  
-    ```javascript
-    findResult().then(function(result){
+    } else {
       // success
-    }, function(reason){
+    }
+  });
+  ```
+   Promise Example;
+   ```javascript
+  findResult().then(function(result){
+    // success
+  }, function(reason){
+    // failure
+  });
+  ```
+   Advanced Example
+  --------------
+   Synchronous Example
+   ```javascript
+  let author, books;
+   try {
+    author = findAuthor();
+    books  = findBooksByAuthor(author);
+    // success
+  } catch(reason) {
+    // failure
+  }
+  ```
+   Errback Example
+   ```js
+   function foundBooks(books) {
+   }
+   function failure(reason) {
+   }
+   findAuthor(function(author, err){
+    if (err) {
+      failure(err);
       // failure
-    });
-    ```
-  
-    Advanced Example
-    --------------
-  
-    Synchronous Example
-  
-    ```javascript
-    let author, books;
-  
-    try {
-      author = findAuthor();
-      books  = findBooksByAuthor(author);
-      // success
-    } catch(reason) {
-      // failure
-    }
-    ```
-  
-    Errback Example
-  
-    ```js
-  
-    function foundBooks(books) {
-  
-    }
-  
-    function failure(reason) {
-  
-    }
-  
-    findAuthor(function(author, err){
-      if (err) {
-        failure(err);
-        // failure
-      } else {
-        try {
-          findBoooksByAuthor(author, function(books, err) {
-            if (err) {
-              failure(err);
-            } else {
-              try {
-                foundBooks(books);
-              } catch(reason) {
-                failure(reason);
-              }
+    } else {
+      try {
+        findBoooksByAuthor(author, function(books, err) {
+          if (err) {
+            failure(err);
+          } else {
+            try {
+              foundBooks(books);
+            } catch(reason) {
+              failure(reason);
             }
-          });
-        } catch(error) {
-          failure(err);
-        }
-        // success
+          }
+        });
+      } catch(error) {
+        failure(err);
       }
-    });
-    ```
-  
-    Promise Example;
-  
-    ```javascript
-    findAuthor().
-      then(findBooksByAuthor).
-      then(function(books){
-        // found books
-    }).catch(function(reason){
-      // something went wrong
-    });
-    ```
-  
-    @method then
-    @param {Function} onFulfilled
-    @param {Function} onRejected
-    Useful for tooling.
-    @return {Promise}
+      // success
+    }
+  });
+  ```
+   Promise Example;
+   ```javascript
+  findAuthor().
+    then(findBooksByAuthor).
+    then(function(books){
+      // found books
+  }).catch(function(reason){
+    // something went wrong
+  });
+  ```
+   @method then
+  @param {Function} onFulfilled
+  @param {Function} onRejected
+  Useful for tooling.
+  @return {Promise}
   */
-  then: then,
 
   /**
-    `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
-    as the catch block of a try/catch statement.
+  `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+  as the catch block of a try/catch statement.
+  ```js
+  function findAuthor(){
+  throw new Error('couldn't find that author');
+  }
+  // synchronous
+  try {
+  findAuthor();
+  } catch(reason) {
+  // something went wrong
+  }
+  // async with promises
+  findAuthor().catch(function(reason){
+  // something went wrong
+  });
+  ```
+  @method catch
+  @param {Function} onRejection
+  Useful for tooling.
+  @return {Promise}
+  */
+
+
+  Promise.prototype.catch = function _catch(onRejection) {
+    return this.then(null, onRejection);
+  };
+
+  /**
+    `finally` will be invoked regardless of the promise's fate just as native
+    try/catch/finally behaves
+  
+    Synchronous example:
   
     ```js
-    function findAuthor(){
-      throw new Error('couldn't find that author');
+    findAuthor() {
+      if (Math.random() > 0.5) {
+        throw new Error();
+      }
+      return new Author();
     }
   
-    // synchronous
     try {
-      findAuthor();
-    } catch(reason) {
-      // something went wrong
+      return findAuthor(); // succeed or fail
+    } catch(error) {
+      return findOtherAuther();
+    } finally {
+      // always runs
+      // doesn't affect the return value
     }
+    ```
   
-    // async with promises
+    Asynchronous example:
+  
+    ```js
     findAuthor().catch(function(reason){
-      // something went wrong
+      return findOtherAuther();
+    }).finally(function(){
+      // author was either found, or not
     });
     ```
   
-    @method catch
-    @param {Function} onRejection
-    Useful for tooling.
+    @method finally
+    @param {Function} callback
     @return {Promise}
   */
-  'catch': function _catch(onRejection) {
-    return this.then(null, onRejection);
-  }
-};
+
+
+  Promise.prototype.finally = function _finally(callback) {
+    var promise = this;
+    var constructor = promise.constructor;
+
+    return promise.then(function (value) {
+      return constructor.resolve(callback()).then(function () {
+        return value;
+      });
+    }, function (reason) {
+      return constructor.resolve(callback()).then(function () {
+        throw reason;
+      });
+    });
+  };
+
+  return Promise;
+}();
+
+Promise$1.prototype.then = then;
+Promise$1.all = all;
+Promise$1.race = race;
+Promise$1.resolve = resolve$1;
+Promise$1.reject = reject$1;
+Promise$1._setScheduler = setScheduler;
+Promise$1._setAsap = setAsap;
+Promise$1._asap = asap;
 
 /*global self*/
-function polyfill$1() {
-    var local = undefined;
+function polyfill() {
+    var local = void 0;
 
     if (typeof commonjsGlobal !== 'undefined') {
         local = commonjsGlobal;
@@ -6861,23 +6958,23 @@ function polyfill$1() {
         }
     }
 
-    local.Promise = Promise$2;
+    local.Promise = Promise$1;
 }
 
 // Strange compat..
-Promise$2.polyfill = polyfill$1;
-Promise$2.Promise = Promise$2;
+Promise$1.polyfill = polyfill;
+Promise$1.Promise = Promise$1;
 
-return Promise$2;
+return Promise$1;
 
 })));
+
+
 
 
 });
 
 var assertString_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6892,9 +6989,9 @@ function assertString(input) {
 module.exports = exports['default'];
 });
 
-var isIP_1 = createCommonjsModule(function (module, exports) {
-'use strict';
+unwrapExports(assertString_1);
 
+var isIP_1 = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6979,8 +7076,6 @@ module.exports = exports['default'];
 var isIP = unwrapExports(isIP_1);
 
 var merge_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6999,13 +7094,13 @@ function merge() {
 module.exports = exports['default'];
 });
 
-var isFQDN = createCommonjsModule(function (module, exports) {
-'use strict';
+unwrapExports(merge_1);
 
+var isFQDN_1 = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = isFDQN;
+exports.default = isFQDN;
 
 
 
@@ -7023,7 +7118,7 @@ var default_fqdn_options = {
   allow_trailing_dot: false
 };
 
-function isFDQN(str, options) {
+function isFQDN(str, options) {
   (0, _assertString2.default)(str);
   options = (0, _merge2.default)(options, default_fqdn_options);
 
@@ -7063,11 +7158,9 @@ function isFDQN(str, options) {
 module.exports = exports['default'];
 });
 
-var isFQDN$1 = unwrapExports(isFQDN);
+var isFQDN = unwrapExports(isFQDN_1);
 
 var isByteLength_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -7101,9 +7194,9 @@ function isByteLength(str, options) {
 module.exports = exports['default'];
 });
 
-var isEmail_1 = createCommonjsModule(function (module, exports) {
-'use strict';
+unwrapExports(isByteLength_1);
 
+var isEmail_1 = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -7123,7 +7216,7 @@ var _isByteLength2 = _interopRequireDefault(isByteLength_1);
 
 
 
-var _isFQDN2 = _interopRequireDefault(isFQDN);
+var _isFQDN2 = _interopRequireDefault(isFQDN_1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7136,7 +7229,7 @@ var default_email_options = {
 
 /* eslint-disable max-len */
 /* eslint-disable no-control-regex */
-var displayName = /^[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~\.\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~\.\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF\s]*<(.+)>$/i;
+var displayName = /^[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~\.\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~\,\.\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF\s]*<(.+)>$/i;
 var emailUserPart = /^[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~]+$/i;
 var quotedEmailUser = /^([\s\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e]|(\\[\x01-\x09\x0b\x0c\x0d-\x7f]))*$/i;
 var emailUserUtf8Part = /^[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+$/i;
@@ -7196,8 +7289,6 @@ module.exports = exports['default'];
 var isEmail = unwrapExports(isEmail_1);
 
 var isInt_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -7234,8 +7325,6 @@ module.exports = exports['default'];
 var isInt = unwrapExports(isInt_1);
 
 var matches_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -7361,8 +7450,6 @@ var endpoint = Object.freeze({
 });
 
 var defineProperty$5 = createCommonjsModule(function (module, exports) {
-"use strict";
-
 exports.__esModule = true;
 
 
@@ -7672,7 +7759,7 @@ var specification = (_specification = {}, _defineProperty$1(_specification, STAT
 // import 'babel-polyfill'
 es6Promise.polyfill();
 
-var _fetchPonyfill = fetchBrowser$1();
+var _fetchPonyfill = fetchBrowser();
 var fetch$1 = _fetchPonyfill.fetch;
 
 var InsufficientFundsError = InsufficientFundsError$1;
@@ -7683,7 +7770,7 @@ var NotFoundError = NotFoundError$1;
 var validator = {
   isIP: isIP,
   isInt: isInt,
-  isFQDN: isFQDN$1,
+  isFQDN: isFQDN,
   isEmail: isEmail,
   matches: matches
 };
@@ -7766,7 +7853,6 @@ var FetchCommand = function (_AbstractCommand) {
       var _this2 = this;
 
       if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) !== 'object' && data !== false) throw new TypeError('Method params should be an object');else {
-        var _error = false;
         var returnArgs = [];
         var methodSpec = FetchCommand.getMethodSpecifications(this.method);
         var args = methodSpec.args,
@@ -7847,6 +7933,7 @@ var FetchCommand = function (_AbstractCommand) {
 
     /**
      * Instance function for making request
+     * @async
      * @param {String} url fetching url
      * @param {Object} [params={}] request parameters
      * @param {function|false} [fetchFunc=false] fetch function
@@ -7860,11 +7947,11 @@ var FetchCommand = function (_AbstractCommand) {
   }, {
     key: '_makeRequest',
     value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee(url) {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(url) {
         var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var fetchFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         var fetchResponse, response, options;
-        return index.wrap(function _callee$(_context) {
+        return regenerator.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -7939,6 +8026,7 @@ var FetchCommand = function (_AbstractCommand) {
 
     /**
      * Fetch method
+     * @async
      * @param {Object} [options={}] - The options object
      * @param {String} [options.key] - Token key
      * @param {Object} [options.headers=false] - Custom headers for request
@@ -7954,14 +8042,14 @@ var FetchCommand = function (_AbstractCommand) {
   }, {
     key: 'fetch',
     value: function () {
-      var _ref2 = _asyncToGenerator(index.mark(function _callee2() {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2() {
         var _this3 = this;
 
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
         var params, fetchResponse, args, method, headers, response, _headers, status, statusText, content, contentType, responseHeaders, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, header, billHeaders;
 
-        return index.wrap(function _callee2$(_context2) {
+        return regenerator.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -7983,14 +8071,15 @@ var FetchCommand = function (_AbstractCommand) {
                 };
                 if (headers !== false) params.headers = headers;
                 this._map.get(this).args = params.body = args;
-                _context2.next = 14;
+                params.formatting = this.formatting;
+                _context2.next = 15;
                 return this._makeRequest(this.url, params);
 
-              case 14:
+              case 15:
                 response = _context2.sent;
 
                 if (!response) {
-                  _context2.next = 72;
+                  _context2.next = 73;
                   break;
                 }
 
@@ -7999,31 +8088,31 @@ var FetchCommand = function (_AbstractCommand) {
                 contentType = _headers.get('Content-Type');
 
                 if (!(contentType.indexOf('text/html') !== -1)) {
-                  _context2.next = 25;
+                  _context2.next = 26;
                   break;
                 }
 
-                _context2.next = 22;
+                _context2.next = 23;
                 return response.text();
 
-              case 22:
+              case 23:
                 content = _context2.sent;
-                _context2.next = 29;
+                _context2.next = 30;
                 break;
 
-              case 25:
+              case 26:
                 if (!(contentType.indexOf('application/json') !== -1)) {
-                  _context2.next = 29;
+                  _context2.next = 30;
                   break;
                 }
 
-                _context2.next = 28;
+                _context2.next = 29;
                 return response.json();
 
-              case 28:
+              case 29:
                 content = _context2.sent;
 
-              case 29:
+              case 30:
                 fetchResponse = {
                   content: content,
                   headers: {},
@@ -8036,59 +8125,59 @@ var FetchCommand = function (_AbstractCommand) {
                 responseHeaders = {};
 
                 if (!_headers._headers) {
-                  _context2.next = 37;
+                  _context2.next = 38;
                   break;
                 }
 
                 responseHeaders = _headers._headers;
-                _context2.next = 56;
+                _context2.next = 57;
                 break;
 
-              case 37:
+              case 38:
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
                 _iteratorError = undefined;
-                _context2.prev = 40;
+                _context2.prev = 41;
 
                 for (_iterator = _getIterator(_headers.entries()); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                   header = _step.value;
 
                   responseHeaders[header[0]] = header[1];
                 }
-                _context2.next = 48;
+                _context2.next = 49;
                 break;
 
-              case 44:
-                _context2.prev = 44;
-                _context2.t0 = _context2['catch'](40);
+              case 45:
+                _context2.prev = 45;
+                _context2.t0 = _context2['catch'](41);
                 _didIteratorError = true;
                 _iteratorError = _context2.t0;
 
-              case 48:
-                _context2.prev = 48;
+              case 49:
                 _context2.prev = 49;
+                _context2.prev = 50;
 
                 if (!_iteratorNormalCompletion && _iterator.return) {
                   _iterator.return();
                 }
 
-              case 51:
-                _context2.prev = 51;
+              case 52:
+                _context2.prev = 52;
 
                 if (!_didIteratorError) {
-                  _context2.next = 54;
+                  _context2.next = 55;
                   break;
                 }
 
                 throw _iteratorError;
 
-              case 54:
-                return _context2.finish(51);
-
               case 55:
-                return _context2.finish(48);
+                return _context2.finish(52);
 
               case 56:
+                return _context2.finish(49);
+
+              case 57:
                 if (responseHeaders) {
                   billHeaders = ['remaining', 'lastbill', 'reset'];
 
@@ -8104,51 +8193,51 @@ var FetchCommand = function (_AbstractCommand) {
                 });
 
                 if (!(fetchResponse.error || content && content.error)) {
-                  _context2.next = 70;
+                  _context2.next = 71;
                   break;
                 }
 
                 if (!(status === 429)) {
-                  _context2.next = 61;
+                  _context2.next = 62;
                   break;
                 }
 
                 throw new InsufficientFundsError(content.error, this._map.get(this).balance_reset);
 
-              case 61:
+              case 62:
                 if (!(status === 404 && options.throwNotFound === true)) {
-                  _context2.next = 65;
+                  _context2.next = 66;
                   break;
                 }
 
                 throw new NotFoundError(content.error, response);
 
-              case 65:
+              case 66:
                 if (!((status === 404 || status === 200) && !options.throwNotFound)) {
-                  _context2.next = 69;
+                  _context2.next = 70;
                   break;
                 }
 
                 fetchResponse.content = null;
-                _context2.next = 70;
+                _context2.next = 71;
                 break;
-
-              case 69:
-                throw new ResponseError(content.error, response);
 
               case 70:
-                _context2.next = 73;
+                throw new ResponseError(content.error, response);
+
+              case 71:
+                _context2.next = 74;
                 break;
 
-              case 72:
+              case 73:
                 throw new ResponseError('Response is empty!');
 
-              case 73:
+              case 74:
                 this.emit(RESPONSE, fetchResponse, this);
                 return _context2.abrupt('return', fetchResponse);
 
-              case 77:
-                _context2.prev = 77;
+              case 78:
+                _context2.prev = 78;
                 _context2.t1 = _context2['catch'](3);
 
                 // if (err instanceof NotFoundError) {
@@ -8160,12 +8249,12 @@ var FetchCommand = function (_AbstractCommand) {
                 this.emit(ERROR, _context2.t1, this);
                 throw _context2.t1;
 
-              case 83:
+              case 84:
               case 'end':
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[3, 77], [40, 44, 48, 56], [49,, 51, 55]]);
+        }, _callee2, this, [[3, 78], [41, 45, 49, 57], [50,, 52, 56]]);
       }));
 
       function fetch() {
@@ -8435,11 +8524,11 @@ var FetchCommand = function (_AbstractCommand) {
   }, {
     key: 'makeRequest',
     value: function () {
-      var _ref3 = _asyncToGenerator(index.mark(function _callee3(url) {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(url) {
         var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var fetchFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-        var headers, body, method, options, response;
-        return index.wrap(function _callee3$(_context3) {
+        var headers, body, method, formatting, options, response;
+        return regenerator.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
@@ -8453,13 +8542,13 @@ var FetchCommand = function (_AbstractCommand) {
               case 2:
                 if (!fetchFunc) fetchFunc = fetch$1;
                 _context3.prev = 3;
-                headers = params.headers, body = params.body, method = params.method;
+                headers = params.headers, body = params.body, method = params.method, formatting = params.formatting;
 
                 if (!headers) {
                   headers = {
                     'Content-Type': 'application/json'
                   };
-                  if (this.formatting) {
+                  if (formatting) {
                     headers['X-Requested-With'] = 'XMLHttpRequest';
                   }
                 }
@@ -8569,9 +8658,9 @@ var StatusCommand = function (_FetchCommand) {
   _createClass(StatusCommand, [{
     key: 'run',
     value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee() {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        return index.wrap(function _callee$(_context) {
+        return regenerator.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -8597,8 +8686,6 @@ var StatusCommand = function (_FetchCommand) {
 }(FetchCommand);
 
 var objectWithoutProperties = createCommonjsModule(function (module, exports) {
-"use strict";
-
 exports.__esModule = true;
 
 exports.default = function (obj, keys) {
@@ -8617,8 +8704,6 @@ exports.default = function (obj, keys) {
 var _objectWithoutProperties = unwrapExports(objectWithoutProperties);
 
 var _extends = createCommonjsModule(function (module, exports) {
-"use strict";
-
 exports.__esModule = true;
 
 
@@ -8644,9 +8729,14 @@ exports.default = _assign2.default || function (target) {
 
 var _extends$1 = unwrapExports(_extends);
 
-var index$5 = createCommonjsModule(function (module) {
-'use strict';
+var empty$1 = {};
 
+
+var empty$2 = Object.freeze({
+	default: empty$1
+});
+
+var isStream_1 = createCommonjsModule(function (module) {
 var isStream = module.exports = function (stream) {
 	return stream !== null && typeof stream === 'object' && typeof stream.pipe === 'function';
 };
@@ -8668,6 +8758,9 @@ isStream.transform = function (stream) {
 };
 });
 
+var fs = ( empty$2 && empty$1 ) || empty$2;
+
+var hasha_1 = createCommonjsModule(function (module) {
 const hasha = (input, opts) => {
 	opts = opts || {};
 
@@ -8677,7 +8770,7 @@ const hasha = (input, opts) => {
 		outputEncoding = undefined;
 	}
 
-	const hash = crypto.createHash(opts.algorithm || 'sha512');
+	const hash = fs.createHash(opts.algorithm || 'sha512');
 
 	const update = buf => {
 		const inputEncoding = typeof buf === 'string' ? 'utf8' : undefined;
@@ -8702,13 +8795,13 @@ hasha.stream = opts => {
 		outputEncoding = undefined;
 	}
 
-	const stream = crypto.createHash(opts.algorithm || 'sha512');
+	const stream = fs.createHash(opts.algorithm || 'sha512');
 	stream.setEncoding(outputEncoding);
 	return stream;
 };
 
 hasha.fromStream = (stream, opts) => {
-	if (!index$5(stream)) {
+	if (!isStream_1(stream)) {
 		return Promise.reject(new TypeError('Expected a stream'));
 	}
 
@@ -8729,955 +8822,7 @@ hasha.fromFile = (fp, opts) => hasha.fromStream(fs.createReadStream(fp), opts);
 
 hasha.fromFileSync = (fp, opts) => hasha(fs.readFileSync(fp), opts);
 
-var index$4 = hasha;
-
-var core = createCommonjsModule(function (module, exports) {
-(function (root, factory) {
-	{
-		// CommonJS
-		module.exports = exports = factory();
-	}
-}(commonjsGlobal, function () {
-
-	/**
-	 * CryptoJS core components.
-	 */
-	var CryptoJS = CryptoJS || (function (Math, undefined) {
-	    /*
-	     * Local polyfil of Object.create
-	     */
-	    var create = Object.create || (function () {
-	        function F() {}
-
-	        return function (obj) {
-	            var subtype;
-
-	            F.prototype = obj;
-
-	            subtype = new F();
-
-	            F.prototype = null;
-
-	            return subtype;
-	        };
-	    }());
-
-	    /**
-	     * CryptoJS namespace.
-	     */
-	    var C = {};
-
-	    /**
-	     * Library namespace.
-	     */
-	    var C_lib = C.lib = {};
-
-	    /**
-	     * Base object for prototypal inheritance.
-	     */
-	    var Base = C_lib.Base = (function () {
-
-
-	        return {
-	            /**
-	             * Creates a new object that inherits from this object.
-	             *
-	             * @param {Object} overrides Properties to copy into the new object.
-	             *
-	             * @return {Object} The new object.
-	             *
-	             * @static
-	             *
-	             * @example
-	             *
-	             *     var MyType = CryptoJS.lib.Base.extend({
-	             *         field: 'value',
-	             *
-	             *         method: function () {
-	             *         }
-	             *     });
-	             */
-	            extend: function (overrides) {
-	                // Spawn
-	                var subtype = create(this);
-
-	                // Augment
-	                if (overrides) {
-	                    subtype.mixIn(overrides);
-	                }
-
-	                // Create default initializer
-	                if (!subtype.hasOwnProperty('init') || this.init === subtype.init) {
-	                    subtype.init = function () {
-	                        subtype.$super.init.apply(this, arguments);
-	                    };
-	                }
-
-	                // Initializer's prototype is the subtype object
-	                subtype.init.prototype = subtype;
-
-	                // Reference supertype
-	                subtype.$super = this;
-
-	                return subtype;
-	            },
-
-	            /**
-	             * Extends this object and runs the init method.
-	             * Arguments to create() will be passed to init().
-	             *
-	             * @return {Object} The new object.
-	             *
-	             * @static
-	             *
-	             * @example
-	             *
-	             *     var instance = MyType.create();
-	             */
-	            create: function () {
-	                var instance = this.extend();
-	                instance.init.apply(instance, arguments);
-
-	                return instance;
-	            },
-
-	            /**
-	             * Initializes a newly created object.
-	             * Override this method to add some logic when your objects are created.
-	             *
-	             * @example
-	             *
-	             *     var MyType = CryptoJS.lib.Base.extend({
-	             *         init: function () {
-	             *             // ...
-	             *         }
-	             *     });
-	             */
-	            init: function () {
-	            },
-
-	            /**
-	             * Copies properties into this object.
-	             *
-	             * @param {Object} properties The properties to mix in.
-	             *
-	             * @example
-	             *
-	             *     MyType.mixIn({
-	             *         field: 'value'
-	             *     });
-	             */
-	            mixIn: function (properties) {
-	                for (var propertyName in properties) {
-	                    if (properties.hasOwnProperty(propertyName)) {
-	                        this[propertyName] = properties[propertyName];
-	                    }
-	                }
-
-	                // IE won't copy toString using the loop above
-	                if (properties.hasOwnProperty('toString')) {
-	                    this.toString = properties.toString;
-	                }
-	            },
-
-	            /**
-	             * Creates a copy of this object.
-	             *
-	             * @return {Object} The clone.
-	             *
-	             * @example
-	             *
-	             *     var clone = instance.clone();
-	             */
-	            clone: function () {
-	                return this.init.prototype.extend(this);
-	            }
-	        };
-	    }());
-
-	    /**
-	     * An array of 32-bit words.
-	     *
-	     * @property {Array} words The array of 32-bit words.
-	     * @property {number} sigBytes The number of significant bytes in this word array.
-	     */
-	    var WordArray = C_lib.WordArray = Base.extend({
-	        /**
-	         * Initializes a newly created word array.
-	         *
-	         * @param {Array} words (Optional) An array of 32-bit words.
-	         * @param {number} sigBytes (Optional) The number of significant bytes in the words.
-	         *
-	         * @example
-	         *
-	         *     var wordArray = CryptoJS.lib.WordArray.create();
-	         *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607]);
-	         *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607], 6);
-	         */
-	        init: function (words, sigBytes) {
-	            words = this.words = words || [];
-
-	            if (sigBytes != undefined) {
-	                this.sigBytes = sigBytes;
-	            } else {
-	                this.sigBytes = words.length * 4;
-	            }
-	        },
-
-	        /**
-	         * Converts this word array to a string.
-	         *
-	         * @param {Encoder} encoder (Optional) The encoding strategy to use. Default: CryptoJS.enc.Hex
-	         *
-	         * @return {string} The stringified word array.
-	         *
-	         * @example
-	         *
-	         *     var string = wordArray + '';
-	         *     var string = wordArray.toString();
-	         *     var string = wordArray.toString(CryptoJS.enc.Utf8);
-	         */
-	        toString: function (encoder) {
-	            return (encoder || Hex).stringify(this);
-	        },
-
-	        /**
-	         * Concatenates a word array to this word array.
-	         *
-	         * @param {WordArray} wordArray The word array to append.
-	         *
-	         * @return {WordArray} This word array.
-	         *
-	         * @example
-	         *
-	         *     wordArray1.concat(wordArray2);
-	         */
-	        concat: function (wordArray) {
-	            // Shortcuts
-	            var thisWords = this.words;
-	            var thatWords = wordArray.words;
-	            var thisSigBytes = this.sigBytes;
-	            var thatSigBytes = wordArray.sigBytes;
-
-	            // Clamp excess bits
-	            this.clamp();
-
-	            // Concat
-	            if (thisSigBytes % 4) {
-	                // Copy one byte at a time
-	                for (var i = 0; i < thatSigBytes; i++) {
-	                    var thatByte = (thatWords[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
-	                    thisWords[(thisSigBytes + i) >>> 2] |= thatByte << (24 - ((thisSigBytes + i) % 4) * 8);
-	                }
-	            } else {
-	                // Copy one word at a time
-	                for (var i = 0; i < thatSigBytes; i += 4) {
-	                    thisWords[(thisSigBytes + i) >>> 2] = thatWords[i >>> 2];
-	                }
-	            }
-	            this.sigBytes += thatSigBytes;
-
-	            // Chainable
-	            return this;
-	        },
-
-	        /**
-	         * Removes insignificant bits.
-	         *
-	         * @example
-	         *
-	         *     wordArray.clamp();
-	         */
-	        clamp: function () {
-	            // Shortcuts
-	            var words = this.words;
-	            var sigBytes = this.sigBytes;
-
-	            // Clamp
-	            words[sigBytes >>> 2] &= 0xffffffff << (32 - (sigBytes % 4) * 8);
-	            words.length = Math.ceil(sigBytes / 4);
-	        },
-
-	        /**
-	         * Creates a copy of this word array.
-	         *
-	         * @return {WordArray} The clone.
-	         *
-	         * @example
-	         *
-	         *     var clone = wordArray.clone();
-	         */
-	        clone: function () {
-	            var clone = Base.clone.call(this);
-	            clone.words = this.words.slice(0);
-
-	            return clone;
-	        },
-
-	        /**
-	         * Creates a word array filled with random bytes.
-	         *
-	         * @param {number} nBytes The number of random bytes to generate.
-	         *
-	         * @return {WordArray} The random word array.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var wordArray = CryptoJS.lib.WordArray.random(16);
-	         */
-	        random: function (nBytes) {
-	            var words = [];
-
-	            var r = (function (m_w) {
-	                var m_w = m_w;
-	                var m_z = 0x3ade68b1;
-	                var mask = 0xffffffff;
-
-	                return function () {
-	                    m_z = (0x9069 * (m_z & 0xFFFF) + (m_z >> 0x10)) & mask;
-	                    m_w = (0x4650 * (m_w & 0xFFFF) + (m_w >> 0x10)) & mask;
-	                    var result = ((m_z << 0x10) + m_w) & mask;
-	                    result /= 0x100000000;
-	                    result += 0.5;
-	                    return result * (Math.random() > .5 ? 1 : -1);
-	                }
-	            });
-
-	            for (var i = 0, rcache; i < nBytes; i += 4) {
-	                var _r = r((rcache || Math.random()) * 0x100000000);
-
-	                rcache = _r() * 0x3ade67b7;
-	                words.push((_r() * 0x100000000) | 0);
-	            }
-
-	            return new WordArray.init(words, nBytes);
-	        }
-	    });
-
-	    /**
-	     * Encoder namespace.
-	     */
-	    var C_enc = C.enc = {};
-
-	    /**
-	     * Hex encoding strategy.
-	     */
-	    var Hex = C_enc.Hex = {
-	        /**
-	         * Converts a word array to a hex string.
-	         *
-	         * @param {WordArray} wordArray The word array.
-	         *
-	         * @return {string} The hex string.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var hexString = CryptoJS.enc.Hex.stringify(wordArray);
-	         */
-	        stringify: function (wordArray) {
-	            // Shortcuts
-	            var words = wordArray.words;
-	            var sigBytes = wordArray.sigBytes;
-
-	            // Convert
-	            var hexChars = [];
-	            for (var i = 0; i < sigBytes; i++) {
-	                var bite = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
-	                hexChars.push((bite >>> 4).toString(16));
-	                hexChars.push((bite & 0x0f).toString(16));
-	            }
-
-	            return hexChars.join('');
-	        },
-
-	        /**
-	         * Converts a hex string to a word array.
-	         *
-	         * @param {string} hexStr The hex string.
-	         *
-	         * @return {WordArray} The word array.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var wordArray = CryptoJS.enc.Hex.parse(hexString);
-	         */
-	        parse: function (hexStr) {
-	            // Shortcut
-	            var hexStrLength = hexStr.length;
-
-	            // Convert
-	            var words = [];
-	            for (var i = 0; i < hexStrLength; i += 2) {
-	                words[i >>> 3] |= parseInt(hexStr.substr(i, 2), 16) << (24 - (i % 8) * 4);
-	            }
-
-	            return new WordArray.init(words, hexStrLength / 2);
-	        }
-	    };
-
-	    /**
-	     * Latin1 encoding strategy.
-	     */
-	    var Latin1 = C_enc.Latin1 = {
-	        /**
-	         * Converts a word array to a Latin1 string.
-	         *
-	         * @param {WordArray} wordArray The word array.
-	         *
-	         * @return {string} The Latin1 string.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var latin1String = CryptoJS.enc.Latin1.stringify(wordArray);
-	         */
-	        stringify: function (wordArray) {
-	            // Shortcuts
-	            var words = wordArray.words;
-	            var sigBytes = wordArray.sigBytes;
-
-	            // Convert
-	            var latin1Chars = [];
-	            for (var i = 0; i < sigBytes; i++) {
-	                var bite = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
-	                latin1Chars.push(String.fromCharCode(bite));
-	            }
-
-	            return latin1Chars.join('');
-	        },
-
-	        /**
-	         * Converts a Latin1 string to a word array.
-	         *
-	         * @param {string} latin1Str The Latin1 string.
-	         *
-	         * @return {WordArray} The word array.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var wordArray = CryptoJS.enc.Latin1.parse(latin1String);
-	         */
-	        parse: function (latin1Str) {
-	            // Shortcut
-	            var latin1StrLength = latin1Str.length;
-
-	            // Convert
-	            var words = [];
-	            for (var i = 0; i < latin1StrLength; i++) {
-	                words[i >>> 2] |= (latin1Str.charCodeAt(i) & 0xff) << (24 - (i % 4) * 8);
-	            }
-
-	            return new WordArray.init(words, latin1StrLength);
-	        }
-	    };
-
-	    /**
-	     * UTF-8 encoding strategy.
-	     */
-	    var Utf8 = C_enc.Utf8 = {
-	        /**
-	         * Converts a word array to a UTF-8 string.
-	         *
-	         * @param {WordArray} wordArray The word array.
-	         *
-	         * @return {string} The UTF-8 string.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var utf8String = CryptoJS.enc.Utf8.stringify(wordArray);
-	         */
-	        stringify: function (wordArray) {
-	            try {
-	                return decodeURIComponent(escape(Latin1.stringify(wordArray)));
-	            } catch (e) {
-	                throw new Error('Malformed UTF-8 data');
-	            }
-	        },
-
-	        /**
-	         * Converts a UTF-8 string to a word array.
-	         *
-	         * @param {string} utf8Str The UTF-8 string.
-	         *
-	         * @return {WordArray} The word array.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var wordArray = CryptoJS.enc.Utf8.parse(utf8String);
-	         */
-	        parse: function (utf8Str) {
-	            return Latin1.parse(unescape(encodeURIComponent(utf8Str)));
-	        }
-	    };
-
-	    /**
-	     * Abstract buffered block algorithm template.
-	     *
-	     * The property blockSize must be implemented in a concrete subtype.
-	     *
-	     * @property {number} _minBufferSize The number of blocks that should be kept unprocessed in the buffer. Default: 0
-	     */
-	    var BufferedBlockAlgorithm = C_lib.BufferedBlockAlgorithm = Base.extend({
-	        /**
-	         * Resets this block algorithm's data buffer to its initial state.
-	         *
-	         * @example
-	         *
-	         *     bufferedBlockAlgorithm.reset();
-	         */
-	        reset: function () {
-	            // Initial values
-	            this._data = new WordArray.init();
-	            this._nDataBytes = 0;
-	        },
-
-	        /**
-	         * Adds new data to this block algorithm's buffer.
-	         *
-	         * @param {WordArray|string} data The data to append. Strings are converted to a WordArray using UTF-8.
-	         *
-	         * @example
-	         *
-	         *     bufferedBlockAlgorithm._append('data');
-	         *     bufferedBlockAlgorithm._append(wordArray);
-	         */
-	        _append: function (data) {
-	            // Convert string to WordArray, else assume WordArray already
-	            if (typeof data == 'string') {
-	                data = Utf8.parse(data);
-	            }
-
-	            // Append
-	            this._data.concat(data);
-	            this._nDataBytes += data.sigBytes;
-	        },
-
-	        /**
-	         * Processes available data blocks.
-	         *
-	         * This method invokes _doProcessBlock(offset), which must be implemented by a concrete subtype.
-	         *
-	         * @param {boolean} doFlush Whether all blocks and partial blocks should be processed.
-	         *
-	         * @return {WordArray} The processed data.
-	         *
-	         * @example
-	         *
-	         *     var processedData = bufferedBlockAlgorithm._process();
-	         *     var processedData = bufferedBlockAlgorithm._process(!!'flush');
-	         */
-	        _process: function (doFlush) {
-	            // Shortcuts
-	            var data = this._data;
-	            var dataWords = data.words;
-	            var dataSigBytes = data.sigBytes;
-	            var blockSize = this.blockSize;
-	            var blockSizeBytes = blockSize * 4;
-
-	            // Count blocks ready
-	            var nBlocksReady = dataSigBytes / blockSizeBytes;
-	            if (doFlush) {
-	                // Round up to include partial blocks
-	                nBlocksReady = Math.ceil(nBlocksReady);
-	            } else {
-	                // Round down to include only full blocks,
-	                // less the number of blocks that must remain in the buffer
-	                nBlocksReady = Math.max((nBlocksReady | 0) - this._minBufferSize, 0);
-	            }
-
-	            // Count words ready
-	            var nWordsReady = nBlocksReady * blockSize;
-
-	            // Count bytes ready
-	            var nBytesReady = Math.min(nWordsReady * 4, dataSigBytes);
-
-	            // Process blocks
-	            if (nWordsReady) {
-	                for (var offset = 0; offset < nWordsReady; offset += blockSize) {
-	                    // Perform concrete-algorithm logic
-	                    this._doProcessBlock(dataWords, offset);
-	                }
-
-	                // Remove processed words
-	                var processedWords = dataWords.splice(0, nWordsReady);
-	                data.sigBytes -= nBytesReady;
-	            }
-
-	            // Return processed words
-	            return new WordArray.init(processedWords, nBytesReady);
-	        },
-
-	        /**
-	         * Creates a copy of this object.
-	         *
-	         * @return {Object} The clone.
-	         *
-	         * @example
-	         *
-	         *     var clone = bufferedBlockAlgorithm.clone();
-	         */
-	        clone: function () {
-	            var clone = Base.clone.call(this);
-	            clone._data = this._data.clone();
-
-	            return clone;
-	        },
-
-	        _minBufferSize: 0
-	    });
-
-	    /**
-	     * Abstract hasher template.
-	     *
-	     * @property {number} blockSize The number of 32-bit words this hasher operates on. Default: 16 (512 bits)
-	     */
-	    var Hasher = C_lib.Hasher = BufferedBlockAlgorithm.extend({
-	        /**
-	         * Configuration options.
-	         */
-	        cfg: Base.extend(),
-
-	        /**
-	         * Initializes a newly created hasher.
-	         *
-	         * @param {Object} cfg (Optional) The configuration options to use for this hash computation.
-	         *
-	         * @example
-	         *
-	         *     var hasher = CryptoJS.algo.SHA256.create();
-	         */
-	        init: function (cfg) {
-	            // Apply config defaults
-	            this.cfg = this.cfg.extend(cfg);
-
-	            // Set initial values
-	            this.reset();
-	        },
-
-	        /**
-	         * Resets this hasher to its initial state.
-	         *
-	         * @example
-	         *
-	         *     hasher.reset();
-	         */
-	        reset: function () {
-	            // Reset data buffer
-	            BufferedBlockAlgorithm.reset.call(this);
-
-	            // Perform concrete-hasher logic
-	            this._doReset();
-	        },
-
-	        /**
-	         * Updates this hasher with a message.
-	         *
-	         * @param {WordArray|string} messageUpdate The message to append.
-	         *
-	         * @return {Hasher} This hasher.
-	         *
-	         * @example
-	         *
-	         *     hasher.update('message');
-	         *     hasher.update(wordArray);
-	         */
-	        update: function (messageUpdate) {
-	            // Append
-	            this._append(messageUpdate);
-
-	            // Update the hash
-	            this._process();
-
-	            // Chainable
-	            return this;
-	        },
-
-	        /**
-	         * Finalizes the hash computation.
-	         * Note that the finalize operation is effectively a destructive, read-once operation.
-	         *
-	         * @param {WordArray|string} messageUpdate (Optional) A final message update.
-	         *
-	         * @return {WordArray} The hash.
-	         *
-	         * @example
-	         *
-	         *     var hash = hasher.finalize();
-	         *     var hash = hasher.finalize('message');
-	         *     var hash = hasher.finalize(wordArray);
-	         */
-	        finalize: function (messageUpdate) {
-	            // Final message update
-	            if (messageUpdate) {
-	                this._append(messageUpdate);
-	            }
-
-	            // Perform concrete-hasher logic
-	            var hash = this._doFinalize();
-
-	            return hash;
-	        },
-
-	        blockSize: 512/32,
-
-	        /**
-	         * Creates a shortcut function to a hasher's object interface.
-	         *
-	         * @param {Hasher} hasher The hasher to create a helper for.
-	         *
-	         * @return {Function} The shortcut function.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var SHA256 = CryptoJS.lib.Hasher._createHelper(CryptoJS.algo.SHA256);
-	         */
-	        _createHelper: function (hasher) {
-	            return function (message, cfg) {
-	                return new hasher.init(cfg).finalize(message);
-	            };
-	        },
-
-	        /**
-	         * Creates a shortcut function to the HMAC's object interface.
-	         *
-	         * @param {Hasher} hasher The hasher to use in this HMAC helper.
-	         *
-	         * @return {Function} The shortcut function.
-	         *
-	         * @static
-	         *
-	         * @example
-	         *
-	         *     var HmacSHA256 = CryptoJS.lib.Hasher._createHmacHelper(CryptoJS.algo.SHA256);
-	         */
-	        _createHmacHelper: function (hasher) {
-	            return function (message, key) {
-	                return new C_algo.HMAC.init(hasher, key).finalize(message);
-	            };
-	        }
-	    });
-
-	    /**
-	     * Algorithm namespace.
-	     */
-	    var C_algo = C.algo = {};
-
-	    return C;
-	}(Math));
-
-
-	return CryptoJS;
-
-}));
-});
-
-var sha256 = createCommonjsModule(function (module, exports) {
-(function (root, factory) {
-	{
-		// CommonJS
-		module.exports = exports = factory(core);
-	}
-}(commonjsGlobal, function (CryptoJS) {
-
-	(function (Math) {
-	    // Shortcuts
-	    var C = CryptoJS;
-	    var C_lib = C.lib;
-	    var WordArray = C_lib.WordArray;
-	    var Hasher = C_lib.Hasher;
-	    var C_algo = C.algo;
-
-	    // Initialization and round constants tables
-	    var H = [];
-	    var K = [];
-
-	    // Compute constants
-	    (function () {
-	        function isPrime(n) {
-	            var sqrtN = Math.sqrt(n);
-	            for (var factor = 2; factor <= sqrtN; factor++) {
-	                if (!(n % factor)) {
-	                    return false;
-	                }
-	            }
-
-	            return true;
-	        }
-
-	        function getFractionalBits(n) {
-	            return ((n - (n | 0)) * 0x100000000) | 0;
-	        }
-
-	        var n = 2;
-	        var nPrime = 0;
-	        while (nPrime < 64) {
-	            if (isPrime(n)) {
-	                if (nPrime < 8) {
-	                    H[nPrime] = getFractionalBits(Math.pow(n, 1 / 2));
-	                }
-	                K[nPrime] = getFractionalBits(Math.pow(n, 1 / 3));
-
-	                nPrime++;
-	            }
-
-	            n++;
-	        }
-	    }());
-
-	    // Reusable object
-	    var W = [];
-
-	    /**
-	     * SHA-256 hash algorithm.
-	     */
-	    var SHA256 = C_algo.SHA256 = Hasher.extend({
-	        _doReset: function () {
-	            this._hash = new WordArray.init(H.slice(0));
-	        },
-
-	        _doProcessBlock: function (M, offset) {
-	            // Shortcut
-	            var H = this._hash.words;
-
-	            // Working variables
-	            var a = H[0];
-	            var b = H[1];
-	            var c = H[2];
-	            var d = H[3];
-	            var e = H[4];
-	            var f = H[5];
-	            var g = H[6];
-	            var h = H[7];
-
-	            // Computation
-	            for (var i = 0; i < 64; i++) {
-	                if (i < 16) {
-	                    W[i] = M[offset + i] | 0;
-	                } else {
-	                    var gamma0x = W[i - 15];
-	                    var gamma0  = ((gamma0x << 25) | (gamma0x >>> 7))  ^
-	                                  ((gamma0x << 14) | (gamma0x >>> 18)) ^
-	                                   (gamma0x >>> 3);
-
-	                    var gamma1x = W[i - 2];
-	                    var gamma1  = ((gamma1x << 15) | (gamma1x >>> 17)) ^
-	                                  ((gamma1x << 13) | (gamma1x >>> 19)) ^
-	                                   (gamma1x >>> 10);
-
-	                    W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
-	                }
-
-	                var ch  = (e & f) ^ (~e & g);
-	                var maj = (a & b) ^ (a & c) ^ (b & c);
-
-	                var sigma0 = ((a << 30) | (a >>> 2)) ^ ((a << 19) | (a >>> 13)) ^ ((a << 10) | (a >>> 22));
-	                var sigma1 = ((e << 26) | (e >>> 6)) ^ ((e << 21) | (e >>> 11)) ^ ((e << 7)  | (e >>> 25));
-
-	                var t1 = h + sigma1 + ch + K[i] + W[i];
-	                var t2 = sigma0 + maj;
-
-	                h = g;
-	                g = f;
-	                f = e;
-	                e = (d + t1) | 0;
-	                d = c;
-	                c = b;
-	                b = a;
-	                a = (t1 + t2) | 0;
-	            }
-
-	            // Intermediate hash value
-	            H[0] = (H[0] + a) | 0;
-	            H[1] = (H[1] + b) | 0;
-	            H[2] = (H[2] + c) | 0;
-	            H[3] = (H[3] + d) | 0;
-	            H[4] = (H[4] + e) | 0;
-	            H[5] = (H[5] + f) | 0;
-	            H[6] = (H[6] + g) | 0;
-	            H[7] = (H[7] + h) | 0;
-	        },
-
-	        _doFinalize: function () {
-	            // Shortcuts
-	            var data = this._data;
-	            var dataWords = data.words;
-
-	            var nBitsTotal = this._nDataBytes * 8;
-	            var nBitsLeft = data.sigBytes * 8;
-
-	            // Add padding
-	            dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
-	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
-	            dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
-	            data.sigBytes = dataWords.length * 4;
-
-	            // Hash final blocks
-	            this._process();
-
-	            // Return final computed hash
-	            return this._hash;
-	        },
-
-	        clone: function () {
-	            var clone = Hasher.clone.call(this);
-	            clone._hash = this._hash.clone();
-
-	            return clone;
-	        }
-	    });
-
-	    /**
-	     * Shortcut function to the hasher's object interface.
-	     *
-	     * @param {WordArray|string} message The message to hash.
-	     *
-	     * @return {WordArray} The hash.
-	     *
-	     * @static
-	     *
-	     * @example
-	     *
-	     *     var hash = CryptoJS.SHA256('message');
-	     *     var hash = CryptoJS.SHA256(wordArray);
-	     */
-	    C.SHA256 = Hasher._createHelper(SHA256);
-
-	    /**
-	     * Shortcut function to the HMAC's object interface.
-	     *
-	     * @param {WordArray|string} message The message to hash.
-	     * @param {WordArray|string} key The secret key.
-	     *
-	     * @return {WordArray} The HMAC.
-	     *
-	     * @static
-	     *
-	     * @example
-	     *
-	     *     var hmac = CryptoJS.HmacSHA256(message, key);
-	     */
-	    C.HmacSHA256 = Hasher._createHmacHelper(SHA256);
-	}(Math));
-
-
-	return CryptoJS.SHA256;
-
-}));
+module.exports = hasha;
 });
 
 var HashCommand = function (_FetchCommand) {
@@ -9685,24 +8830,43 @@ var HashCommand = function (_FetchCommand) {
 
   /**
    * HashCommand class for file & stream hashing.
-   * Run method sends hash to API
+   * Run method sends hash to API.
+   * This class implements {@link https://www.npmjs.com/package/hasha|Hasha} for hashing functionality
    * @constructs HashCommand
    * @augments FetchCommand
    * @param [params]
    * @param {string} [params.key] - API key.
+   * @param {string} [params.algorithm=sha256] - Algorithm used for hashing. Only `sha256` and `md5` are allowed
+   * @param {string} [params.encoding=hex] - Encoding of the returned hash. {@link https://www.npmjs.com/package/hasha#encoding|Available values}
+   * @throws TypeError
    */
   function HashCommand(params) {
     _classCallCheck(this, HashCommand);
 
-    return _possibleConstructorReturn(this, (HashCommand.__proto__ || _Object$getPrototypeOf(HashCommand)).call(this, _extends$1({
+    var _this = _possibleConstructorReturn(this, (HashCommand.__proto__ || _Object$getPrototypeOf(HashCommand)).call(this, _extends$1({
       method: HASH
     }, params)));
+
+    var algorithm = params.algorithm,
+        encoding = params.encoding;
+
+    if (algorithm && !['sha256', 'md5'].includes(algorithm)) throw new TypeError('Only sha256 and md5 are allowed');
+    _this.options = {
+      algorithm: algorithm || 'sha256',
+      encoding: encoding || 'hex'
+    };
+    return _this;
   }
 
   /**
    * Get file or stream hash and check it by sending request to API
+   * @async
    * @member HashCommand#run
-   * @param {{stream: Stream}|{file: string}|{hash: string}} options
+   * @param options You can pass options used in {@link FetchCommand#fetch} merged with options below
+   * @param {string} [options.hash] - Hash to check.
+   * @param {Stream} [options.stream] - Stream object. {@link HashCommand#hashStream}
+   * @param {string} [options.file] - The path to the file. {@link HashCommand#getFileHash}
+   * @param {(Buffer|string|Buffer[]|string[])} [options.input] - Input for hashing. {@link HashCommand#getInputHash}
    * @fulfil {Object}
    * @reject {Error}
    * @throws {InsufficientFundsError|TypeError}
@@ -9713,16 +8877,16 @@ var HashCommand = function (_FetchCommand) {
   _createClass(HashCommand, [{
     key: 'run',
     value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee() {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var fetchHash, runResponse, stream, file, string, hash, otherOptions;
-        return index.wrap(function _callee$(_context) {
+        var fetchHash, runResponse, stream, file, input, hash, otherOptions;
+        return regenerator.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 fetchHash = void 0;
                 runResponse = void 0;
-                stream = options.stream, file = options.file, string = options.string, hash = options.hash, otherOptions = _objectWithoutProperties(options, ['stream', 'file', 'string', 'hash']);
+                stream = options.stream, file = options.file, input = options.input, hash = options.hash, otherOptions = _objectWithoutProperties(options, ['stream', 'file', 'input', 'hash']);
                 _context.prev = 3;
 
                 if (!stream) {
@@ -9753,13 +8917,13 @@ var HashCommand = function (_FetchCommand) {
                 break;
 
               case 16:
-                if (!string) {
+                if (!input) {
                   _context.next = 22;
                   break;
                 }
 
                 _context.next = 19;
-                return this.getStringHash(string);
+                return this.getInputHash(input);
 
               case 19:
                 fetchHash = _context.sent;
@@ -9814,11 +8978,11 @@ var HashCommand = function (_FetchCommand) {
     }()
 
     /**
-     * Get Hash transform object.
+     * Get a hash transform stream.
      * *** NOTE: Can't use in browser
      * @see {@link https://nodejs.org/api/crypto.html#crypto_class_hash}
      * @member HashCommand#hashStream
-     * @returns {string}
+     * @returns {Stream}
      */
 
   }, {
@@ -9830,100 +8994,44 @@ var HashCommand = function (_FetchCommand) {
      * *** NOTE: Can't use in browser
      * @param {Stream} stream Stream object
      * @member HashCommand#getStreamHash
-     * @returns {Promise}
+     * @returns {Promise<string>}
      */
-    value: function () {
-      var _ref2 = _asyncToGenerator(index.mark(function _callee2(stream) {
-        var hash;
-        return index.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.next = 2;
-                return index$4.fromStream(stream, {
-                  algorithm: 'sha256'
-                });
-
-              case 2:
-                hash = _context2.sent;
-                return _context2.abrupt('return', hash);
-
-              case 4:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function getStreamHash(_x2) {
-        return _ref2.apply(this, arguments);
-      }
-
-      return getStreamHash;
-    }()
+    value: function getStreamHash(stream) {
+      return hasha_1.fromStream(stream, this.options);
+    }
 
     /**
      * Get hash passing only file path.
      * *** NOTE: Can't use in browser
-     * @param {string} filepath
+     * @param {string} filepath The path to the file
      * @member HashCommand#getFileHash
-     * @returns {Promise}
+     * @returns {Promise<string>}
      */
 
   }, {
     key: 'getFileHash',
-    value: function () {
-      var _ref3 = _asyncToGenerator(index.mark(function _callee3(filepath) {
-        var hash;
-        return index.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return index$4.fromFile(filepath, {
-                  algorithm: 'sha256'
-                });
-
-              case 2:
-                hash = _context3.sent;
-                return _context3.abrupt('return', hash);
-
-              case 4:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function getFileHash(_x3) {
-        return _ref3.apply(this, arguments);
-      }
-
-      return getFileHash;
-    }()
+    value: function getFileHash(filepath) {
+      return hasha_1.fromFile(filepath, this.options);
+    }
 
     /**
-     * Get SHA256 from string.
+     * Get hash.
      * Can be used in browser
-     * @param {string} string
-     * @member HashCommand#getStringHash
+     * @param {Buffer|string|Buffer[]|string[]} input Input for hashing
+     * @see {@link https://www.npmjs.com/package/hasha#input}
+     * @member HashCommand#getInputHash
      * @returns {string}
      */
 
   }, {
-    key: 'getStringHash',
-    value: function getStringHash(string) {
-      var hash = sha256(string);
-      return hash;
+    key: 'getInputHash',
+    value: function getInputHash(input) {
+      return hasha_1(input, this.options);
     }
   }, {
     key: 'hashStream',
     get: function get() {
-      return index$4.stream({
-        algorithm: 'sha256'
-      });
+      return hasha_1.stream(this.options);
     }
   }]);
 
@@ -10104,9 +9212,9 @@ var Account = function (_EventEmitter) {
      * @returns {{}}
      */
     value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee() {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
         var statusData;
-        return index.wrap(function _callee$(_context) {
+        return regenerator.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -10145,9 +9253,9 @@ var Account = function (_EventEmitter) {
   }, {
     key: 'getSubscriptions',
     value: function () {
-      var _ref2 = _asyncToGenerator(index.mark(function _callee2() {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2() {
         var statusData, subscriptions;
-        return index.wrap(function _callee2$(_context2) {
+        return regenerator.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -10184,10 +9292,10 @@ var Account = function (_EventEmitter) {
   }, {
     key: 'getStatus',
     value: function () {
-      var _ref3 = _asyncToGenerator(index.mark(function _callee3() {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3() {
         var statusCommand, _ref4, content, headers;
 
-        return index.wrap(function _callee3$(_context3) {
+        return regenerator.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
@@ -10277,7 +9385,7 @@ var TmLabs$1 = function (_EventEmitter) {
       key: options.key
     });
     var limit = options && options.limit ? options.limit : Infinity;
-    var queue = new index$3({ concurrency: limit });
+    var queue = new pQueue({ concurrency: limit });
     var history = [];
     _this._map = new _WeakMap();
     _this._map.set(_this, {
@@ -10311,13 +9419,13 @@ var TmLabs$1 = function (_EventEmitter) {
   _createClass(TmLabs, [{
     key: 'runBatch',
     value: function () {
-      var _ref = _asyncToGenerator(index.mark(function _callee2() {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2() {
         var _this2 = this;
 
         var commands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var batchResponse, promises;
-        return index.wrap(function _callee2$(_context2) {
+        return regenerator.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -10330,9 +9438,9 @@ var TmLabs$1 = function (_EventEmitter) {
                   if (!commandObj.command) throw new TypeError("Empty required param 'method'");
                   var command = commandObj.command;
                   promises.push(new _Promise(function () {
-                    var _ref2 = _asyncToGenerator(index.mark(function _callee(resolve, reject) {
+                    var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(resolve, reject) {
                       var answer;
-                      return index.wrap(function _callee$(_context) {
+                      return regenerator.wrap(function _callee$(_context) {
                         while (1) {
                           switch (_context.prev = _context.next) {
                             case 0:
@@ -10418,13 +9526,13 @@ var TmLabs$1 = function (_EventEmitter) {
   }, {
     key: 'fetchBatch',
     value: function () {
-      var _ref3 = _asyncToGenerator(index.mark(function _callee4(method) {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4(method) {
         var _this3 = this;
 
         var objects = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
         var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { throw: false };
         var batchResponse, methods, promises;
-        return index.wrap(function _callee4$(_context4) {
+        return regenerator.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
@@ -10451,9 +9559,9 @@ var TmLabs$1 = function (_EventEmitter) {
 
                 objects.forEach(function (params) {
                   promises.push(new _Promise(function () {
-                    var _ref4 = _asyncToGenerator(index.mark(function _callee3(resolve, reject) {
+                    var _ref4 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(resolve, reject) {
                       var answer;
-                      return index.wrap(function _callee3$(_context3) {
+                      return regenerator.wrap(function _callee3$(_context3) {
                         while (1) {
                           switch (_context3.prev = _context3.next) {
                             case 0:
@@ -10739,9 +9847,9 @@ var _this = undefined;
  * @returns {Promise}
  */
 var fetch = function () {
-  var _ref = _asyncToGenerator(index.mark(function _callee(method, params) {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(method, params) {
     var command, answer;
-    return index.wrap(function _callee$(_context) {
+    return regenerator.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -10780,9 +9888,9 @@ var fetch = function () {
  * @returns {Promise}
  */
 var hash = function () {
-  var _ref2 = _asyncToGenerator(index.mark(function _callee2(params) {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(params) {
     var command, answer;
-    return index.wrap(function _callee2$(_context2) {
+    return regenerator.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:

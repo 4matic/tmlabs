@@ -784,6 +784,7 @@ Fetch method
 - ResponseError
 - Error
 
+**Async**:   
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -939,10 +940,10 @@ Params
 * [HashCommand](#HashCommand) ⇐ [<code>FetchCommand</code>](#FetchCommand)
     * [new HashCommand([params])](#new_HashCommand_new)
     * [.run](#HashCommand+run) ⇒ <code>Promise</code>
-    * [.getStreamHash](#HashCommand+getStreamHash) ⇒ <code>Promise</code>
-    * [.hashStream](#HashCommand+hashStream) ⇒ <code>string</code>
-    * [.getFileHash](#HashCommand+getFileHash) ⇒ <code>Promise</code>
-    * [.getStringHash](#HashCommand+getStringHash) ⇒ <code>string</code>
+    * [.getStreamHash](#HashCommand+getStreamHash) ⇒ <code>Promise.&lt;string&gt;</code>
+    * [.hashStream](#HashCommand+hashStream) ⇒ <code>Stream</code>
+    * [.getFileHash](#HashCommand+getFileHash) ⇒ <code>Promise.&lt;string&gt;</code>
+    * [.getInputHash](#HashCommand+getInputHash) ⇒ <code>string</code>
     * [.method](#FetchCommand+method) : <code>string</code>
     * [.fetch](#FetchCommand+fetch) ⇒ <code>Promise</code>
     * [.headers](#FetchCommand+headers) : <code>Object</code> \| <code>undefined</code>
@@ -968,13 +969,20 @@ Params
 
 ### new HashCommand([params])
 HashCommand class for file & stream hashing.
-Run method sends hash to API
+Run method sends hash to API.
+This class implements [Hasha](https://www.npmjs.com/package/hasha) for hashing functionality
+
+**Throws**:
+
+- TypeError
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| [params] |  |  |
-| [params.key] | <code>string</code> | API key. |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [params] |  |  |  |
+| [params.key] | <code>string</code> |  | API key. |
+| [params.algorithm] | <code>string</code> | <code>&quot;sha256&quot;</code> | Algorithm used for hashing. Only `sha256` and `md5` are allowed |
+| [params.encoding] | <code>string</code> | <code>&quot;hex&quot;</code> | Encoding of the returned hash. [Available values](https://www.npmjs.com/package/hasha#encoding) |
 
 <a name="HashCommand+run"></a>
 
@@ -987,16 +995,21 @@ Get file or stream hash and check it by sending request to API
 
 - <code>InsufficientFundsError</code><code>TypeError</code> 
 
+**Async**:   
 **Fulfil**: <code>Object</code>  
 **Reject**: <code>Error</code>  
 
-| Param | Type |
-| --- | --- |
-| options | <code>Object</code> \| <code>Object</code> \| <code>Object</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| options |  | You can pass options used in [fetch](#FetchCommand+fetch) merged with options below |
+| [options.hash] | <code>string</code> | Hash to check. |
+| [options.stream] | <code>Stream</code> | Stream object. [hashStream](#HashCommand+hashStream) |
+| [options.file] | <code>string</code> | The path to the file. [getFileHash](#HashCommand+getFileHash) |
+| [options.input] | <code>Buffer</code> \| <code>string</code> \| <code>Array.&lt;Buffer&gt;</code> \| <code>Array.&lt;string&gt;</code> | Input for hashing. [getInputHash](#HashCommand+getInputHash) |
 
 <a name="HashCommand+getStreamHash"></a>
 
-### hashCommand.getStreamHash ⇒ <code>Promise</code>
+### hashCommand.getStreamHash ⇒ <code>Promise.&lt;string&gt;</code>
 Get hash passing stream as parameter.
 *** NOTE: Can't use in browser
 
@@ -1008,35 +1021,36 @@ Get hash passing stream as parameter.
 
 <a name="HashCommand+hashStream"></a>
 
-### hashCommand.hashStream ⇒ <code>string</code>
-Get Hash transform object.
+### hashCommand.hashStream ⇒ <code>Stream</code>
+Get a hash transform stream.
 *** NOTE: Can't use in browser
 
 **Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
 **See**: [https://nodejs.org/api/crypto.html#crypto_class_hash](https://nodejs.org/api/crypto.html#crypto_class_hash)  
 <a name="HashCommand+getFileHash"></a>
 
-### hashCommand.getFileHash ⇒ <code>Promise</code>
+### hashCommand.getFileHash ⇒ <code>Promise.&lt;string&gt;</code>
 Get hash passing only file path.
 *** NOTE: Can't use in browser
 
 **Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
 
-| Param | Type |
-| --- | --- |
-| filepath | <code>string</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| filepath | <code>string</code> | The path to the file |
 
-<a name="HashCommand+getStringHash"></a>
+<a name="HashCommand+getInputHash"></a>
 
-### hashCommand.getStringHash ⇒ <code>string</code>
-Get SHA256 from string.
+### hashCommand.getInputHash ⇒ <code>string</code>
+Get hash.
 Can be used in browser
 
 **Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**See**: [https://www.npmjs.com/package/hasha#input](https://www.npmjs.com/package/hasha#input)  
 
-| Param | Type |
-| --- | --- |
-| string | <code>string</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| input | <code>Buffer</code> \| <code>string</code> \| <code>Array.&lt;Buffer&gt;</code> \| <code>Array.&lt;string&gt;</code> | Input for hashing |
 
 <a name="FetchCommand+method"></a>
 
@@ -1061,6 +1075,7 @@ Fetch method
 - ResponseError
 - Error
 
+**Async**:   
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1281,6 +1296,7 @@ Fetch method
 - ResponseError
 - Error
 
+**Async**:   
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |

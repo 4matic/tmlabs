@@ -9,6 +9,9 @@
     "lcov",
     "text"
   ],
+  "exclude": [
+    "test/bundle/*.js"
+  ],
   "sourceMap": false,
   "instrument": false
 }

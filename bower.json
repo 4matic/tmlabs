@@ -19,8 +19,20 @@
     "node",
     "scan",
     "ip",
+    "intelligence",
     "security",
-    "es6"
+    "es6",
+    "port",
+    "history",
+    "registry",
+    "dns",
+    "email",
+    "leaks",
+    "geoip",
+    "free",
+    "free-credits",
+    "reconnaissance",
+    "pentest tool"
   ],
   "homepage": "https://tempicolabs.com/",
   "ignore": [

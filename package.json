@@ -164,5 +164,5 @@
     "smelly-event-emitter": "^0.1.1",
     "validator": "^9.2.0"
   },
-  "runkitExampleFilename": "runkit.js"
+  "tonicExampleFilename": "examples/runkit.js"
 }

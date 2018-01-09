@@ -1,13 +1,13 @@
-<h1 align="center">
+<div align="center">
   <br>
   <a href="https://tempicolabs.com"><img src="https://www.tempicolabs.com/img/logo_tl_H_black.png" alt="TempicoLabs" width="400"></a>
   <br>
-  Tempico Labs SDK
+  <h1>Tempico Labs SDK</h1>
   <br>
   <br>
-</h1>
+</div>
 
-<h4 align="center">Tempico Labs SDK for API. For node.js and the web.</h4>
+<div align="center"><h4>Tempico Labs SDK for API. For node.js and the web.</h4></div>
 
 <p align="center">
   <img src="https://img.shields.io/bower/v/tmlabs.svg" alt="Bower version">

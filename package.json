@@ -1,6 +1,6 @@
 {
   "name": "@tempicolabs/tmlabs",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Javascript SDK for TempicoLabs API",
   "main": "dist/tmlabs.umd.js",
   "browser": {

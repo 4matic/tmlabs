@@ -230,6 +230,7 @@ class FetchCommand extends AbstractCommand {
 
   /**
    * Main static fetch function
+   * @async
    * @static
    * @param {String} url fetching url
    * @param {Object} [params={}] request parameters

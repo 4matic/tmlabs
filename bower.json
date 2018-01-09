@@ -2,7 +2,7 @@
   "name": "tmlabs",
   "description": "Javascript SDK for TempicoLabs API",
   "main": "dist/tmlabs.js",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "authors": [
     "Maxim Maximov <root@4matikku.com>"
   ],
@@ -10,7 +10,15 @@
   "keywords": [
     "tempicolabs",
     "api",
+    "service",
     "sdk",
+    "blacklist",
+    "hash",
+    "malware",
+    "browser",
+    "node",
+    "scan",
+    "ip",
     "security",
     "es6"
   ],

@@ -18,6 +18,7 @@ class StatusCommand extends FetchCommand {
 
   /**
    * Return API status promise
+   * @async
    * @param options
    * @member StatusCommand#run
    * @returns {Promise}

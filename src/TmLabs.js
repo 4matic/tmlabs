@@ -42,6 +42,7 @@ class TmLabs extends EventEmitter {
 
   /**
    * Run commands
+   * @async
    * @param {Array.<Object>} commands Array of command objects which contain command key and it params key for command run options
    * @param {Object} [options] Batch command options
    * @param {Boolean} [options.throw=false] If true command will throw exceptions
@@ -73,6 +74,7 @@ class TmLabs extends EventEmitter {
 
   /**
    * Fetch specific method multiple times with different params
+   * @async
    * @param {string} method API method dns|ip, etc
    * @param {Object[]} objects array of request parameters
    * @param options additional options

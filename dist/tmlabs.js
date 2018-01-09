@@ -7348,29 +7348,10 @@ module.exports = exports['default'];
 
 var matches = unwrapExports(matches_1);
 
-/* eslint-disable import/extensions */
-
-// @app.route('/api/v2/hash/<h>', methods=['GET'])
-//
-// @app.route('/api/v2/ip/<ipaddr>', methods=['GET'])
-// @app.route('/api/v2/ip/<ipaddr>/<mode>', methods=['GET'])
-//
-// @app.route('/api/v2/me', methods=['GET'])
-// @app.route('/api/v2/me/<mode>', methods=['GET'])
-//
-// @app.route('/api/email/leaks/<email>', methods=['GET'])
-//
-// @app.route('/api/v2/dns/<domain>', methods=['GET'])
-//
-// @app.route('/api/v2/scan/<ip>', methods=['GET'])
-// @app.route('/api/v2/scan/<ip>/<portmin>', methods=['GET'])
-// @app.route('/api/v2/scan/<ip>/<portmin>/<portmax>', methods=['GET'])
-//
-// @app.route('/api/status', methods=['GET'])
-
 /**
  * @module endpoint
  * @desc Endpoint constants
+ * @readonly
  * @memberOf module:constants
  */
 
@@ -7814,7 +7795,7 @@ var FetchCommand = function (_AbstractCommand) {
     if (formatting !== undefined) _this.formatting = formatting;else _this.formatting = true;
 
     /**
-     * Command method
+     * FetchCommand method
      * @type {string}
      * @throws ReferenceError
      * @member FetchCommand#method
@@ -7996,6 +7977,7 @@ var FetchCommand = function (_AbstractCommand) {
 
     /**
      * Main static fetch function
+     * @async
      * @static
      * @param {String} url fetching url
      * @param {Object} [params={}] request parameters
@@ -8649,6 +8631,7 @@ var StatusCommand = function (_FetchCommand) {
 
   /**
    * Return API status promise
+   * @async
    * @param options
    * @member StatusCommand#run
    * @returns {Promise}
@@ -8840,7 +8823,9 @@ var HashCommand = function (_FetchCommand) {
    * @param {string} [params.encoding=hex] - Encoding of the returned hash. {@link https://www.npmjs.com/package/hasha#encoding|Available values}
    * @throws TypeError
    */
-  function HashCommand(params) {
+  function HashCommand() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     _classCallCheck(this, HashCommand);
 
     var _this = _possibleConstructorReturn(this, (HashCommand.__proto__ || _Object$getPrototypeOf(HashCommand)).call(this, _extends$1({
@@ -8851,7 +8836,8 @@ var HashCommand = function (_FetchCommand) {
         encoding = params.encoding;
 
     if (algorithm && !['sha256', 'md5'].includes(algorithm)) throw new TypeError('Only sha256 and md5 are allowed');
-    _this.options = {
+
+    _this._map.get(_this).options = {
       algorithm: algorithm || 'sha256',
       encoding: encoding || 'hex'
     };
@@ -8859,23 +8845,31 @@ var HashCommand = function (_FetchCommand) {
   }
 
   /**
-   * Get file or stream hash and check it by sending request to API
-   * @async
-   * @member HashCommand#run
-   * @param options You can pass options used in {@link FetchCommand#fetch} merged with options below
-   * @param {string} [options.hash] - Hash to check.
-   * @param {Stream} [options.stream] - Stream object. {@link HashCommand#hashStream}
-   * @param {string} [options.file] - The path to the file. {@link HashCommand#getFileHash}
-   * @param {(Buffer|string|Buffer[]|string[])} [options.input] - Input for hashing. {@link HashCommand#getInputHash}
-   * @fulfil {Object}
-   * @reject {Error}
-   * @throws {InsufficientFundsError|TypeError}
-   * @returns {Promise}
+   * HashCommand options
+   * @type {{ algorithm: string, encoding: string }}
+   * @readonly
+   * @member HashCommand#options
    */
 
 
   _createClass(HashCommand, [{
     key: 'run',
+
+
+    /**
+     * Get file or stream hash and check it by sending request to API
+     * @async
+     * @member HashCommand#run
+     * @param options You can pass options used in {@link FetchCommand#fetch} merged with options below
+     * @param {string} [options.hash] - Hash to check.
+     * @param {Stream} [options.stream] - Stream object. {@link HashCommand#hashStream}
+     * @param {string} [options.file] - The path to the file. {@link HashCommand#getFileHash}
+     * @param {(Buffer|string|Buffer[]|string[])} [options.input] - Input for hashing. {@link HashCommand#getInputHash}
+     * @fulfil {Object}
+     * @reject {Error}
+     * @throws {InsufficientFundsError|TypeError}
+     * @returns {Promise}
+     */
     value: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -9017,7 +9011,7 @@ var HashCommand = function (_FetchCommand) {
     /**
      * Get hash.
      * Can be used in browser
-     * @param {Buffer|string|Buffer[]|string[]} input Input for hashing
+     * @param {(Buffer|string|Buffer[]|string[])} input Input for hashing
      * @see {@link https://www.npmjs.com/package/hasha#input}
      * @member HashCommand#getInputHash
      * @returns {string}
@@ -9027,6 +9021,11 @@ var HashCommand = function (_FetchCommand) {
     key: 'getInputHash',
     value: function getInputHash(input) {
       return hasha_1(input, this.options);
+    }
+  }, {
+    key: 'options',
+    get: function get() {
+      return this._map.get(this).options;
     }
   }, {
     key: 'hashStream',
@@ -9063,15 +9062,13 @@ var Command = function (_AbstractCommand) {
     }
     return _ret = new Proxy(_this, {
       get: function get(target, name) {
-        if (['run', 'instance', 'class'].includes(name)) return target[name];else if (typeof name === 'string' && name.startsWith('get')) return function () {
-          var _target$instance$name;
+        if (['run', 'instance', 'class'].includes(name)) return target[name];else if (typeof name === 'string' && name.startsWith('get')) {
+          return function () {
+            var _target$instance;
 
-          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-          }
-
-          return (_target$instance$name = target.instance[name]).call.apply(_target$instance$name, [null].concat(args));
-        };else return target.instance[name];
+            return (_target$instance = target.instance)[name].apply(_target$instance, arguments);
+          };
+        } else return target.instance[name];
       }
     }), _possibleConstructorReturn(_this, _ret);
   }
@@ -9167,18 +9164,20 @@ var Account = function (_EventEmitter) {
 
   /**
    * Run command with params on behalf of this account
-   * @param {Command} command
-   * @param params command params
+   * @param {Command} command - Any command that inherits from `AbstractCommand` class
+   * @param {Object} params={} - Params for {@link Command#run|run} method specific for class
    * @member Account#runCommand
-   * @see {@link module:constants~event}
+   * @see {@link module:constants:event}
    * @returns {Promise} result
    */
 
 
   _createClass(Account, [{
     key: 'runCommand',
-    value: function runCommand(command, params) {
+    value: function runCommand(command) {
       var _this2 = this;
+
+      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       var newParams = params;
       if (this.key) newParams.key = this.key;
@@ -9207,6 +9206,7 @@ var Account = function (_EventEmitter) {
 
     /**
      * Get account balance by making new request
+     * @async
      * @member Account#getBalance
      * @see {@link Account#getStatus}
      * @returns {{}}
@@ -9245,6 +9245,7 @@ var Account = function (_EventEmitter) {
 
     /**
      * Get account subscriptions by making new request
+     * @async
      * @member Account#getSubscriptions
      * @see {@link Account#getStatus}
      * @returns {null|{}}
@@ -9284,6 +9285,7 @@ var Account = function (_EventEmitter) {
 
     /**
      * Get account status by making new request
+     * @async
      * @member Account#getStatus
      * @see {@link StatusCommand}
      * @returns {{}}
@@ -9407,6 +9409,7 @@ var TmLabs$1 = function (_EventEmitter) {
 
   /**
    * Run commands
+   * @async
    * @param {Array.<Object>} commands Array of command objects which contain command key and it params key for command run options
    * @param {Object} [options] Batch command options
    * @param {Boolean} [options.throw=false] If true command will throw exceptions
@@ -9515,6 +9518,7 @@ var TmLabs$1 = function (_EventEmitter) {
 
     /**
      * Fetch specific method multiple times with different params
+     * @async
      * @param {string} method API method dns|ip, etc
      * @param {Object[]} objects array of request parameters
      * @param options additional options
@@ -9821,7 +9825,7 @@ var TmLabs$1 = function (_EventEmitter) {
   }], [{
     key: 'version',
     get: function get() {
-      var version = "3.2.1";
+      var version = "3.3.0";
       if (!version) throw new Error('Use bundled packages in /dist/ folder to get version');
       return version;
     }
@@ -9840,6 +9844,7 @@ var _this = undefined;
  * fetch('ip', { ip: '8.8.8.8' }).then((ipData) => {
  *  console.log('Status data:', ipData);
  * });
+ * @async
  * @function fetch
  * @param method
  * @param params See options argument {@link FetchCommand#fetch}
@@ -9882,6 +9887,7 @@ var fetch = function () {
  * hash({ hash: 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051' }).then((hashData) => {
  *  console.log('Hash data:', hashData);
  * });
+ * @async
  * @function hash
  * @param params See options argument {@link HashCommand#run}
  * @member module:TmLabs.hash

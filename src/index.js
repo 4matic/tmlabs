@@ -13,6 +13,7 @@ import HashCommand from './command/HashCommand'
  * fetch('ip', { ip: '8.8.8.8' }).then((ipData) => {
  *  console.log('Status data:', ipData);
  * });
+ * @async
  * @function fetch
  * @param method
  * @param params See options argument {@link FetchCommand#fetch}
@@ -33,6 +34,7 @@ const fetch = async (method, params) => {
  * hash({ hash: 'ff2178501f16e2c6ab435cfbabd45c90e7419c0e828d7da9d5c63acf016ba051' }).then((hashData) => {
  *  console.log('Hash data:', hashData);
  * });
+ * @async
  * @function hash
  * @param params See options argument {@link HashCommand#run}
  * @member module:TmLabs.hash

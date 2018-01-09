@@ -27,13 +27,13 @@ class Account extends EventEmitter {
 
   /**
    * Run command with params on behalf of this account
-   * @param {Command} command
-   * @param params command params
+   * @param {Command} command - Any command that inherits from `AbstractCommand` class
+   * @param {Object} params={} - Params for {@link Command#run|run} method specific for class
    * @member Account#runCommand
-   * @see {@link module:constants~event}
+   * @see {@link module:constants:event}
    * @returns {Promise} result
    */
-  runCommand (command, params) {
+  runCommand (command, params = {}) {
     let newParams = params
     if (this.key) newParams.key = this.key
     command.on(event.RESPONSE, (response, cmd) => {
@@ -80,6 +80,7 @@ class Account extends EventEmitter {
 
   /**
    * Get account balance by making new request
+   * @async
    * @member Account#getBalance
    * @see {@link Account#getStatus}
    * @returns {{}}
@@ -94,6 +95,7 @@ class Account extends EventEmitter {
 
   /**
    * Get account subscriptions by making new request
+   * @async
    * @member Account#getSubscriptions
    * @see {@link Account#getStatus}
    * @returns {null|{}}
@@ -106,6 +108,7 @@ class Account extends EventEmitter {
 
   /**
    * Get account status by making new request
+   * @async
    * @member Account#getStatus
    * @see {@link StatusCommand}
    * @returns {{}}

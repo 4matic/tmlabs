@@ -122,6 +122,7 @@ var tmLabs = TmLabs.default();
 Simple fetch function.
 
 **Kind**: static property of [<code>TmLabs</code>](#module_TmLabs)  
+**Async**:   
 
 | Param | Description |
 | --- | --- |
@@ -142,6 +143,7 @@ fetch('ip', { ip: '8.8.8.8' }).then((ipData) => {
 Simple hash function
 
 **Kind**: static property of [<code>TmLabs</code>](#module_TmLabs)  
+**Async**:   
 
 | Param | Description |
 | --- | --- |
@@ -179,6 +181,7 @@ Endpoint specifications object
 ## endpoint
 Endpoint constants
 
+**Read only**: true  
 
 * [endpoint](#module_constants.module_endpoint)
     * [~IP](#module_constants.module_endpoint..IP) : <code>string</code>
@@ -421,12 +424,12 @@ Run command with params on behalf of this account
 
 **Kind**: instance property of [<code>Account</code>](#Account)  
 **Returns**: <code>Promise</code> - result  
-**See**: [module:constants~event](module:constants~event)  
+**See**: [module:constants:event](module:constants:event)  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| command | [<code>Command</code>](#Command) |  |
-| params |  | command params |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| command | [<code>Command</code>](#Command) |  | Any command that inherits from `AbstractCommand` class |
+| params | <code>Object</code> | <code>{}</code> | Params for [run](#Command+run) method specific for class |
 
 <a name="Account+getBalance"></a>
 
@@ -434,6 +437,7 @@ Run command with params on behalf of this account
 Get account balance by making new request
 
 **Kind**: instance property of [<code>Account</code>](#Account)  
+**Async**:   
 **See**: [getStatus](#Account+getStatus)  
 <a name="Account+balanceRemaining"></a>
 
@@ -448,6 +452,7 @@ Remaining balance
 Get account subscriptions by making new request
 
 **Kind**: instance property of [<code>Account</code>](#Account)  
+**Async**:   
 **See**: [getStatus](#Account+getStatus)  
 <a name="Account+getStatus"></a>
 
@@ -455,6 +460,7 @@ Get account subscriptions by making new request
 Get account status by making new request
 
 **Kind**: instance property of [<code>Account</code>](#Account)  
+**Async**:   
 **See**: [StatusCommand](#StatusCommand)  
 <a name="Account+balanceLastBill"></a>
 
@@ -595,6 +601,7 @@ Account
 Run commands
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**Async**:   
 **Resolves**: <code>Array.&lt;Object&gt;</code> result  
 
 | Param | Type | Default | Description |
@@ -609,6 +616,7 @@ Run commands
 Fetch specific method multiple times with different params
 
 **Kind**: instance property of [<code>TmLabs</code>](#TmLabs)  
+**Async**:   
 **Resolves**: <code>Array.&lt;Object&gt;</code> result  
 
 | Param | Type | Description |
@@ -752,7 +760,7 @@ FetchCommand for API requests
 <a name="FetchCommand+method"></a>
 
 ### fetchCommand.method : <code>string</code>
-Command method
+FetchCommand method
 
 **Kind**: instance property of [<code>FetchCommand</code>](#FetchCommand)  
 **Throws**:
@@ -939,6 +947,7 @@ Params
 
 * [HashCommand](#HashCommand) ⇐ [<code>FetchCommand</code>](#FetchCommand)
     * [new HashCommand([params])](#new_HashCommand_new)
+    * [.options](#HashCommand+options) : <code>Object</code>
     * [.run](#HashCommand+run) ⇒ <code>Promise</code>
     * [.getStreamHash](#HashCommand+getStreamHash) ⇒ <code>Promise.&lt;string&gt;</code>
     * [.hashStream](#HashCommand+hashStream) ⇒ <code>Stream</code>
@@ -984,6 +993,13 @@ This class implements [Hasha](https://www.npmjs.com/package/hasha) for hashing f
 | [params.algorithm] | <code>string</code> | <code>&quot;sha256&quot;</code> | Algorithm used for hashing. Only `sha256` and `md5` are allowed |
 | [params.encoding] | <code>string</code> | <code>&quot;hex&quot;</code> | Encoding of the returned hash. [Available values](https://www.npmjs.com/package/hasha#encoding) |
 
+<a name="HashCommand+options"></a>
+
+### hashCommand.options : <code>Object</code>
+HashCommand options
+
+**Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
+**Read only**: true  
 <a name="HashCommand+run"></a>
 
 ### hashCommand.run ⇒ <code>Promise</code>
@@ -1055,7 +1071,7 @@ Can be used in browser
 <a name="FetchCommand+method"></a>
 
 ### hashCommand.method : <code>string</code>
-Command method
+FetchCommand method
 
 **Kind**: instance property of [<code>HashCommand</code>](#HashCommand)  
 **Throws**:
@@ -1268,6 +1284,7 @@ Return API status promise
 
 **Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
 **Overrides**: [<code>run</code>](#FetchCommand+run)  
+**Async**:   
 
 | Param |
 | --- |
@@ -1276,7 +1293,7 @@ Return API status promise
 <a name="FetchCommand+method"></a>
 
 ### statusCommand.method : <code>string</code>
-Command method
+FetchCommand method
 
 **Kind**: instance property of [<code>StatusCommand</code>](#StatusCommand)  
 **Throws**:

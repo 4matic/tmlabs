@@ -5,13 +5,13 @@ import babel from 'rollup-plugin-babel'
 import babili from 'rollup-plugin-babili'
 import replace from 'rollup-plugin-replace'
 import builtins from 'rollup-plugin-node-builtins'
-import globals from 'rollup-plugin-node-globals'
+// import globals from 'rollup-plugin-node-globals'
 
 let external = !process.env.production && !process.env.browser ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : []
 
 const pkg = require('./package.json')
 
-pkg.version = '3.2.1' // override
+pkg.version = '3.3.0' // override
 
 const replaceOptions = {
   exclude: 'node_modules/**',

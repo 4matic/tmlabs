@@ -14,6 +14,7 @@ import TmLabs from './../TmLabs'
 import { endpoint, specification, argument, error, event } from '../constant/index'
 promisePonyfill.polyfill()
 const { fetch } = fetchPonyfill()
+// const { fetch } = require('fetch-ponyfill')()
 const { InsufficientFundsError, ResponseError, NotFoundError } = error
 
 const validator = {

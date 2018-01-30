@@ -5,7 +5,7 @@ import babel from 'rollup-plugin-babel'
 import babili from 'rollup-plugin-babili'
 import replace from 'rollup-plugin-replace'
 import builtins from 'rollup-plugin-node-builtins'
-// import globals from 'rollup-plugin-node-globals'
+import globals from 'rollup-plugin-node-globals'
 
 let external = !process.env.production && !process.env.browser ? ['os', 'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util', 'crypto', 'fs'] : []
 
@@ -35,8 +35,8 @@ export default {
   },
   plugins: [
     json(),
-    builtins(),
     // globals(),
+    builtins(),
     resolve({
       jsnext: true,
       main: true,
@@ -66,6 +66,7 @@ export default {
         'external-helpers'
       ]
     }),
+    globals(),
     replace(replaceOptions),
     process.env.production ? babili({
       comments: false,

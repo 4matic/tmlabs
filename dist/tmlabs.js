@@ -1420,7 +1420,7 @@ var _invoke = function(fn, args, that){
   } return              fn.apply(that, args);
 };
 
-var process$2            = _global.process;
+var process$1            = _global.process;
 var setTask            = _global.setImmediate;
 var clearTask          = _global.clearImmediate;
 var MessageChannel$1     = _global.MessageChannel;
@@ -1456,9 +1456,9 @@ if(!setTask || !clearTask){
     delete queue[id];
   };
   // Node.js 0.8-
-  if(_cof(process$2) == 'process'){
+  if(_cof(process$1) == 'process'){
     defer = function(id){
-      process$2.nextTick(_ctx(run, id, 1));
+      process$1.nextTick(_ctx(run, id, 1));
     };
   // Browsers with MessageChannel, includes WebWorkers
   } else if(MessageChannel$1){
@@ -1495,16 +1495,16 @@ var _task = {
 
 var macrotask = _task.set;
 var Observer  = _global.MutationObserver || _global.WebKitMutationObserver;
-var process$3   = _global.process;
+var process$2   = _global.process;
 var Promise$1   = _global.Promise;
-var isNode$1    = _cof(process$3) == 'process';
+var isNode$1    = _cof(process$2) == 'process';
 
 var _microtask = function(){
   var head, last, notify;
 
   var flush = function(){
     var parent, fn;
-    if(isNode$1 && (parent = process$3.domain))parent.exit();
+    if(isNode$1 && (parent = process$2.domain))parent.exit();
     while(head){
       fn   = head.fn;
       head = head.next;
@@ -1522,7 +1522,7 @@ var _microtask = function(){
   // Node.js
   if(isNode$1){
     notify = function(){
-      process$3.nextTick(flush);
+      process$2.nextTick(flush);
     };
   // browsers with MutationObserver
   } else if(Observer){
@@ -1604,10 +1604,10 @@ var task               = _task.set;
 var microtask          = _microtask();
 var PROMISE            = 'Promise';
 var TypeError$1          = _global.TypeError;
-var process$1            = _global.process;
+var process            = _global.process;
 var $Promise           = _global[PROMISE];
-var process$1            = _global.process;
-var isNode             = _classof(process$1) == 'process';
+var process            = _global.process;
+var isNode             = _classof(process) == 'process';
 var empty              = function(){ /* empty */ };
 var Internal;
 var GenericPromiseCapability;
@@ -1703,7 +1703,7 @@ var onUnhandled = function(promise){
     if(isUnhandled(promise)){
       abrupt = perform(function(){
         if(isNode){
-          process$1.emit('unhandledRejection', value, promise);
+          process.emit('unhandledRejection', value, promise);
         } else if(handler = _global.onunhandledrejection){
           handler({promise: promise, reason: value});
         } else if((console = _global.console) && console.error){
@@ -1730,7 +1730,7 @@ var onHandleUnhandled = function(promise){
   task.call(_global, function(){
     var handler;
     if(isNode){
-      process$1.emit('rejectionHandled', promise);
+      process.emit('rejectionHandled', promise);
     } else if(handler = _global.onrejectionhandled){
       handler({promise: promise, reason: promise._v});
     }
@@ -1801,7 +1801,7 @@ if(!USE_NATIVE){
       var reaction    = newPromiseCapability(_speciesConstructor(this, $Promise));
       reaction.ok     = typeof onFulfilled == 'function' ? onFulfilled : true;
       reaction.fail   = typeof onRejected == 'function' && onRejected;
-      reaction.domain = isNode ? process$1.domain : undefined;
+      reaction.domain = isNode ? process.domain : undefined;
       this._c.push(reaction);
       if(this._a)this._a.push(reaction);
       if(this._s)notify(this, false);
@@ -1939,6 +1939,233 @@ exports.default = function (fn) {
 });
 
 var _asyncToGenerator = unwrapExports(asyncToGenerator);
+
+var global$2 = typeof global !== "undefined" ? global :
+            typeof self !== "undefined" ? self :
+            typeof window !== "undefined" ? window : {}
+
+// shim for using process in browser
+// based off https://github.com/defunctzombie/node-process/blob/master/browser.js
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+var cachedSetTimeout = defaultSetTimout;
+var cachedClearTimeout = defaultClearTimeout;
+if (typeof global$2.setTimeout === 'function') {
+    cachedSetTimeout = setTimeout;
+}
+if (typeof global$2.clearTimeout === 'function') {
+    cachedClearTimeout = clearTimeout;
+}
+
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue$1 = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue$1 = currentQueue.concat(queue$1);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue$1.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue$1.length;
+    while(len) {
+        currentQueue = queue$1;
+        queue$1 = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue$1.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+function nextTick(fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue$1.push(new Item(fun, args));
+    if (queue$1.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+}
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+var title = 'browser';
+var platform = 'browser';
+var browser = true;
+var env = {};
+var argv = [];
+var version = ''; // empty string to avoid regexp issues
+var versions = {};
+var release = {};
+var config = {};
+
+function noop() {}
+
+var on = noop;
+var addListener = noop;
+var once = noop;
+var off = noop;
+var removeListener = noop;
+var removeAllListeners = noop;
+var emit = noop;
+
+function binding(name) {
+    throw new Error('process.binding is not supported');
+}
+
+function cwd () { return '/' }
+function chdir (dir) {
+    throw new Error('process.chdir is not supported');
+}
+function umask() { return 0; }
+
+// from https://github.com/kumavis/browser-process-hrtime/blob/master/index.js
+var performance = global$2.performance || {};
+var performanceNow =
+  performance.now        ||
+  performance.mozNow     ||
+  performance.msNow      ||
+  performance.oNow       ||
+  performance.webkitNow  ||
+  function(){ return (new Date()).getTime() };
+
+// generate timestamp or delta
+// see http://nodejs.org/api/process.html#process_process_hrtime
+function hrtime(previousTimestamp){
+  var clocktime = performanceNow.call(performance)*1e-3;
+  var seconds = Math.floor(clocktime);
+  var nanoseconds = Math.floor((clocktime%1)*1e9);
+  if (previousTimestamp) {
+    seconds = seconds - previousTimestamp[0];
+    nanoseconds = nanoseconds - previousTimestamp[1];
+    if (nanoseconds<0) {
+      seconds--;
+      nanoseconds += 1e9;
+    }
+  }
+  return [seconds,nanoseconds]
+}
+
+var startTime = new Date();
+function uptime() {
+  var currentTime = new Date();
+  var dif = currentTime - startTime;
+  return dif / 1000;
+}
+
+var process$3 = {
+  nextTick: nextTick,
+  title: title,
+  browser: browser,
+  env: env,
+  argv: argv,
+  version: version,
+  versions: versions,
+  on: on,
+  addListener: addListener,
+  once: once,
+  off: off,
+  removeListener: removeListener,
+  removeAllListeners: removeAllListeners,
+  emit: emit,
+  binding: binding,
+  cwd: cwd,
+  chdir: chdir,
+  umask: umask,
+  hrtime: hrtime,
+  platform: platform,
+  release: release,
+  config: config,
+  uptime: uptime
+};
 
 var f$1 = {}.propertyIsEnumerable;
 
@@ -2921,7 +3148,7 @@ var noop = function () {};
 
 // Use the fastest possible means to execute a task in a future turn
 // of the event loop.
-var nextTick =(function () {
+var nextTick$$1 =(function () {
     // linked list of tasks (single, with head node)
     var head = {task: void 0, next: null};
     var tail = head;
@@ -2991,10 +3218,10 @@ var nextTick =(function () {
         }
     }
 
-    nextTick = function (task) {
+    nextTick$$1 = function (task) {
         tail = tail.next = {
             task: task,
-            domain: isNodeJS && process.domain,
+            domain: isNodeJS && process$3.domain,
             next: null
         };
 
@@ -3004,8 +3231,8 @@ var nextTick =(function () {
         }
     };
 
-    if (typeof process === "object" &&
-        process.toString() === "[object process]" && process.nextTick) {
+    if (typeof process$3 === "object" &&
+        process$3.toString() === "[object process]" && nextTick) {
         // Ensure Q is in a real Node environment, with a `process.nextTick`.
         // To see through fake Node environments:
         // * Mocha test runner - exposes a `process` global without a `nextTick`
@@ -3017,7 +3244,7 @@ var nextTick =(function () {
         isNodeJS = true;
 
         requestTick = function () {
-            process.nextTick(flush);
+            nextTick(flush);
         };
 
     } else if (typeof setImmediate === "function") {
@@ -3060,14 +3287,14 @@ var nextTick =(function () {
     // runs a task after all other tasks have been run
     // this is useful for unhandled rejection tracking that needs to happen
     // after all `then`d tasks have been run.
-    nextTick.runAfter = function (task) {
+    nextTick$$1.runAfter = function (task) {
         laterQueue.push(task);
         if (!flushing) {
             flushing = true;
             requestTick();
         }
     };
-    return nextTick;
+    return nextTick$$1;
 })();
 
 // Attempt to make generics safe in the face of downstream
@@ -3338,7 +3565,7 @@ Q.resolve = Q;
  * Performs a task in a future turn of the event loop.
  * @param {Function} task
  */
-Q.nextTick = nextTick;
+Q.nextTick = nextTick$$1;
 
 /**
  * Controls whether or not long stack traces will be on
@@ -3354,7 +3581,7 @@ Q.longStackSupport = false;
 var longStackCounter = 1;
 
 // enable long stacks if Q_DEBUG is set
-if (typeof process === "object" && process && process.env && process.env.Q_DEBUG) {
+if (typeof process$3 === "object" && process$3 && process$3.env && process$3.env.Q_DEBUG) {
     Q.longStackSupport = true;
 }
 
@@ -3896,10 +4123,10 @@ function trackRejection(promise, reason) {
     if (!trackUnhandledRejections) {
         return;
     }
-    if (typeof process === "object" && typeof process.emit === "function") {
+    if (typeof process$3 === "object" && typeof process$3.emit === "function") {
         Q.nextTick.runAfter(function () {
             if (array_indexOf(unhandledRejections, promise) !== -1) {
-                process.emit("unhandledRejection", reason, promise);
+                process$3.emit("unhandledRejection", reason, promise);
                 reportedUnhandledRejections.push(promise);
             }
         });
@@ -3920,11 +4147,11 @@ function untrackRejection(promise) {
 
     var at = array_indexOf(unhandledRejections, promise);
     if (at !== -1) {
-        if (typeof process === "object" && typeof process.emit === "function") {
+        if (typeof process$3 === "object" && typeof process$3.emit === "function") {
             Q.nextTick.runAfter(function () {
                 var atReport = array_indexOf(reportedUnhandledRejections, promise);
                 if (atReport !== -1) {
-                    process.emit("rejectionHandled", unhandledReasons[at], promise);
+                    process$3.emit("rejectionHandled", unhandledReasons[at], promise);
                     reportedUnhandledRejections.splice(atReport, 1);
                 }
             });
@@ -4642,8 +4869,8 @@ Promise.prototype.done = function (fulfilled, rejected, progress) {
         this.then(fulfilled, rejected, progress) :
         this;
 
-    if (typeof process === "object" && process && process.domain) {
-        onUnhandledError = process.domain.bind(onUnhandledError);
+    if (typeof process$3 === "object" && process$3 && process$3.domain) {
+        onUnhandledError = process$3.domain.bind(onUnhandledError);
     }
 
     promise.then(void 0, onUnhandledError);
@@ -5265,31 +5492,6 @@ exports.default = function (arr) {
 
 var _toConsumableArray = unwrapExports(toConsumableArray);
 
-/*
-The MIT License (MIT)
-
-Copyright (c) 2016 CoderPuppy
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
-
 var fetchBrowser = createCommonjsModule(function (module, exports) {
 (function (self) {
   function fetchPonyfill(options) {
@@ -5849,7 +6051,7 @@ function setAsap(asapFn) {
 var browserWindow = typeof window !== 'undefined' ? window : undefined;
 var browserGlobal = browserWindow || {};
 var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+var isNode = typeof self === 'undefined' && typeof process$3 !== 'undefined' && {}.toString.call(process$3) === '[object process]';
 
 // test for web worker but not in IE10
 var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
@@ -5859,7 +6061,7 @@ function useNextTick() {
   // node version 0.10.x displays a deprecation warning when nextTick is used recursively
   // see https://github.com/cujojs/when/issues/410 for details
   return function () {
-    return process.nextTick(flush);
+    return nextTick(flush);
   };
 }
 
@@ -7742,6 +7944,8 @@ es6Promise.polyfill();
 
 var _fetchPonyfill = fetchBrowser();
 var fetch$1 = _fetchPonyfill.fetch;
+// const { fetch } = require('fetch-ponyfill')()
+
 
 var InsufficientFundsError = InsufficientFundsError$1;
 var ResponseError = ResponseError$1;
@@ -7776,7 +7980,7 @@ var FetchCommand = function (_AbstractCommand) {
     var _this = _possibleConstructorReturn(this, (FetchCommand.__proto__ || _Object$getPrototypeOf(FetchCommand)).call(this, 'fetch', params));
 
     var method = params.method,
-        version = params.version,
+        version$$1 = params.version,
         data = params.data,
         key = params.key,
         fetchFunc = params.fetchFunc,
@@ -7788,7 +7992,7 @@ var FetchCommand = function (_AbstractCommand) {
     if (!_Object$values(methods).includes(method)) throw new TypeError('Invalid method param');
     if (fetchFunc) _this.fetchFunc = fetchFunc;else _this.fetchFunc = FetchCommand.fetchClass;
 
-    if (version !== undefined) _this.version = version;else _this.version = 'v3';
+    if (version$$1 !== undefined) _this.version = version$$1;else _this.version = 'v3';
 
     if (key !== undefined && typeof key === 'string') _this._map.get(_this).key = key;else {}
 
@@ -9825,9 +10029,9 @@ var TmLabs$1 = function (_EventEmitter) {
   }], [{
     key: 'version',
     get: function get() {
-      var version = "3.3.0";
-      if (!version) throw new Error('Use bundled packages in /dist/ folder to get version');
-      return version;
+      var version$$1 = "3.3.0";
+      if (!version$$1) throw new Error('Use bundled packages in /dist/ folder to get version');
+      return version$$1;
     }
   }]);
 

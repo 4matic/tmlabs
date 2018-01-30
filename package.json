@@ -92,19 +92,19 @@
   "size-limit": [
     {
       "path": "dist/tmlabs.umd.js",
-      "limit": "222 KB"
+      "limit": "215 KB"
     },
     {
       "path": "dist/tmlabs.js",
-      "limit": "30 KB"
+      "limit": "31 KB"
     },
     {
       "path": "dist/tmlabs.min.js",
-      "limit": "30 KB"
+      "limit": "31 KB"
     },
     {
       "path": "dist/tmlabs.es.js",
-      "limit": "222 KB"
+      "limit": "215 KB"
     }
   ],
   "devDependencies": {

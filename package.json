@@ -23,7 +23,8 @@
     "build:browser:minified": "rollup -c --environment production -f umd -o dist/tmlabs.min.js",
     "build:es": "rollup -c -f es -o dist/tmlabs.es.js",
     "docs:api": "jsdoc2md --configure docs/jsdoc.json --template docs/template.hbs --files src/*.js src/**/*.js > docs/api.md",
-    "test": "mocha",
+    "test:src": "mocha test/*.js",
+    "test:dist": "mocha test/bundle/*.js",
     "test:watch": "npm run test -- --reporter min --watch",
     "precommit": "lint-staged && npm run size"
   },
@@ -92,7 +93,7 @@
   "size-limit": [
     {
       "path": "dist/tmlabs.umd.js",
-      "limit": "215 KB"
+      "limit": "31 KB"
     },
     {
       "path": "dist/tmlabs.js",
@@ -104,7 +105,7 @@
     },
     {
       "path": "dist/tmlabs.es.js",
-      "limit": "215 KB"
+      "limit": "31 KB"
     }
   ],
   "devDependencies": {

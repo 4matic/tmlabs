@@ -1,7 +1,6 @@
 /* global fetch:false */
 /* eslint-disable no-unused-vars */
 import os from 'os'
-import fetchPonyfill from 'fetch-ponyfill'
 import promisePonyfill from 'es6-promise'
 // import 'babel-polyfill'
 import isIP from 'validator/lib/isIP'
@@ -13,8 +12,7 @@ import AbstractCommand from './AbstractCommand'
 import TmLabs from './../TmLabs'
 import { endpoint, specification, argument, error, event } from '../constant/index'
 promisePonyfill.polyfill()
-const { fetch } = fetchPonyfill()
-// const { fetch } = require('fetch-ponyfill')()
+const { fetch } = require('fetch-ponyfill')()
 const { InsufficientFundsError, ResponseError, NotFoundError } = error
 
 const validator = {

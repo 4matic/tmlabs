@@ -61,7 +61,7 @@ lint:
   stage: lint
   script:
      - npm install
-     - npm run lint:js
+     - npm run lint
 
 test:size:
   stage: test

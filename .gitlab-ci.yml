@@ -1,0 +1,114 @@
+image: node:6
+
+stages:
+  - install
+  - build
+  - test
+
+cache:
+  paths:
+     - node_modules
+
+install:
+  stage: install
+  script:
+     - npm install
+
+build:umd:
+  stage: build
+  script:
+     - npm install
+     - npm run build:umd
+  artifacts:
+      paths:
+      - dist/tmlabs.umd.js
+      - dist/tmlabs.umd.js.map
+      expire_in: 2 hours
+  dependencies:
+     - install
+
+build:es:
+  stage: build
+  script:
+     - npm install
+     - npm run build:es
+  artifacts:
+      paths:
+      - dist/tmlabs.es.js
+      - dist/tmlabs.es.js.map
+      expire_in: 2 hours
+  dependencies:
+     - install
+
+build:browser:
+  stage: build
+  script:
+     - npm install
+     - npm run build:browser
+     - npm run build:browser:minified
+  artifacts:
+      paths:
+      - dist/tmlabs.js
+      - dist/tmlabs.js.map
+      - dist/tmlabs.min.js
+      - dist/tmlabs.min.js.map
+      expire_in: 2 hours
+  dependencies:
+     - install
+
+test:size:
+  stage: test
+  script:
+     - npm install
+     - npm run size
+
+test:src:
+  stage: test
+  script:
+     - npm install
+     - npm run test:src
+
+test:node:4:
+  stage: test
+  image: node:4
+  script:
+     - npm install
+     - npm run test:dist
+  dependencies:
+     - build:umd
+
+test:node:6:
+  stage: test
+  image: node:6
+  script:
+     - npm install
+     - npm run test:dist
+  dependencies:
+     - build:umd
+
+test:node:7:
+  stage: test
+  image: node:7
+  script:
+     - npm install
+     - npm run test:dist
+  dependencies:
+     - build:umd
+
+test:node:8:
+  stage: test
+  image: node:8
+  script:
+     - npm install
+     - npm run test:dist
+  dependencies:
+     - build:umd
+
+test:node:9:
+  stage: test
+  image: node:9
+  script:
+     - npm install
+     - npm run test:dist
+  dependencies:
+     - build:umd

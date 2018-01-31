@@ -14,9 +14,9 @@ class AbstractCommand extends EventEmitter {
    */
   constructor (action, params) {
     super()
-    if (new.target === AbstractCommand) {
-      throw new TypeError('Cannot construct AbstractCommand instance directly')
-    }
+    // if (new.target === AbstractCommand) {
+    //   throw new TypeError('Cannot construct AbstractCommand instance directly')
+    // }
     if (!action) throw new ReferenceError('Empty action string argument')
     if (typeof action !== 'string') throw new ReferenceError('Invalid action type')
     if (params !== false) {

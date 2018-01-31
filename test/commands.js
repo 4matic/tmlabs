@@ -681,13 +681,13 @@ describe('Commands Tests', () => {
       const response = await command.run({
         file: filepath
       })
-      const realHash = await getFileRealHash(filepath)
+      // const realHash = await getFileRealHash(filepath)
       assert.equal(response.content, null, 'response content is null')
       assert.notEqual(command.content, null, 'command content is not null')
       assert.hasAllKeys(command.content, [
         'error'
       ], 'checking properties')
-      assert.equal(command.content.hash, realHash)
+      // assert.equal(command.content.hash, realHash)
     })
   })
   describe('Class StatusCommand', () => {

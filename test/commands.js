@@ -233,7 +233,7 @@ describe('Commands Tests', () => {
               'val': email
             }], 'arguments')
             assert.equal(command.statusText, 'OK')
-            assert.hasAllKeys(command.content, ['last_modified', 'payload', 'source'])
+            assert.hasAllKeys(command.content, ['last_modified', 'payload'])
           })
         })
         describe('method ip', () => {
@@ -394,9 +394,6 @@ describe('Commands Tests', () => {
               }
               assert.equal(command.status, undefined, 'code undefined')
               assert.equal(command.error, true, 'error=true')
-
-
-
               // const command = new Command('fetch', {
               //   method: 'scan'
               // })
@@ -690,7 +687,7 @@ describe('Commands Tests', () => {
       assert.hasAllKeys(command.content, [
         'error'
       ], 'checking properties')
-      // assert.equal(command.content.sha256, realHash)
+      assert.equal(command.content.hash, realHash)
     })
   })
   describe('Class StatusCommand', () => {

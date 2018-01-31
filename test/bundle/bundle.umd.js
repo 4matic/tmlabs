@@ -17,7 +17,7 @@ describe('UMD Bundle Tests', () => {
   })
   it('FetchCommand class object initialization. throw error', () => {
     assert.throw(() => {
-      const command = new FetchCommand()
+      const command = new FetchCommand() // eslint-disable-line
     }, ReferenceError, 'Empty params object argument')
   })
   it('do command. fetch google ip data. using alias as require param', async () => {

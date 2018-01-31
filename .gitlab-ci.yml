@@ -3,6 +3,7 @@ image: node:6
 stages:
   - install
   - build
+  - lint
   - test
 
 cache:
@@ -56,6 +57,12 @@ build:browser:
   dependencies:
      - install
 
+lint:
+  stage: lint
+  script:
+     - npm install
+     - npm run lint:js
+
 test:size:
   stage: test
   script:
@@ -66,7 +73,7 @@ test:src:
   stage: test
   script:
      - npm install
-     - npm run test:src
+     - npm run coverage:src
 
 test:node:4:
   stage: test

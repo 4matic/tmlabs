@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "size": "size-limit",
-    "lint:js": "eslint src tools",
+    "lint": "eslint --ext js .",
     "lint:staged": "lint-staged",
     "build": "npm run build:umd && npm run build:es && npm run build:browser && npm run build:browser:minified",
     "build:umd": "rollup -c -f umd -o dist/tmlabs.umd.js",
@@ -24,6 +24,7 @@
     "build:es": "rollup -c -f es -o dist/tmlabs.es.js",
     "docs:api": "jsdoc2md --configure docs/jsdoc.json --template docs/template.hbs --files src/*.js src/**/*.js > docs/api.md",
     "test:src": "mocha test/*.js",
+    "coverage:src": "nyc --reporter=text-summary npm run test:src",
     "test:dist": "mocha test/bundle/*.js",
     "test:watch": "npm run test -- --reporter min --watch",
     "precommit": "lint-staged && npm run size"
@@ -93,7 +94,7 @@
   "size-limit": [
     {
       "path": "dist/tmlabs.umd.js",
-      "limit": "31 KB"
+      "limit": "32 KB"
     },
     {
       "path": "dist/tmlabs.js",
@@ -105,7 +106,7 @@
     },
     {
       "path": "dist/tmlabs.es.js",
-      "limit": "31 KB"
+      "limit": "32 KB"
     }
   ],
   "devDependencies": {

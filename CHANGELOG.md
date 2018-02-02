@@ -1,3 +1,11 @@
+4.0.0
+* BREAKING CHANGE: moved from `tempicolabs.com/api` to `api.itsecurity.ee`
+* UMD & ES bundle sizes decrease
+* Updated all dependencies to the latest versions
+* Fixing for node v4 support
+* Fixing for using with webpack
+* Docs updated
+
 3.3.0
 * Bundle size decrease using [size-limit](https://www.npmjs.com/package/size-limit)
 * `HashCommand` updates. Removed method `HashCommand.getStringHash`, added new `HashCommand.getInputHash`

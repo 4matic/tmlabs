@@ -7,7 +7,7 @@ import TmLabs, { FetchCommand } from '../../dist/tmlabs.umd'
 
 chai.use(chaiString)
 
-const baseUrl = 'https://tempicolabs.com/api/v3'
+const baseUrl = 'https://api.itsecurity.ee/v3'
 const testIP = '173.194.122.233'
 
 describe('UMD Bundle Tests', () => {

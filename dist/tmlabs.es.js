@@ -1063,20 +1063,20 @@ var _uid = function(key){
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
 
-var shared = _shared('keys');
+var shared$1 = _shared('keys');
 var _sharedKey = function(key){
-  return shared[key] || (shared[key] = _uid(key));
+  return shared$1[key] || (shared$1[key] = _uid(key));
 };
 
 var arrayIndexOf = _arrayIncludes(false);
-var IE_PROTO$1     = _sharedKey('IE_PROTO');
+var IE_PROTO     = _sharedKey('IE_PROTO');
 
 var _objectKeysInternal = function(object, names){
   var O      = _toIobject(object)
     , i      = 0
     , result = []
     , key;
-  for(key in O)if(key != IE_PROTO$1)_has(O, key) && result.push(key);
+  for(key in O)if(key != IE_PROTO)_has(O, key) && result.push(key);
   // Don't enum bug & hidden keys
   while(names.length > i)if(_has(O, key = names[i++])){
     ~arrayIndexOf(result, key) || result.push(key);
@@ -1109,7 +1109,7 @@ var _objectDps = _descriptors ? Object.defineProperties : function definePropert
 var _html = _global.document && document.documentElement;
 
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-var IE_PROTO    = _sharedKey('IE_PROTO');
+var IE_PROTO$1    = _sharedKey('IE_PROTO');
 var Empty       = function(){ /* empty */ };
 var PROTOTYPE$1   = 'prototype';
 
@@ -1142,7 +1142,7 @@ var _objectCreate = Object.create || function create(O, Properties){
     result = new Empty;
     Empty[PROTOTYPE$1] = null;
     // add "__proto__" for Object.getPrototypeOf polyfill
-    result[IE_PROTO] = O;
+    result[IE_PROTO$1] = O;
   } else result = createDict();
   return Properties === undefined ? result : _objectDps(result, Properties);
 };
@@ -1414,7 +1414,7 @@ var _invoke = function(fn, args, that){
   } return              fn.apply(that, args);
 };
 
-var process$1            = _global.process;
+var process            = _global.process;
 var setTask            = _global.setImmediate;
 var clearTask          = _global.clearImmediate;
 var MessageChannel$1     = _global.MessageChannel;
@@ -1450,9 +1450,9 @@ if(!setTask || !clearTask){
     delete queue[id];
   };
   // Node.js 0.8-
-  if(_cof(process$1) == 'process'){
+  if(_cof(process) == 'process'){
     defer = function(id){
-      process$1.nextTick(_ctx(run, id, 1));
+      process.nextTick(_ctx(run, id, 1));
     };
   // Browsers with MessageChannel, includes WebWorkers
   } else if(MessageChannel$1){
@@ -1489,16 +1489,16 @@ var _task = {
 
 var macrotask = _task.set;
 var Observer  = _global.MutationObserver || _global.WebKitMutationObserver;
-var process$2   = _global.process;
+var process$1   = _global.process;
 var Promise$1   = _global.Promise;
-var isNode$1    = _cof(process$2) == 'process';
+var isNode    = _cof(process$1) == 'process';
 
 var _microtask = function(){
   var head, last, notify;
 
   var flush = function(){
     var parent, fn;
-    if(isNode$1 && (parent = process$2.domain))parent.exit();
+    if(isNode && (parent = process$1.domain))parent.exit();
     while(head){
       fn   = head.fn;
       head = head.next;
@@ -1514,9 +1514,9 @@ var _microtask = function(){
   };
 
   // Node.js
-  if(isNode$1){
+  if(isNode){
     notify = function(){
-      process$2.nextTick(flush);
+      process$1.nextTick(flush);
     };
   // browsers with MutationObserver
   } else if(Observer){
@@ -1598,10 +1598,10 @@ var task               = _task.set;
 var microtask          = _microtask();
 var PROMISE            = 'Promise';
 var TypeError$1          = _global.TypeError;
-var process            = _global.process;
+var process$2            = _global.process;
 var $Promise           = _global[PROMISE];
-var process            = _global.process;
-var isNode             = _classof(process) == 'process';
+var process$2            = _global.process;
+var isNode$1             = _classof(process$2) == 'process';
 var empty              = function(){ /* empty */ };
 var Internal;
 var GenericPromiseCapability;
@@ -1613,7 +1613,7 @@ var USE_NATIVE = !!function(){
     var promise     = $Promise.resolve(1)
       , FakePromise = (promise.constructor = {})[_wks('species')] = function(exec){ exec(empty, empty); };
     // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-    return (isNode || typeof PromiseRejectionEvent == 'function') && promise.then(empty) instanceof FakePromise;
+    return (isNode$1 || typeof PromiseRejectionEvent == 'function') && promise.then(empty) instanceof FakePromise;
   } catch(e){ /* empty */ }
 }();
 
@@ -1696,8 +1696,8 @@ var onUnhandled = function(promise){
       , abrupt, handler, console;
     if(isUnhandled(promise)){
       abrupt = perform(function(){
-        if(isNode){
-          process.emit('unhandledRejection', value, promise);
+        if(isNode$1){
+          process$2.emit('unhandledRejection', value, promise);
         } else if(handler = _global.onunhandledrejection){
           handler({promise: promise, reason: value});
         } else if((console = _global.console) && console.error){
@@ -1705,7 +1705,7 @@ var onUnhandled = function(promise){
         }
       });
       // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
-      promise._h = isNode || isUnhandled(promise) ? 2 : 1;
+      promise._h = isNode$1 || isUnhandled(promise) ? 2 : 1;
     } promise._a = undefined;
     if(abrupt)throw abrupt.error;
   });
@@ -1723,8 +1723,8 @@ var isUnhandled = function(promise){
 var onHandleUnhandled = function(promise){
   task.call(_global, function(){
     var handler;
-    if(isNode){
-      process.emit('rejectionHandled', promise);
+    if(isNode$1){
+      process$2.emit('rejectionHandled', promise);
     } else if(handler = _global.onrejectionhandled){
       handler({promise: promise, reason: promise._v});
     }
@@ -1795,7 +1795,7 @@ if(!USE_NATIVE){
       var reaction    = newPromiseCapability(_speciesConstructor(this, $Promise));
       reaction.ok     = typeof onFulfilled == 'function' ? onFulfilled : true;
       reaction.fail   = typeof onRejected == 'function' && onRejected;
-      reaction.domain = isNode ? process.domain : undefined;
+      reaction.domain = isNode$1 ? process$2.domain : undefined;
       this._c.push(reaction);
       if(this._a)this._a.push(reaction);
       if(this._s)notify(this, false);
@@ -1885,20 +1885,20 @@ _export(_export.S + _export.F * !(USE_NATIVE && _iterDetect(function(iter){
   }
 });
 
-var promise$1 = _core.Promise;
+var promise = _core.Promise;
 
-var promise = createCommonjsModule(function (module) {
-module.exports = { "default": promise$1, __esModule: true };
+var promise$2 = createCommonjsModule(function (module) {
+module.exports = { "default": promise, __esModule: true };
 });
 
-var _Promise = unwrapExports(promise);
+var _Promise = unwrapExports(promise$2);
 
 var asyncToGenerator = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
 
-var _promise2 = _interopRequireDefault(promise);
+var _promise2 = _interopRequireDefault(promise$2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2191,13 +2191,13 @@ _export(_export.S, 'Object', {
   }
 });
 
-var values$1 = _core.Object.values;
+var values = _core.Object.values;
 
-var values = createCommonjsModule(function (module) {
-module.exports = { "default": values$1, __esModule: true };
+var values$2 = createCommonjsModule(function (module) {
+module.exports = { "default": values, __esModule: true };
 });
 
-var _Object$values = unwrapExports(values);
+var _Object$values = unwrapExports(values$2);
 
 var f$2 = _wks;
 
@@ -2205,13 +2205,13 @@ var _wksExt = {
 	f: f$2
 };
 
-var iterator$2 = _wksExt.f('iterator');
+var iterator = _wksExt.f('iterator');
 
-var iterator = createCommonjsModule(function (module) {
-module.exports = { "default": iterator$2, __esModule: true };
+var iterator$2 = createCommonjsModule(function (module) {
+module.exports = { "default": iterator, __esModule: true };
 });
 
-unwrapExports(iterator);
+unwrapExports(iterator$2);
 
 var _meta = createCommonjsModule(function (module) {
 var META     = _uid('meta')
@@ -2317,16 +2317,16 @@ var _isArray = Array.isArray || function isArray(arg){
 // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
 var hiddenKeys = _enumBugKeys.concat('length', 'prototype');
 
-var f$5 = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
+var f$4 = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
   return _objectKeysInternal(O, hiddenKeys);
 };
 
 var _objectGopn = {
-	f: f$5
+	f: f$4
 };
 
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var gOPN$1      = _objectGopn.f;
+var gOPN      = _objectGopn.f;
 var toString$1  = {}.toString;
 
 var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
@@ -2334,27 +2334,27 @@ var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNa
 
 var getWindowNames = function(it){
   try {
-    return gOPN$1(it);
+    return gOPN(it);
   } catch(e){
     return windowNames.slice();
   }
 };
 
-var f$4 = function getOwnPropertyNames(it){
-  return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN$1(_toIobject(it));
+var f$5 = function getOwnPropertyNames(it){
+  return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(_toIobject(it));
 };
 
 var _objectGopnExt = {
-	f: f$4
+	f: f$5
 };
 
-var gOPD$1           = Object.getOwnPropertyDescriptor;
+var gOPD           = Object.getOwnPropertyDescriptor;
 
-var f$6 = _descriptors ? gOPD$1 : function getOwnPropertyDescriptor(O, P){
+var f$6 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P){
   O = _toIobject(O);
   P = _toPrimitive(P, true);
   if(_ie8DomDefine)try {
-    return gOPD$1(O, P);
+    return gOPD(O, P);
   } catch(e){ /* empty */ }
   if(_has(O, P))return _propertyDesc(!_objectPie.f.call(O, P), O[P]);
 };
@@ -2365,9 +2365,9 @@ var _objectGopd = {
 
 // ECMAScript 6 symbols shim
 var META           = _meta.KEY;
-var gOPD           = _objectGopd.f;
+var gOPD$1           = _objectGopd.f;
 var dP$1             = _objectDp.f;
-var gOPN           = _objectGopnExt.f;
+var gOPN$1           = _objectGopnExt.f;
 var $Symbol        = _global.Symbol;
 var $JSON          = _global.JSON;
 var _stringify     = $JSON && $JSON.stringify;
@@ -2390,7 +2390,7 @@ var setSymbolDesc = _descriptors && _fails(function(){
     get: function(){ return dP$1(this, 'a', {value: 7}).a; }
   })).a != 7;
 }) ? function(it, key, D){
-  var protoDesc = gOPD(ObjectProto$1, key);
+  var protoDesc = gOPD$1(ObjectProto$1, key);
   if(protoDesc)delete ObjectProto$1[key];
   dP$1(it, key, D);
   if(protoDesc && it !== ObjectProto$1)dP$1(ObjectProto$1, key, protoDesc);
@@ -2444,12 +2444,12 @@ var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key){
   it  = _toIobject(it);
   key = _toPrimitive(key, true);
   if(it === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key))return;
-  var D = gOPD(it, key);
+  var D = gOPD$1(it, key);
   if(D && _has(AllSymbols, key) && !(_has(it, HIDDEN) && it[HIDDEN][key]))D.enumerable = true;
   return D;
 };
 var $getOwnPropertyNames = function getOwnPropertyNames(it){
-  var names  = gOPN(_toIobject(it))
+  var names  = gOPN$1(_toIobject(it))
     , result = []
     , i      = 0
     , key;
@@ -2459,7 +2459,7 @@ var $getOwnPropertyNames = function getOwnPropertyNames(it){
 };
 var $getOwnPropertySymbols = function getOwnPropertySymbols(it){
   var IS_OP  = it === ObjectProto$1
-    , names  = gOPN(IS_OP ? OPSymbols : _toIobject(it))
+    , names  = gOPN$1(IS_OP ? OPSymbols : _toIobject(it))
     , result = []
     , i      = 0
     , key;
@@ -2578,24 +2578,24 @@ _wksDefine('asyncIterator');
 
 _wksDefine('observable');
 
-var symbol$2 = _core.Symbol;
+var symbol = _core.Symbol;
 
-var symbol = createCommonjsModule(function (module) {
-module.exports = { "default": symbol$2, __esModule: true };
+var symbol$2 = createCommonjsModule(function (module) {
+module.exports = { "default": symbol, __esModule: true };
 });
 
-unwrapExports(symbol);
+unwrapExports(symbol$2);
 
 var _typeof_1 = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
 
-var _iterator2 = _interopRequireDefault(iterator);
+var _iterator2 = _interopRequireDefault(iterator$2);
 
 
 
-var _symbol2 = _interopRequireDefault(symbol);
+var _symbol2 = _interopRequireDefault(symbol$2);
 
 var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
 
@@ -2878,13 +2878,13 @@ if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
 }
 });
 
-var weakMap$1 = _core.WeakMap;
+var weakMap = _core.WeakMap;
 
-var weakMap = createCommonjsModule(function (module) {
-module.exports = { "default": weakMap$1, __esModule: true };
+var weakMap$2 = createCommonjsModule(function (module) {
+module.exports = { "default": weakMap, __esModule: true };
 });
 
-var _WeakMap = unwrapExports(weakMap);
+var _WeakMap = unwrapExports(weakMap$2);
 
 // most Object methods by ES6 should accept primitives
 
@@ -2904,13 +2904,13 @@ _objectSap('getPrototypeOf', function(){
   };
 });
 
-var getPrototypeOf$1 = _core.Object.getPrototypeOf;
+var getPrototypeOf = _core.Object.getPrototypeOf;
 
-var getPrototypeOf = createCommonjsModule(function (module) {
-module.exports = { "default": getPrototypeOf$1, __esModule: true };
+var getPrototypeOf$2 = createCommonjsModule(function (module) {
+module.exports = { "default": getPrototypeOf, __esModule: true };
 });
 
-var _Object$getPrototypeOf = unwrapExports(getPrototypeOf);
+var _Object$getPrototypeOf = unwrapExports(getPrototypeOf$2);
 
 var classCallCheck = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
@@ -2928,22 +2928,22 @@ var _classCallCheck = unwrapExports(classCallCheck);
 _export(_export.S + _export.F * !_descriptors, 'Object', {defineProperty: _objectDp.f});
 
 var $Object = _core.Object;
-var defineProperty$3 = function defineProperty(it, key, desc){
+var defineProperty$1 = function defineProperty(it, key, desc){
   return $Object.defineProperty(it, key, desc);
 };
 
-var defineProperty$1 = createCommonjsModule(function (module) {
-module.exports = { "default": defineProperty$3, __esModule: true };
+var defineProperty$3 = createCommonjsModule(function (module) {
+module.exports = { "default": defineProperty$1, __esModule: true };
 });
 
-unwrapExports(defineProperty$1);
+unwrapExports(defineProperty$3);
 
 var createClass = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
 
-var _defineProperty2 = _interopRequireDefault(defineProperty$1);
+var _defineProperty2 = _interopRequireDefault(defineProperty$3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3017,38 +3017,38 @@ var _setProto = {
 
 _export(_export.S, 'Object', {setPrototypeOf: _setProto.set});
 
-var setPrototypeOf$2 = _core.Object.setPrototypeOf;
+var setPrototypeOf = _core.Object.setPrototypeOf;
 
-var setPrototypeOf = createCommonjsModule(function (module) {
-module.exports = { "default": setPrototypeOf$2, __esModule: true };
+var setPrototypeOf$2 = createCommonjsModule(function (module) {
+module.exports = { "default": setPrototypeOf, __esModule: true };
 });
 
-unwrapExports(setPrototypeOf);
+unwrapExports(setPrototypeOf$2);
 
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 _export(_export.S, 'Object', {create: _objectCreate});
 
 var $Object$1 = _core.Object;
-var create$2 = function create(P, D){
+var create = function create(P, D){
   return $Object$1.create(P, D);
 };
 
-var create = createCommonjsModule(function (module) {
-module.exports = { "default": create$2, __esModule: true };
+var create$2 = createCommonjsModule(function (module) {
+module.exports = { "default": create, __esModule: true };
 });
 
-unwrapExports(create);
+unwrapExports(create$2);
 
 var inherits = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
 
-var _setPrototypeOf2 = _interopRequireDefault(setPrototypeOf);
+var _setPrototypeOf2 = _interopRequireDefault(setPrototypeOf$2);
 
 
 
-var _create2 = _interopRequireDefault(create);
+var _create2 = _interopRequireDefault(create$2);
 
 
 
@@ -5308,13 +5308,13 @@ _objectSap('keys', function(){
   };
 });
 
-var keys$1 = _core.Object.keys;
+var keys = _core.Object.keys;
 
-var keys = createCommonjsModule(function (module) {
-module.exports = { "default": keys$1, __esModule: true };
+var keys$2 = createCommonjsModule(function (module) {
+module.exports = { "default": keys, __esModule: true };
 });
 
-var _Object$keys = unwrapExports(keys);
+var _Object$keys = unwrapExports(keys$2);
 
 var AbstractCommand = function (_EventEmitter) {
   _inherits(AbstractCommand, _EventEmitter);
@@ -5333,11 +5333,11 @@ var AbstractCommand = function (_EventEmitter) {
   function AbstractCommand(action, params) {
     _classCallCheck(this, AbstractCommand);
 
+    // if (new.target === AbstractCommand) {
+    //   throw new TypeError('Cannot construct AbstractCommand instance directly')
+    // }
     var _this = _possibleConstructorReturn(this, (AbstractCommand.__proto__ || _Object$getPrototypeOf(AbstractCommand)).call(this));
 
-    if (new.target === AbstractCommand) {
-      throw new TypeError('Cannot construct AbstractCommand instance directly');
-    }
     if (!action) throw new ReferenceError('Empty action string argument');
     if (typeof action !== 'string') throw new ReferenceError('Invalid action type');
     if (params !== false) {
@@ -5397,15 +5397,15 @@ var AbstractCommand = function (_EventEmitter) {
 }(EventEmitter);
 
 var $JSON$1 = _core.JSON || (_core.JSON = {stringify: JSON.stringify});
-var stringify$1 = function stringify(it){ // eslint-disable-line no-unused-vars
+var stringify = function stringify(it){ // eslint-disable-line no-unused-vars
   return $JSON$1.stringify.apply($JSON$1, arguments);
 };
 
-var stringify = createCommonjsModule(function (module) {
-module.exports = { "default": stringify$1, __esModule: true };
+var stringify$2 = createCommonjsModule(function (module) {
+module.exports = { "default": stringify, __esModule: true };
 });
 
-var _JSON$stringify = unwrapExports(stringify);
+var _JSON$stringify = unwrapExports(stringify$2);
 
 var core_getIterator = _core.getIterator = function(it){
   var iterFn = core_getIteratorMethod(it);
@@ -5413,13 +5413,13 @@ var core_getIterator = _core.getIterator = function(it){
   return _anObject(iterFn.call(it));
 };
 
-var getIterator$1 = core_getIterator;
+var getIterator = core_getIterator;
 
-var getIterator = createCommonjsModule(function (module) {
-module.exports = { "default": getIterator$1, __esModule: true };
+var getIterator$2 = createCommonjsModule(function (module) {
+module.exports = { "default": getIterator, __esModule: true };
 });
 
-var _getIterator = unwrapExports(getIterator);
+var _getIterator = unwrapExports(getIterator$2);
 
 var _createProperty = function(object, index, value){
   if(index in object)_objectDp.f(object, index, _propertyDesc(0, value));
@@ -5454,20 +5454,20 @@ _export(_export.S + _export.F * !_iterDetect(function(iter){  }), 'Array', {
   }
 });
 
-var from$2 = _core.Array.from;
+var from = _core.Array.from;
 
-var from = createCommonjsModule(function (module) {
-module.exports = { "default": from$2, __esModule: true };
+var from$2 = createCommonjsModule(function (module) {
+module.exports = { "default": from, __esModule: true };
 });
 
-unwrapExports(from);
+unwrapExports(from$2);
 
 var toConsumableArray = createCommonjsModule(function (module, exports) {
 exports.__esModule = true;
 
 
 
-var _from2 = _interopRequireDefault(from);
+var _from2 = _interopRequireDefault(from$2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5602,7 +5602,7 @@ var es6Promise = createCommonjsModule(function (module, exports) {
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   v4.2.2+97478eb6
+ * @version   v4.2.4+314e4831
  */
 
 (function (global, factory) {
@@ -5731,8 +5731,7 @@ function flush() {
 
 function attemptVertx() {
   try {
-    var r = commonjsRequire;
-    var vertx = r('vertx');
+    var vertx = Function('return this')().require('vertx');
     vertxNext = vertx.runOnLoop || vertx.runOnContext;
     return useVertxTimer();
   } catch (e) {
@@ -5822,7 +5821,7 @@ function resolve$1(object) {
   return promise;
 }
 
-var PROMISE_ID = Math.random().toString(36).substring(16);
+var PROMISE_ID = Math.random().toString(36).substring(2);
 
 function noop() {}
 
@@ -5830,7 +5829,7 @@ var PENDING = void 0;
 var FULFILLED = 1;
 var REJECTED = 2;
 
-var GET_THEN_ERROR = new ErrorObject();
+var TRY_CATCH_ERROR = { error: null };
 
 function selfFulfillment() {
   return new TypeError("You cannot resolve a promise with itself");
@@ -5844,8 +5843,8 @@ function getThen(promise) {
   try {
     return promise.then;
   } catch (error) {
-    GET_THEN_ERROR.error = error;
-    return GET_THEN_ERROR;
+    TRY_CATCH_ERROR.error = error;
+    return TRY_CATCH_ERROR;
   }
 }
 
@@ -5904,9 +5903,9 @@ function handleMaybeThenable(promise, maybeThenable, then$$1) {
   if (maybeThenable.constructor === promise.constructor && then$$1 === then && maybeThenable.constructor.resolve === resolve$1) {
     handleOwnThenable(promise, maybeThenable);
   } else {
-    if (then$$1 === GET_THEN_ERROR) {
-      reject(promise, GET_THEN_ERROR.error);
-      GET_THEN_ERROR.error = null;
+    if (then$$1 === TRY_CATCH_ERROR) {
+      reject(promise, TRY_CATCH_ERROR.error);
+      TRY_CATCH_ERROR.error = null;
     } else if (then$$1 === undefined) {
       fulfill(promise, maybeThenable);
     } else if (isFunction(then$$1)) {
@@ -6000,12 +5999,6 @@ function publish(promise) {
   promise._subscribers.length = 0;
 }
 
-function ErrorObject() {
-  this.error = null;
-}
-
-var TRY_CATCH_ERROR = new ErrorObject();
-
 function tryCatch(callback, detail) {
   try {
     return callback(detail);
@@ -6077,10 +6070,6 @@ function makePromise(promise) {
   promise._state = undefined;
   promise._result = undefined;
   promise._subscribers = [];
-}
-
-function validationError() {
-  return new Error('Array Methods must be provided an Array');
 }
 
 function validationError() {
@@ -6740,36 +6729,36 @@ Promise$1._asap = asap;
 
 /*global self*/
 function polyfill() {
-    var local = void 0;
+  var local = void 0;
 
-    if (typeof commonjsGlobal !== 'undefined') {
-        local = commonjsGlobal;
-    } else if (typeof self !== 'undefined') {
-        local = self;
-    } else {
-        try {
-            local = Function('return this')();
-        } catch (e) {
-            throw new Error('polyfill failed because global object is unavailable in this environment');
-        }
+  if (typeof commonjsGlobal !== 'undefined') {
+    local = commonjsGlobal;
+  } else if (typeof self !== 'undefined') {
+    local = self;
+  } else {
+    try {
+      local = Function('return this')();
+    } catch (e) {
+      throw new Error('polyfill failed because global object is unavailable in this environment');
+    }
+  }
+
+  var P = local.Promise;
+
+  if (P) {
+    var promiseToString = null;
+    try {
+      promiseToString = Object.prototype.toString.call(P.resolve());
+    } catch (e) {
+      // silently ignored
     }
 
-    var P = local.Promise;
-
-    if (P) {
-        var promiseToString = null;
-        try {
-            promiseToString = Object.prototype.toString.call(P.resolve());
-        } catch (e) {
-            // silently ignored
-        }
-
-        if (promiseToString === '[object Promise]' && !P.cast) {
-            return;
-        }
+    if (promiseToString === '[object Promise]' && !P.cast) {
+      return;
     }
+  }
 
-    local.Promise = Promise$1;
+  local.Promise = Promise$1;
 }
 
 // Strange compat..
@@ -7246,7 +7235,7 @@ exports.__esModule = true;
 
 
 
-var _defineProperty2 = _interopRequireDefault(defineProperty$1);
+var _defineProperty2 = _interopRequireDefault(defineProperty$3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7384,7 +7373,7 @@ var argument = (_EMAIL_LEAKS$SCAN$HAS = {}, _defineProperty$1(_EMAIL_LEAKS$SCAN$
  * Response error
  * @class
  */
-var ResponseError$1 = function (_Error) {
+var ResponseError = function (_Error) {
   _inherits(ResponseError, _Error);
 
   /**
@@ -7415,7 +7404,7 @@ var ResponseError$1 = function (_Error) {
  */
 
 
-var NotFoundError$1 = function (_ResponseError) {
+var NotFoundError = function (_ResponseError) {
   _inherits(NotFoundError, _ResponseError);
 
   /**
@@ -7436,7 +7425,7 @@ var NotFoundError$1 = function (_ResponseError) {
   }
 
   return NotFoundError;
-}(ResponseError$1);
+}(ResponseError);
 
 /**
  * Error for insufficient funds
@@ -7444,7 +7433,7 @@ var NotFoundError$1 = function (_ResponseError) {
  */
 
 
-var InsufficientFundsError$1 = function (_Error2) {
+var InsufficientFundsError = function (_Error2) {
   _inherits(InsufficientFundsError, _Error2);
 
   /**
@@ -7552,11 +7541,11 @@ var specification = (_specification = {}, _defineProperty$1(_specification, STAT
 es6Promise.polyfill();
 
 var _require = require('fetch-ponyfill')();
-var fetch$1 = _require.fetch;
+var fetch = _require.fetch;
 
-var InsufficientFundsError = InsufficientFundsError$1;
-var ResponseError = ResponseError$1;
-var NotFoundError = NotFoundError$1;
+var InsufficientFundsError$1 = InsufficientFundsError;
+var ResponseError$1 = ResponseError;
+var NotFoundError$1 = NotFoundError;
 
 
 var validator = {
@@ -7995,7 +7984,7 @@ var FetchCommand = function (_AbstractCommand) {
                   break;
                 }
 
-                throw new InsufficientFundsError(content.error, this._map.get(this).balance_reset);
+                throw new InsufficientFundsError$1(content.error, this._map.get(this).balance_reset);
 
               case 62:
                 if (!(status === 404 && options.throwNotFound === true)) {
@@ -8003,7 +7992,7 @@ var FetchCommand = function (_AbstractCommand) {
                   break;
                 }
 
-                throw new NotFoundError(content.error, response);
+                throw new NotFoundError$1(content.error, response);
 
               case 66:
                 if (!((status === 404 || status === 200) && !options.throwNotFound)) {
@@ -8016,14 +8005,14 @@ var FetchCommand = function (_AbstractCommand) {
                 break;
 
               case 70:
-                throw new ResponseError(content.error, response);
+                throw new ResponseError$1(content.error, response);
 
               case 71:
                 _context2.next = 74;
                 break;
 
               case 73:
-                throw new ResponseError('Response is empty!');
+                throw new ResponseError$1('Response is empty!');
 
               case 74:
                 this.emit(RESPONSE, fetchResponse, this);
@@ -8239,7 +8228,7 @@ var FetchCommand = function (_AbstractCommand) {
   }, {
     key: 'url',
     get: function get() {
-      var parts = [FetchCommand.apiUrl, 'api', this.version, this.method];
+      var parts = [FetchCommand.apiUrl, this.version, this.method];
       var args = this.args;
       var url = '';
       parts.forEach(function (part) {
@@ -8333,7 +8322,7 @@ var FetchCommand = function (_AbstractCommand) {
                 throw new ReferenceError('Empty url');
 
               case 2:
-                if (!fetchFunc) fetchFunc = fetch$1;
+                if (!fetchFunc) fetchFunc = fetch;
                 _context3.prev = 3;
                 headers = params.headers, body = params.body, method = params.method, formatting = params.formatting;
 
@@ -8342,7 +8331,7 @@ var FetchCommand = function (_AbstractCommand) {
                     'Content-Type': 'application/json'
                   };
                   {
-                    headers['User-Agent'] = os.type() + '_' + process$3.arch + ' Node ' + process$3.version + ' - TempicoLabs SDK v' + TmLabs$1.version;
+                    headers['User-Agent'] = os.type() + '_' + process$3.arch + ' Node ' + process$3.version + ' - TempicoLabs SDK v' + TmLabs.version;
                   }
                   if (formatting) {
                     headers['X-Requested-With'] = 'XMLHttpRequest';
@@ -8399,12 +8388,12 @@ var FetchCommand = function (_AbstractCommand) {
   }, {
     key: 'apiUrl',
     get: function get() {
-      return 'https://tempicolabs.com';
+      return 'https://api.itsecurity.ee';
     }
   }, {
     key: 'fetchClass',
     get: function get() {
-      return fetch$1;
+      return fetch;
     }
   }]);
 
@@ -8416,13 +8405,13 @@ var FetchCommand = function (_AbstractCommand) {
 
 _export(_export.S + _export.F, 'Object', {assign: _objectAssign});
 
-var assign$1 = _core.Object.assign;
+var assign = _core.Object.assign;
 
-var assign = createCommonjsModule(function (module) {
-module.exports = { "default": assign$1, __esModule: true };
+var assign$2 = createCommonjsModule(function (module) {
+module.exports = { "default": assign, __esModule: true };
 });
 
-var _Object$assign = unwrapExports(assign);
+var _Object$assign = unwrapExports(assign$2);
 
 var StatusCommand = function (_FetchCommand) {
   _inherits(StatusCommand, _FetchCommand);
@@ -8505,7 +8494,7 @@ exports.__esModule = true;
 
 
 
-var _assign2 = _interopRequireDefault(assign);
+var _assign2 = _interopRequireDefault(assign$2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9179,7 +9168,7 @@ var Account = function (_EventEmitter) {
   return Account;
 }(EventEmitter);
 
-var TmLabs$1 = function (_EventEmitter) {
+var TmLabs = function (_EventEmitter) {
   _inherits(TmLabs, _EventEmitter);
 
   /**
@@ -9665,7 +9654,7 @@ var _this = undefined;
  * @member module:TmLabs.fetch
  * @returns {Promise}
  */
-var fetch = function () {
+var fetch$1 = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(method, params) {
     var command, answer;
     return regenerator.wrap(function _callee$(_context) {
@@ -9735,6 +9724,6 @@ var hash = function () {
   };
 }();
 
-export { TmLabs$1 as TmLabs, Command, Account, fetch, hash, FetchCommand, StatusCommand, HashCommand };
-export default TmLabs$1;
+export default TmLabs;
+export { TmLabs, Command, Account, fetch$1 as fetch, hash, FetchCommand, StatusCommand, HashCommand };
 //# sourceMappingURL=tmlabs.es.js.map

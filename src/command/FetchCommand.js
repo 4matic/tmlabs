@@ -85,7 +85,7 @@ class FetchCommand extends AbstractCommand {
    * @returns {String}
    */
   static get apiUrl () {
-    return 'https://tempicolabs.com'
+    return 'https://api.itsecurity.ee'
   }
 
   /**
@@ -519,7 +519,7 @@ class FetchCommand extends AbstractCommand {
    * @member FetchCommand#url
    */
   get url () {
-    const parts = [FetchCommand.apiUrl, 'api', this.version, this.method]
+    const parts = [FetchCommand.apiUrl, this.version, this.method]
     const args = this.args
     let url = ''
     parts.forEach((part) => {

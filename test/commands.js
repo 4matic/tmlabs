@@ -21,7 +21,7 @@ chai.use(chaiString)
 
 const execFile = ChildProcess.execFile
 
-const baseUrl = 'https://tempicolabs.com/api/v3'
+const baseUrl = 'https://api.itsecurity.ee/v3'
 const testIP = '173.194.222.139'
 
 const getFileRealHash = (filepath) => {

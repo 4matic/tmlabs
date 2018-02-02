@@ -4,7 +4,7 @@
 * Updated all dependencies to the latest versions
 * Fixing for node v4 support
 * Fixing for using with webpack
-* Docs updated
+* Docs, README & LICENCE updates
 
 3.3.0
 * Bundle size decrease using [size-limit](https://www.npmjs.com/package/size-limit)

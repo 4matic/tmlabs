@@ -1,6 +1,6 @@
 <div align="center">
   <br>
-  <a href="https://tempicolabs.com"><img src="https://www.tempicolabs.com/img/logo_tl_H_black.png" alt="TempicoLabs" width="400"></a>
+  <a href="https://itsecurity.ee"><img src="https://itsecurity.ee/img/logo_tl_H_black.png" alt="TempicoLabs" width="400"></a>
   <br>
   <h1>Tempico Labs SDK</h1>
 </div>
@@ -18,7 +18,7 @@
   <a href="https://github.com/TempicoLabs/tmlabs/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/TempicoLabs/tmlabs.svg" alt="Github Licence">
   </a>
-  <a href="https://docs.tempicolabs.com/">
+  <a href="https://docs.itsecurity.ee/">
     <img src="https://img.shields.io/badge/docs-postman-orange.svg" alt="Postman Documentation">
   </a>
   <a href="https://runkit.com/4matic/get-started-with-tmlabs">
@@ -30,7 +30,7 @@
 </p>
 <br>
 
-**TmLabs** is a SDK for [TempicoLabs API](https://www.tempicolabs.com/index.t3m#api-description) using in **node.js** and the **browser**.
+**TmLabs** is a SDK for [TempicoLabs API](https://itsecurity.ee/index.t3m#api-description) using in **node.js** and the **browser**.
 It is written in clean ES6 Javascript. 
 
 ### Install
@@ -63,7 +63,7 @@ bower install tmlabs --save
 
 **[Read SDK Documentation](docs/api.md).**
 
-**[Read the full API Documentation](https://docs.tempicolabs.com/).**
+**[Read the full API Documentation](https://docs.itsecurity.ee/).**
 
 ### Usage
 
@@ -153,4 +153,4 @@ For example in ES6:
 
 ### License
 
-MIT. Copyright (c) [Maxim Maximov](http://4matikku.com) and [TempicoLabs, LLC](https://tempicolabs.com).
+MIT. Copyright (c) [Maxim Maximov](http://4matikku.com) and [TempicoLabs, LLC](https://itsecurity.ee).

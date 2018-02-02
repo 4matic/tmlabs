@@ -34,7 +34,7 @@
     "reconnaissance",
     "pentest tool"
   ],
-  "homepage": "https://tempicolabs.com/",
+  "homepage": "https://itsecurity.ee",
   "ignore": [
     "**/.*",
     "node_modules",

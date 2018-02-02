@@ -21,7 +21,7 @@ chai.use(chaiString)
 
 const execFile = ChildProcess.execFile
 
-const baseUrl = 'https://api.itsecurity.ee/v3'
+const baseUrl = 'https://api.itsecurity.ee'
 const testIP = '173.194.222.139'
 
 const getFileRealHash = (filepath) => {
@@ -227,13 +227,14 @@ describe('Commands Tests', () => {
             })
             assert.equal(command.status, 200, 'code 200')
             assert.equal(command.error, false, 'error=true')
-            assert.startsWith(command.url, `https://tempicolabs.com/api/email/leaks/${email}`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/email/leaks/${email}`, 'correct url')
             assert.deepEqual(command.args, [{
               'arg': 'email',
               'val': email
             }], 'arguments')
             assert.equal(command.statusText, 'OK')
-            assert.hasAllKeys(command.content, ['last_modified', 'payload'])
+            // console.log('command.content', command.content)
+            assert.hasAllKeys(command.content, ['last_modified', 'payload', 'source'])
           })
         })
         describe('method ip', () => {
@@ -255,7 +256,7 @@ describe('Commands Tests', () => {
               'arg': 'ip',
               'val': '127.0.0.1'
             }], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/ip/127.0.0.1/`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/v3/ip/127.0.0.1/`, 'correct url')
             assert.equal(command.statusText, 'BAD REQUEST')
             // assert.equal(command.errorText, 'Incorrect IPv4 address', 'incorrect ipv4 address')
           })
@@ -272,7 +273,7 @@ describe('Commands Tests', () => {
               'arg': 'ipaddr',
               'val': testIP
             }], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/ip/${testIP}/`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/v3/ip/${testIP}/`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.equal(command.errorText, undefined)
             assert.equal(command.content.isp, 'Google')
@@ -310,7 +311,7 @@ describe('Commands Tests', () => {
               arg: 'mode',
               val: 'blacklist'
             }], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/ip/${testIP}/blacklist/`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/v3/ip/${testIP}/blacklist/`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.equal(command.content.blacklisted, false)
           })
@@ -331,7 +332,7 @@ describe('Commands Tests', () => {
               arg: 'domain',
               val: 'google.com'
             }], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/dns/google.com`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/v3/dns/google.com`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.hasAllKeys(command.content, ['ipv4', 'ipv6'])
             assert.isAtLeast(command.content.ipv4.length, 1)
@@ -354,7 +355,7 @@ describe('Commands Tests', () => {
               arg: 'hash',
               val: hash
             }], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/hash/${hash}`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/v3/hash/${hash}`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.equal(command.content.error, 'No results found')
             // assert.hasAllKeys(command.content, ['mtime', 'mtime-human', 'sha256', 'status'])
@@ -410,7 +411,7 @@ describe('Commands Tests', () => {
               //   arg: 'ipaddr',
               //   val: scanIP
               // }], 'arguments')
-              // assert.startsWith(command.url, `${baseUrl}/scan/tcp/${scanIP}`, 'correct url')
+              // assert.startsWith(command.url, `${baseUrl}/v3/scan/tcp/${scanIP}`, 'correct url')
               // assert.equal(command.statusText, 'OK')
               // assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor', 'osmatch', 'portused'])
             })
@@ -436,7 +437,7 @@ describe('Commands Tests', () => {
                 arg: 'portmin',
                 val: portmin
               }], 'arguments')
-              assert.startsWith(command.url, `${baseUrl}/scan/tcp/${scanIP}/${portmin}/`, 'correct url')
+              assert.startsWith(command.url, `${baseUrl}/v3/scan/tcp/${scanIP}/${portmin}/`, 'correct url')
               assert.equal(command.statusText, 'OK')
               assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor', 'osmatch', 'portused'])
             })
@@ -467,7 +468,7 @@ describe('Commands Tests', () => {
                 arg: 'portmax',
                 val: portmax
               }], 'arguments')
-              assert.startsWith(command.url, `${baseUrl}/scan/tcp/${scanIP}/${portmin}/${portmax}`, 'correct url')
+              assert.startsWith(command.url, `${baseUrl}/v3/scan/tcp/${scanIP}/${portmin}/${portmax}`, 'correct url')
               assert.equal(command.statusText, 'OK')
               assert.containsAllKeys(command.content, ['addresses', 'hostnames', 'status', 'tcp', 'vendor', 'osmatch', 'portused'])
             })
@@ -482,7 +483,7 @@ describe('Commands Tests', () => {
             assert.equal(command.status, 200)
             assert.equal(command.error, false, 'error=true')
             assert.deepEqual(command.args, [], 'arguments')
-            assert.startsWith(command.url, `${baseUrl}/me`, 'correct url')
+            assert.startsWith(command.url, `${baseUrl}/v3/me`, 'correct url')
             assert.equal(command.statusText, 'OK')
             assert.containsAllKeys(command.content, ['as_name', 'ports', 'device', 'browser', 'blacklisted', 'touchscreen'])
             assert.equal(command.content.browser, 'Other')
@@ -503,7 +504,7 @@ describe('Commands Tests', () => {
           assert.equal(command.status, 200)
           assert.equal(command.error, false, 'error=true')
           assert.deepEqual(command.args, [], 'arguments')
-          assert.startsWith(command.url, `${baseUrl}/me`, 'correct url')
+          assert.startsWith(command.url, `${baseUrl}/v3/me`, 'correct url')
           assert.equal(command.statusText, 'OK')
           assert.containsAllKeys(command.content, ['location', 'os', 'as_name', 'ports', 'device', 'browser', 'blacklisted', 'touchscreen'])
           assert.equal(command.content.browser, 'Chrome 58.0.3029')
@@ -523,7 +524,7 @@ describe('Commands Tests', () => {
             arg: 'mode',
             val: 'blacklist'
           }], 'arguments')
-          assert.startsWith(command.url, `${baseUrl}/me/blacklist`, 'correct url')
+          assert.startsWith(command.url, `${baseUrl}/v3/me/blacklist`, 'correct url')
           assert.equal(command.statusText, 'NOT FOUND')
           assert.containsAllKeys(command.content, ['blacklisted'])
         })
@@ -588,7 +589,7 @@ describe('Commands Tests', () => {
         'arg': 'ipaddr',
         'val': testIP
       }], 'arguments')
-      assert.startsWith(command.url, `${baseUrl}/ip/${testIP}/`, 'correct url')
+      assert.startsWith(command.url, `${baseUrl}/v3/ip/${testIP}/`, 'correct url')
       assert.equal(command.statusText, 'OK')
       assert.equal(command.errorText, undefined)
       assert.equal(command.content.isp, 'Google')
@@ -701,7 +702,7 @@ describe('Commands Tests', () => {
       await command.run()
       assert.equal(command.status, 200, 'code 200')
       assert.equal(command.error, false, 'error=false')
-      assert.startsWith(command.url, 'https://tempicolabs.com/api/account/status', 'correct url')
+      assert.startsWith(command.url, `${baseUrl}/account/status`, 'correct url')
       assert.equal(command.statusText, 'OK')
       assert.equal(command.errorText, undefined)
       assert.hasAllKeys(command.content, [
